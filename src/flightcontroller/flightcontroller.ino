@@ -1,59 +1,73 @@
 #include <PIDController.h>
 #include <Servo.h>
 
-int MIN_ESC_INPUT = 1000;
-int MAX_ESC_INPUT = 2000;
-
-int MOTOR_ONE_PIN = 10;
-int MOTOR_TWO_PIN = 9;
-int MOTOR_THREE_PIN = 11;
-int MOTOR_FOUR_PIN = 6;
+// *** DRONE LEVEL SETTINGS ***
 
 bool STABILIZE_MODE = true;
 
-int MIN_THROTTLE_STICK_POSITION = 0;  // Needs to be set.
-int MAX_THROTTLE_STICK_POSITION = 0;  // Needs to be set.
-int MIN_THROTTLE = 0;
-int MAX_THROTTLE = MIN_ESC_INPUT + 0.9 * (MAX_ESC_INPUT - MIN_ESC_INPUT);
+// *** MOTOR SETTINGS ***
 
-int MIN_ROLL_STICK_POSITION = 0;  // Needs to be set.
-int MAX_ROLL_STICK_POSITION = 0;  // Needs to be set.
+int MIN_ESC_INPUT = 1000;
+int MAX_ESC_INPUT = 2000;
+
+int MOTOR_ONE_ESC_PIN = 10;
+int MOTOR_TWO_ESC_PIN = 9;
+int MOTOR_THREE_ESC_PIN = 11;
+int MOTOR_FOUR_ESC_PIN = 6;
+
+// *** THROTTLE SETTINGS ***
+
+int MIN_THROTTLE_STICK_POSITION = 0;
+int MAX_THROTTLE_STICK_POSITION = 0;
+int MIN_THROTTLE = 0;
+float ALLOWABLE_THROTTLE_PORTION = 0.9
+
+// *** ROLL SETTINGS ***
+
+int MIN_ROLL_STICK_POSITION = 0;
+int MAX_ROLL_STICK_POSITION = 0;
 int MIN_ROLL_ANGLE_DEG = -60;
 int MAX_ROLL_ANGLE_DEG = 60;
 int MIN_ROLL_RATE_DEG_PER_SEC = -180;
 int MAX_ROLL_RATE_DEG_PER_SEC = 180;
 
-int ROLL_ANGLE_KP = 0;  // Needs to be set.
-int ROLL_ANGLE_KI = 0;  // Needs to be set.
-int ROLL_ANGLE_KD = 0;  // Needs to be set.
+float ROLL_ANGLE_KP = 1;
+float ROLL_ANGLE_KI = 0;
+float ROLL_ANGLE_KD = 0;
 
-int ROLL_RATE_KP = 0;  // Needs to be set.
-int ROLL_RATE_KI = 0;  // Needs to be set.
-int ROLL_RATE_KD = 0;  // Needs to be set.
+float ROLL_RATE_KP = 1;
+float ROLL_RATE_KI = 0;
+float ROLL_RATE_KD = 0;
 
-int MIN_PITCH_STICK_POSITION = 0;  // Needs to be set.
-int MAX_PITCH_STICK_POSITION = 0;  // Needs to be set.
+// *** PITCH SETTINGS ***
+
+int MIN_PITCH_STICK_POSITION = 0;
+int MAX_PITCH_STICK_POSITION = 0;
 int MIN_PITCH_ANGLE_DEG = -60;
 int MAX_PITCH_ANGLE_DEG = 60;
 int MIN_PITCH_RATE_DEG_PER_SEC = -180;
 int MAX_PITCH_RATE_DEG_PER_SEC = 180;
 
-int PITCH_ANGLE_KP = 0;  // Needs to be set.
-int PITCH_ANGLE_KI = 0;  // Needs to be set.
-int PITCH_ANGLE_KD = 0;  // Needs to be set.
+float PITCH_ANGLE_KP = 1;
+float PITCH_ANGLE_KI = 0;
+float PITCH_ANGLE_KD = 0;
 
-int PITCH_RATE_KP = 0;  // Needs to be set.
-int PITCH_RATE_KI = 0;  // Needs to be set.
-int PITCH_RATE_KD = 0;  // Needs to be set.
+float PITCH_RATE_KP = 1;
+float PITCH_RATE_KI = 0;
+float PITCH_RATE_KD = 0;
 
-int MIN_YAW_STICK_POSITION = 0;  // Needs to be set.
-int MAX_YAW_STICK_POSITION = 0;  // Needs to be set.
+// *** YAW SETTINGS ***
+
+int MIN_YAW_STICK_POSITION = 0;
+int MAX_YAW_STICK_POSITION = 0;
 int MIN_YAW_RATE_DEG_PER_SEC = -180;
 int MAX_YAW_RATE_DEG_PER_SEC = 180;
 
-int YAW_RATE_KP = 0;  // Needs to be set.
-int YAW_RATE_KI = 0;  // Needs to be set.
-int YAW_RATE_KD = 0;  // Needs to be set.
+float YAW_RATE_KP = 1;
+float YAW_RATE_KI = 0;
+float YAW_RATE_KD = 0;
+
+// *** END OF SETTINGS ***
 
 Servo motorOneEsc;
 Servo motorTwoEsc;
@@ -68,26 +82,10 @@ PIDController yawRateController;
 
 void setup() {
 
-  motorOneEsc.attach(
-    MOTOR_ONE_PIN,
-    MIN_ESC_INPUT,
-    MAX_ESC_INPUT
-  );
-  motorTwoEsc.attach(
-    MOTOR_TWO_PIN,
-    MIN_ESC_INPUT,
-    MAX_ESC_INPUT
-  );
-  motorThreeEsc.attach(
-    MOTOR_THREE_PIN,
-    MIN_ESC_INPUT,
-    MAX_ESC_INPUT
-  );
-  motorFourEsc.attach(
-    MOTOR_FOUR_PIN,
-    MIN_ESC_INPUT,
-    MAX_ESC_INPUT
-  );
+  initializeMotor(motorOneEsc, MOTOR_ONE_ESC_PIN);
+  initializeMotor(motorTwoEsc, MOTOR_TWO_ESC_PIN);
+  initializeMotor(motorThreeEsc, MOTOR_THREE_ESC_PIN);
+  initializeMotor(motorFourEsc, MOTOR_FOUR_ESC_PIN);
 
   if (STABILIZE_MODE) {
     initializePidController(
@@ -154,7 +152,7 @@ void loop() {
     MIN_THROTTLE_STICK_POSITION,
     MAX_THROTTLE_STICK_POSITION,
     MIN_THROTTLE,
-    MAX_THROTTLE
+    MIN_ESC_INPUT + ALLOWABLE_THROTTLE_PORTION * (MAX_ESC_INPUT - MIN_ESC_INPUT);
   );
 
   float referenceRollRate;
@@ -268,6 +266,10 @@ void loop() {
   );
 }
 
+void initializeMotor(Servo motor, int pin) {
+  motor.attach(pin, MIN_ESC_INPUT, MAX_ESC_INPUT);
+}
+
 void initializePidController(
   PIDController pid,
   float kp,
@@ -321,7 +323,7 @@ float mixMotorInputs(
   float roll
 ) {
   bool isCcwMotor = (bow && !port) || (!bow && port);
-  
+
   float motorInput = throttle;
   motorInput = motorInput + (isCcwMotor) ? yaw : -yaw;
   motorInput = motorInput + (bow) ? pitch : -pitch;
