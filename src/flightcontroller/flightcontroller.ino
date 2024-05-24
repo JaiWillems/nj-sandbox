@@ -83,6 +83,7 @@ void setup() {
     MIN_ROLL_RATE_DEG_PER_SEC,
     MAX_ROLL_RATE_DEG_PER_SEC
   );
+  rollRateController.minimize(1);
 
   pitchRateController.begin();
   pitchRateController.tune(
@@ -94,6 +95,7 @@ void setup() {
     MIN_PITCH_RATE_DEG_PER_SEC,
     MAX_PITCH_RATE_DEG_PER_SEC
   );
+  pitchRateController.minimize(1);
 
   yawRateController.begin();
   yawRateController.tune(
@@ -105,6 +107,7 @@ void setup() {
     MIN_YAW_RATE_DEG_PER_SEC,
     MAX_YAW_RATE_DEG_PER_SEC
   );
+  yawRateController.minimize(1);
 }
 
 void loop() {
