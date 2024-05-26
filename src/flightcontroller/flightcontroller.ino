@@ -1,5 +1,7 @@
 #include <PIDController.h>
 #include <Servo.h>
+#include <I2Cdev.h>
+#include <MPU6050_6Axis_MotionApps20.h>
 
 // *** DRONE LEVEL SETTINGS ***
 
@@ -9,6 +11,8 @@ bool STABILIZE_MODE = true;
 
 int MIN_ESC_INPUT = 1000;
 int MAX_ESC_INPUT = 2000;
+int MIN_ESC_INPUT_FROM_PID = -50;
+int MAX_ESC_INPUT_FROM_PID = 50;
 
 int MOTOR_ONE_ESC_PIN = 10;
 int MOTOR_TWO_ESC_PIN = 9;
@@ -18,56 +22,67 @@ int MOTOR_FOUR_ESC_PIN = 6;
 // *** THROTTLE SETTINGS ***
 
 int MIN_THROTTLE_STICK_POSITION = 0;
-int MAX_THROTTLE_STICK_POSITION = 0;
-int MIN_THROTTLE = 0;
-float ALLOWABLE_THROTTLE_PORTION = 0.9
+int MAX_THROTTLE_STICK_POSITION = 1023;
+int MIN_THROTTLE = MIN_ESC_INPUT;
+int MAX_THROTTLE = MIN_ESC_INPUT + 0.85 * (MAX_ESC_INPUT - MIN_ESC_INPUT);
 
 // *** ROLL SETTINGS ***
 
 int MIN_ROLL_STICK_POSITION = 0;
-int MAX_ROLL_STICK_POSITION = 0;
+int MAX_ROLL_STICK_POSITION = 1023;
 int MIN_ROLL_ANGLE_DEG = -60;
 int MAX_ROLL_ANGLE_DEG = 60;
 int MIN_ROLL_RATE_DEG_PER_SEC = -180;
 int MAX_ROLL_RATE_DEG_PER_SEC = 180;
 
-float ROLL_ANGLE_KP = 1;
-float ROLL_ANGLE_KI = 0;
-float ROLL_ANGLE_KD = 0;
-
-float ROLL_RATE_KP = 1;
-float ROLL_RATE_KI = 0;
-float ROLL_RATE_KD = 0;
-
 // *** PITCH SETTINGS ***
 
 int MIN_PITCH_STICK_POSITION = 0;
-int MAX_PITCH_STICK_POSITION = 0;
+int MAX_PITCH_STICK_POSITION = 1023;
 int MIN_PITCH_ANGLE_DEG = -60;
 int MAX_PITCH_ANGLE_DEG = 60;
 int MIN_PITCH_RATE_DEG_PER_SEC = -180;
 int MAX_PITCH_RATE_DEG_PER_SEC = 180;
 
-float PITCH_ANGLE_KP = 1;
-float PITCH_ANGLE_KI = 0;
-float PITCH_ANGLE_KD = 0;
-
-float PITCH_RATE_KP = 1;
-float PITCH_RATE_KI = 0;
-float PITCH_RATE_KD = 0;
-
 // *** YAW SETTINGS ***
 
 int MIN_YAW_STICK_POSITION = 0;
-int MAX_YAW_STICK_POSITION = 0;
+int MAX_YAW_STICK_POSITION = 1023;
 int MIN_YAW_RATE_DEG_PER_SEC = -180;
 int MAX_YAW_RATE_DEG_PER_SEC = 180;
 
-float YAW_RATE_KP = 1;
-float YAW_RATE_KI = 0;
-float YAW_RATE_KD = 0;
+// *** PID SETTINGS ***
+
+int PID_FREQUENCY_HZ = 100;
+
+float ROLL_ANGLE_KP = 1.0;
+float ROLL_ANGLE_KI = 0.0;
+float ROLL_ANGLE_KD = 0.0;
+
+float PITCH_ANGLE_KP = 1.0;
+float PITCH_ANGLE_KI = 0.0;
+float PITCH_ANGLE_KD = 0.0;
+
+float ROLL_RATE_KP = 1.0;
+float ROLL_RATE_KI = 0.0;
+float ROLL_RATE_KD = 0.0;
+
+float PITCH_RATE_KP = 1.0;
+float PITCH_RATE_KI = 0.0;
+float PITCH_RATE_KD = 0.0;
+
+float YAW_RATE_KP = 1.0;
+float YAW_RATE_KI = 0.0;
+float YAW_RATE_KD = 0.0;
 
 // *** END OF SETTINGS ***
+
+MPU6050 imu;
+float measuredRollAngle;
+float measuredPitchAngle;
+int16_t measuredRollRate;
+int16_t measuredPitchRate;
+int16_t measuredYawRate;
 
 Servo motorOneEsc;
 Servo motorTwoEsc;
@@ -82,14 +97,38 @@ PIDController yawRateController;
 
 void setup() {
 
-  initializeMotor(motorOneEsc, MOTOR_ONE_ESC_PIN);
-  initializeMotor(motorTwoEsc, MOTOR_TWO_ESC_PIN);
-  initializeMotor(motorThreeEsc, MOTOR_THREE_ESC_PIN);
-  initializeMotor(motorFourEsc, MOTOR_FOUR_ESC_PIN);
+  imu.initialize();
+
+  if (imu.dmpInitialize() == 0) {
+      imu.CalibrateAccel(6);
+      imu.CalibrateGyro(6);
+      imu.setDMPEnabled(true);
+  }
+  else {
+    // TODO: Send signal to user of DMP
+    // (Digital Motion Processing) initialization failure.
+  }
+
+  initializeMotor(
+    &motorOneEsc,
+    MOTOR_ONE_ESC_PIN
+  );
+  initializeMotor(
+    &motorTwoEsc,
+    MOTOR_TWO_ESC_PIN
+  );
+  initializeMotor(
+    &motorThreeEsc,
+    MOTOR_THREE_ESC_PIN
+  );
+  initializeMotor(
+    &motorFourEsc,
+    MOTOR_FOUR_ESC_PIN
+  );
 
   if (STABILIZE_MODE) {
     initializePidController(
-      rollAngleController,
+      &rollAngleController,
       ROLL_ANGLE_KP,
       ROLL_ANGLE_KI,
       ROLL_ANGLE_KD,
@@ -97,7 +136,7 @@ void setup() {
       MAX_ROLL_RATE_DEG_PER_SEC
     );
     initializePidController(
-      pitchAngleController,
+      &pitchAngleController,
       PITCH_ANGLE_KP,
       PITCH_ANGLE_KI,
       PITCH_ANGLE_KD,
@@ -107,7 +146,7 @@ void setup() {
   }
 
   initializePidController(
-    rollRateController,
+    &rollRateController,
     ROLL_RATE_KP,
     ROLL_RATE_KI,
     ROLL_RATE_KD,
@@ -115,7 +154,7 @@ void setup() {
     MAX_ESC_INPUT
   );
   initializePidController(
-    pitchRateController,
+    &pitchRateController,
     PITCH_RATE_KP,
     PITCH_RATE_KI,
     PITCH_RATE_KD,
@@ -123,7 +162,7 @@ void setup() {
     MAX_ESC_INPUT
   );
   initializePidController(
-    yawRateController,
+    &yawRateController,
     YAW_RATE_KP,
     YAW_RATE_KI,
     YAW_RATE_KD,
@@ -135,24 +174,54 @@ void setup() {
 void loop() {
 
   // Set from CD&H inputs.
-  int throttleStickSetting = 0;
-  int rollStickSetting = 0;
-  int pitchStickSetting = 0;
-  int yawStickSetting = 0;
+  int throttleStickSetting = 512;
+  int rollStickSetting = 512;
+  int pitchStickSetting = 512;
+  int yawStickSetting = 512;
 
-  // Set from IMU reading.
-  int measuredRollAngle = 0;
-  int measuredPitchAngle = 0;
-  int measuredRollRate = 0;
-  int measuredPitchRate = 0;
-  int measuredYawRate = 0;
+  uint8_t fifoBuffer[64];
+  if (imu.dmpGetCurrentFIFOPacket(fifoBuffer)) {
+    // TODO: Handle dmpGetCurrentFIFOPacket function
+    // when it hangs.
+
+    Quaternion orientation;
+    VectorFloat gravity;
+    float ypr[3];
+
+    imu.getRotation(
+      &measuredRollRate,
+      &measuredPitchRate,
+      &measuredYawRate
+    );
+
+    // Negate pitch/yaw rates to get in the drone frame.
+    measuredPitchRate = -measuredPitchRate;
+    measuredYawRate = -measuredYawRate;
+
+    imu.dmpGetQuaternion(
+      &orientation,
+      fifoBuffer
+    );
+    imu.dmpGetGravity(
+      &gravity,
+      &orientation
+    );
+    imu.dmpGetYawPitchRoll(
+      ypr,
+      &orientation,
+      &gravity
+    );
+
+    measuredPitchAngle = ypr[1] * RAD_TO_DEG;
+    measuredRollAngle = ypr[2] * RAD_TO_DEG;
+  }
 
   int throttleContribution = map(
     throttleStickSetting,
     MIN_THROTTLE_STICK_POSITION,
     MAX_THROTTLE_STICK_POSITION,
     MIN_THROTTLE,
-    MIN_ESC_INPUT + ALLOWABLE_THROTTLE_PORTION * (MAX_ESC_INPUT - MIN_ESC_INPUT);
+    MAX_THROTTLE
   );
 
   float referenceRollRate;
@@ -165,7 +234,7 @@ void loop() {
       MAX_ROLL_ANGLE_DEG
     );
     referenceRollRate = computePidIteration(
-      rollAngleController,
+      &rollAngleController,
       referenceRollAngle,
       measuredRollAngle
     );
@@ -180,7 +249,7 @@ void loop() {
     );
   }
   float rollContribution = computePidIteration(
-    rollRateController,
+    &rollRateController,
     referenceRollRate,
     measuredRollRate
   );
@@ -195,7 +264,7 @@ void loop() {
       MAX_PITCH_ANGLE_DEG
     );
     referencePitchRate = computePidIteration(
-      pitchAngleController,
+      &pitchAngleController,
       referencePitchAngle,
       measuredPitchAngle
     );
@@ -210,7 +279,7 @@ void loop() {
     );
   }
   float pitchContribution = computePidIteration(
-    pitchRateController,
+    &pitchRateController,
     referencePitchRate,
     measuredPitchRate
   );
@@ -223,13 +292,13 @@ void loop() {
     MAX_YAW_RATE_DEG_PER_SEC
   );
   float yawContribution = computePidIteration(
-    yawRateController,
+    &yawRateController,
     referenceYawRate,
     measuredYawRate
   );
 
   writeToMotor(
-    motorOneEsc,
+    &motorOneEsc,
     true,
     false,
     throttleContribution,
@@ -238,7 +307,7 @@ void loop() {
     rollContribution
   );
   writeToMotor(
-    motorTwoEsc,
+    &motorTwoEsc,
     false,
     false,
     throttleContribution,
@@ -247,7 +316,7 @@ void loop() {
     rollContribution
   );
   writeToMotor(
-    motorThreeEsc,
+    &motorThreeEsc,
     false,
     true,
     throttleContribution,
@@ -256,7 +325,7 @@ void loop() {
     rollContribution
   );
   writeToMotor(
-    motorFourEsc,
+    &motorFourEsc,
     true,
     true,
     throttleContribution,
@@ -264,37 +333,39 @@ void loop() {
     pitchContribution,
     rollContribution
   );
+
+  delay(1000 / PID_FREQUENCY_HZ);
 }
 
-void initializeMotor(Servo motor, int pin) {
-  motor.attach(pin, MIN_ESC_INPUT, MAX_ESC_INPUT);
+void initializeMotor(Servo* motor, int pin) {
+  (*motor).attach(pin, MIN_ESC_INPUT, MAX_ESC_INPUT);
 }
 
 void initializePidController(
-  PIDController pid,
+  PIDController* pid,
   float kp,
   float ki,
   float kd,
   float minLimit,
   float maxLimit
 ) {
-  pid.begin();
-  pid.tune(kp, ki, kd);
-  pid.limit(minLimit, maxLimit);
-  pid.minimize(1);
+  (*pid).begin();
+  (*pid).tune(kp, ki, kd);
+  (*pid).limit(minLimit, maxLimit);
+  (*pid).minimize(1);
 }
 
 float computePidIteration(
-  PIDController pid,
+  PIDController* pid,
   float reference,
   float measured
 ) {
-  pid.setpoint(reference);
-  return pid.compute(measured);
+  (*pid).setpoint(reference);
+  return (*pid).compute(measured);
 }
 
 void writeToMotor(
-  Servo motorEsc,
+  Servo* motorEsc,
   bool bow,
   bool port,
   float throttle,
@@ -302,7 +373,7 @@ void writeToMotor(
   float pitch,
   float roll
 ) {
-  motorEsc.write(
+  (*motorEsc).write(
     mixMotorInputs(
       bow,
       port,
@@ -329,5 +400,25 @@ float mixMotorInputs(
   motorInput = motorInput + (bow) ? pitch : -pitch;
   motorInput = motorInput + (port) ? roll : -roll;
 
-  return motorInput;
+  return clampValue(
+    motorInput,
+    MIN_ESC_INPUT,
+    MAX_ESC_INPUT
+  );
+}
+
+float clampValue(
+  float value,
+  float minValue,
+  float maxValue
+) {
+  if (value < minValue) {
+    return minValue;
+  }
+  else if (value > maxValue) {
+    return maxValue;
+  }
+  else {
+    return value;
+  }
 }
