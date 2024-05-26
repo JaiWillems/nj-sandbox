@@ -3,6 +3,8 @@
 #include <RF24.h>
 #include <SoftwareSerial.h>
 
+const byte START_MARKER = 255;
+
 const int RX_pin = 9;
 const int TX_PIN = 10;
 
@@ -37,8 +39,10 @@ void loop() {
   if (radio.available()) {
     radio.read(&controlPacket, sizeof(controlPacket));
   }
-  
-  if (flightControllerComms.available()){
-    flightControllerComms.write((char*)&controlPacket); 
-  }
+  flightControllerComms.write(START_MARKER);
+  flightControllerComms.write(
+  (char*)&controlPacket,
+  sizeof(controlPacket)
+  );
+  delay (10);
 }
