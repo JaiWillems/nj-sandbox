@@ -396,9 +396,9 @@ float mixMotorInputs(
   bool isCcwMotor = (bow && !port) || (!bow && port);
 
   float motorInput = throttle;
-  motorInput = motorInput + (isCcwMotor) ? yaw : -yaw;
-  motorInput = motorInput + (bow) ? pitch : -pitch;
-  motorInput = motorInput + (port) ? roll : -roll;
+  motorInput = motorInput + ((isCcwMotor) ? yaw : -yaw);
+  motorInput = motorInput + ((bow) ? pitch : -pitch);
+  motorInput = motorInput + ((port) ? roll : -roll);
 
   return constrain(
     motorInput,
