@@ -400,25 +400,9 @@ float mixMotorInputs(
   motorInput = motorInput + (bow) ? pitch : -pitch;
   motorInput = motorInput + (port) ? roll : -roll;
 
-  return clampValue(
+  return constrain(
     motorInput,
     MIN_ESC_INPUT,
     MAX_ESC_INPUT
   );
-}
-
-float clampValue(
-  float value,
-  float minValue,
-  float maxValue
-) {
-  if (value < minValue) {
-    return minValue;
-  }
-  else if (value > maxValue) {
-    return maxValue;
-  }
-  else {
-    return value;
-  }
 }
