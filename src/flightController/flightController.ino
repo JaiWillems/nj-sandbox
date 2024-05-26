@@ -2,6 +2,7 @@
 #include <Servo.h>
 #include <I2Cdev.h>
 #include <MPU6050_6Axis_MotionApps20.h>
+#include <SoftwareSerial.h>
 
 // *** DRONE LEVEL SETTINGS ***
 
@@ -18,6 +19,12 @@ int MOTOR_ONE_ESC_PIN = 10;
 int MOTOR_TWO_ESC_PIN = 9;
 int MOTOR_THREE_ESC_PIN = 11;
 int MOTOR_FOUR_ESC_PIN = 6;
+
+// *** COMMS SETTINGS ***
+
+const int START_MARKER = 255;
+int RX_PIN = 3;
+int TX_PIN = 4;
 
 // *** THROTTLE SETTINGS ***
 
@@ -37,8 +44,8 @@ int MAX_ROLL_RATE_DEG_PER_SEC = 180;
 
 // *** PITCH SETTINGS ***
 
-int MIN_PITCH_STICK_POSITION = 0;
-int MAX_PITCH_STICK_POSITION = 1023;
+int MIN_PITCH_STICK_POSITION = 1023;
+int MAX_PITCH_STICK_POSITION = 0;
 int MIN_PITCH_ANGLE_DEG = -60;
 int MAX_PITCH_ANGLE_DEG = 60;
 int MIN_PITCH_RATE_DEG_PER_SEC = -180;
@@ -77,6 +84,22 @@ float YAW_RATE_KD = 0.0;
 
 // *** END OF SETTINGS ***
 
+struct ControlPacket {
+  int thrustInput;
+  int yawInput;
+  int pitchInput;
+  int rollInput;
+};
+
+ControlPacket controlPacket;
+
+SoftwareSerial cdhComms(RX_PIN, TX_PIN);
+
+int throttleStickSetting = 512;
+int rollStickSetting = 512;
+int pitchStickSetting = 512;
+int yawStickSetting = 512;
+
 MPU6050 imu;
 float measuredRollAngle;
 float measuredPitchAngle;
@@ -96,6 +119,8 @@ PIDController pitchRateController;
 PIDController yawRateController;
 
 void setup() {
+
+  cdhComms.begin(9600);
 
   imu.initialize();
 
@@ -173,11 +198,26 @@ void setup() {
 
 void loop() {
 
-  // Set from CD&H inputs.
-  int throttleStickSetting = 512;
-  int rollStickSetting = 512;
-  int pitchStickSetting = 512;
-  int yawStickSetting = 512;
+  byte* structStart = reinterpret_cast<byte*>(&controlPacket);
+  if (cdhComms.available() > sizeof(controlPacket) + 1) {
+    Serial.println("Comms Available...");
+    byte data = cdhComms.read();
+
+    if (data == START_MARKER) {
+      Serial.println("Start Marker Found...");
+      for (byte n = 0; n < sizeof(controlPacket); n++) {
+        *(structStart + n) = cdhComms.read();
+      }
+      while (cdhComms.available() > 0) {
+        byte dumpTheData = cdhComms.read();
+      }
+
+      throttleStickSetting = controlPacket.thrustInput;
+      rollStickSetting = controlPacket.rollInput;
+      pitchStickSetting = controlPacket.pitchInput;
+      yawStickSetting = controlPacket.yawInput;
+    }
+  }
 
   uint8_t fifoBuffer[64];
   if (imu.dmpGetCurrentFIFOPacket(fifoBuffer)) {
