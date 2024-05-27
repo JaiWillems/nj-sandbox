@@ -120,9 +120,18 @@ PIDController yawRateController;
 
 void setup() {
 
+  Serial.begin(9600);
   cdhComms.begin(9600);
 
+  Wire.begin();
   imu.initialize();
+
+  if (imu.testConnection()) {
+    Serial.print("IMU Connection Successful.");
+  }
+  else {
+    Serial.print("IMU Connection Failed...");
+  }
 
   if (imu.dmpInitialize() == 0) {
       imu.CalibrateAccel(6);
@@ -130,8 +139,7 @@ void setup() {
       imu.setDMPEnabled(true);
   }
   else {
-    // TODO: Send signal to user of DMP
-    // (Digital Motion Processing) initialization failure.
+    Serial.println("DMP Initialization Failure...");
   }
 
   initializeMotor(
@@ -175,24 +183,24 @@ void setup() {
     ROLL_RATE_KP,
     ROLL_RATE_KI,
     ROLL_RATE_KD,
-    MIN_ESC_INPUT,
-    MAX_ESC_INPUT
+    MIN_ESC_INPUT_FROM_PID,
+    MAX_ESC_INPUT_FROM_PID
   );
   initializePidController(
     &pitchRateController,
     PITCH_RATE_KP,
     PITCH_RATE_KI,
     PITCH_RATE_KD,
-    MIN_ESC_INPUT,
-    MAX_ESC_INPUT
+    MIN_ESC_INPUT_FROM_PID,
+    MAX_ESC_INPUT_FROM_PID
   );
   initializePidController(
     &yawRateController,
     YAW_RATE_KP,
     YAW_RATE_KI,
     YAW_RATE_KD,
-    MIN_ESC_INPUT,
-    MAX_ESC_INPUT
+    MIN_ESC_INPUT_FROM_PID,
+    MAX_ESC_INPUT_FROM_PID
   );
 }
 
@@ -200,11 +208,11 @@ void loop() {
 
   byte* structStart = reinterpret_cast<byte*>(&controlPacket);
   if (cdhComms.available() > sizeof(controlPacket) + 1) {
-    Serial.println("Comms Available...");
+
     byte data = cdhComms.read();
 
     if (data == START_MARKER) {
-      Serial.println("Start Marker Found...");
+
       for (byte n = 0; n < sizeof(controlPacket); n++) {
         *(structStart + n) = cdhComms.read();
       }
@@ -219,6 +227,16 @@ void loop() {
     }
   }
 
+  imu.getRotation(
+    &measuredRollRate,
+    &measuredPitchRate,
+    &measuredYawRate
+  );
+
+  // Negate pitch/yaw rates to get in the drone frame.
+  measuredPitchRate = -measuredPitchRate;
+  measuredYawRate = -measuredYawRate;
+
   uint8_t fifoBuffer[64];
   if (imu.dmpGetCurrentFIFOPacket(fifoBuffer)) {
     // TODO: Handle dmpGetCurrentFIFOPacket function
@@ -227,16 +245,6 @@ void loop() {
     Quaternion orientation;
     VectorFloat gravity;
     float ypr[3];
-
-    imu.getRotation(
-      &measuredRollRate,
-      &measuredPitchRate,
-      &measuredYawRate
-    );
-
-    // Negate pitch/yaw rates to get in the drone frame.
-    measuredPitchRate = -measuredPitchRate;
-    measuredYawRate = -measuredYawRate;
 
     imu.dmpGetQuaternion(
       &orientation,
@@ -439,7 +447,6 @@ float mixMotorInputs(
   motorInput = motorInput + ((isCcwMotor) ? yaw : -yaw);
   motorInput = motorInput + ((bow) ? pitch : -pitch);
   motorInput = motorInput + ((port) ? roll : -roll);
-
   return constrain(
     motorInput,
     MIN_ESC_INPUT,
