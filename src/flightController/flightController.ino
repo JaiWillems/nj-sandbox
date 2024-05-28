@@ -1,8 +1,9 @@
 #include <PIDController.h>
-#include <Servo.h>
 #include <I2Cdev.h>
 #include <MPU6050_6Axis_MotionApps20.h>
 #include <SoftwareSerial.h>
+
+#include "motor.h"
 
 // *** DRONE LEVEL SETTINGS ***
 
@@ -107,10 +108,34 @@ int16_t measuredRollRate;
 int16_t measuredPitchRate;
 int16_t measuredYawRate;
 
-Servo motorOneEsc;
-Servo motorTwoEsc;
-Servo motorThreeEsc;
-Servo motorFourEsc;
+Motor motorOne(
+  MOTOR_ONE_ESC_PIN,
+  MIN_ESC_INPUT,
+  MAX_ESC_INPUT,
+  true,
+  false
+);
+Motor motorTwo(
+  MOTOR_TWO_ESC_PIN,
+  MIN_ESC_INPUT,
+  MAX_ESC_INPUT,
+  false,
+  false
+);
+Motor motorThree(
+  MOTOR_THREE_ESC_PIN,
+  MIN_ESC_INPUT,
+  MAX_ESC_INPUT,
+  false,
+  true
+);
+Motor motorFour(
+  MOTOR_FOUR_ESC_PIN,
+  MIN_ESC_INPUT,
+  MAX_ESC_INPUT,
+  true,
+  true
+);
 
 PIDController rollAngleController;
 PIDController pitchAngleController;
@@ -141,23 +166,6 @@ void setup() {
   else {
     Serial.println("DMP Initialization Failure...");
   }
-
-  initializeMotor(
-    &motorOneEsc,
-    MOTOR_ONE_ESC_PIN
-  );
-  initializeMotor(
-    &motorTwoEsc,
-    MOTOR_TWO_ESC_PIN
-  );
-  initializeMotor(
-    &motorThreeEsc,
-    MOTOR_THREE_ESC_PIN
-  );
-  initializeMotor(
-    &motorFourEsc,
-    MOTOR_FOUR_ESC_PIN
-  );
 
   if (STABILIZE_MODE) {
     initializePidController(
@@ -345,37 +353,25 @@ void loop() {
     measuredYawRate
   );
 
-  writeToMotor(
-    &motorOneEsc,
-    true,
-    false,
+  motorOne.setSpeed(
     throttleContribution,
     yawContribution,
     pitchContribution,
     rollContribution
   );
-  writeToMotor(
-    &motorTwoEsc,
-    false,
-    false,
+  motorTwo.setSpeed(
     throttleContribution,
     yawContribution,
     pitchContribution,
     rollContribution
   );
-  writeToMotor(
-    &motorThreeEsc,
-    false,
-    true,
+  motorThree.setSpeed(
     throttleContribution,
     yawContribution,
     pitchContribution,
     rollContribution
   );
-  writeToMotor(
-    &motorFourEsc,
-    true,
-    true,
+  motorFour.setSpeed(
     throttleContribution,
     yawContribution,
     pitchContribution,
@@ -383,10 +379,6 @@ void loop() {
   );
 
   delay(1000 / PID_FREQUENCY_HZ);
-}
-
-void initializeMotor(Servo* motor, int pin) {
-  (*motor).attach(pin, MIN_ESC_INPUT, MAX_ESC_INPUT);
 }
 
 void initializePidController(
@@ -410,46 +402,4 @@ float computePidIteration(
 ) {
   (*pid).setpoint(reference);
   return (*pid).compute(measured);
-}
-
-void writeToMotor(
-  Servo* motorEsc,
-  bool bow,
-  bool port,
-  float throttle,
-  float yaw,
-  float pitch,
-  float roll
-) {
-  (*motorEsc).write(
-    mixMotorInputs(
-      bow,
-      port,
-      throttle,
-      yaw,
-      pitch,
-      roll
-    )
-  );
-}
-
-float mixMotorInputs(
-  bool bow,
-  bool port,
-  float throttle,
-  float yaw,
-  float pitch,
-  float roll
-) {
-  bool isCcwMotor = (bow && !port) || (!bow && port);
-
-  float motorInput = throttle;
-  motorInput = motorInput + ((isCcwMotor) ? yaw : -yaw);
-  motorInput = motorInput + ((bow) ? pitch : -pitch);
-  motorInput = motorInput + ((port) ? roll : -roll);
-  return constrain(
-    motorInput,
-    MIN_ESC_INPUT,
-    MAX_ESC_INPUT
-  );
 }
