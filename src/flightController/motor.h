@@ -6,27 +6,13 @@ class Motor {
     void attach(
       int pin,
       int minInput,
-      int maxInput,
-      bool bow,
-      bool port
+      int maxInput
     );
     void setSpeed(
-      float thrustContribution,
-      float yawContribution,
-      float pitchContribution,
-      float rollContribution
+      int input
     );
   private:
     Servo _motor;
     int _minInput;
     int _maxInput;
-    bool _bow;
-    bool _port;
-    float mixMotorInputs(
-      float throttle,
-      float yaw,
-      float pitch,
-      float roll
-    );
-    bool isMotorCcw();
 };

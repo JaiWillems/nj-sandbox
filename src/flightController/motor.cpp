@@ -5,9 +5,7 @@
 void Motor::attach(
   int pin,
   int minInput,
-  int maxInput,
-  bool bow,
-  bool port
+  int maxInput
 ) {
   _motor.attach(
     pin,
@@ -16,43 +14,16 @@ void Motor::attach(
   );
   _minInput = minInput;
   _maxInput = maxInput;
-  _bow = bow;
-  _port = port;
 }
 
 void Motor::setSpeed(
-  float thrustContribution,
-  float yawContribution,
-  float pitchContribution,
-  float rollContribution
+  int input
 ) {
-  float motorInput = mixMotorInputs(
-    thrustContribution,
-    yawContribution,
-    pitchContribution,
-    rollContribution
+  _motor.write(
+    constrain(
+      input,
+      _minInput,
+      _maxInput
+    )
   );
-  float validMotorInput = constrain(
-    motorInput,
-    _minInput,
-    _maxInput
-  );
-  _motor.write(validMotorInput);
-}
-
-float Motor::mixMotorInputs(
-  float throttle,
-  float yaw,
-  float pitch,
-  float roll
-) {
-  float motorInput = throttle;
-  motorInput = motorInput + (isMotorCcw() ? yaw : -yaw);
-  motorInput = motorInput + ((_bow) ? pitch : -pitch);
-  motorInput = motorInput + ((_port) ? roll : -roll);
-  return motorInput;
-}
-
-bool Motor::isMotorCcw() {
-  return (_bow && !_port) || (!_bow && _port);
 }

@@ -21,4 +21,18 @@ class Drone {
     Motor _motorTwo;
     Motor _motorThree;
     Motor _motorFour;
+    int _minMotorInput;
+    int _maxMotorInput;
+    int mixControlInputs(
+      bool bow,
+      bool port,
+      float throttleInput,
+      float yawInput,
+      float pitchInput,
+      float rollInput
+    );
+    bool isMotorCcw(
+      bool bow,
+      bool port
+    );
 };

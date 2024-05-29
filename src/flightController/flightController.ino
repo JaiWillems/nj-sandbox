@@ -1,9 +1,7 @@
-#include <I2Cdev.h>
 #include <SoftwareSerial.h>
-
 #include "Imu.h"
 #include "PidController.h"
-#include "Motor.h"
+#include "Drone.h"
 
 // *** DRONE LEVEL SETTINGS ***
 
@@ -109,10 +107,14 @@ int16_t measuredYawRate;
 int16_t measuredPitchRate;
 int16_t measuredRollRate;
 
-Motor motorOne;
-Motor motorTwo;
-Motor motorThree;
-Motor motorFour;
+Drone drone(
+  MOTOR_ONE_ESC_PIN,
+  MOTOR_TWO_ESC_PIN,
+  MOTOR_THREE_ESC_PIN,
+  MOTOR_FOUR_ESC_PIN,
+  MIN_ESC_INPUT,
+  MAX_ESC_INPUT
+);
 
 PidController rollAngleController(
   ROLL_ANGLE_KP,
@@ -170,35 +172,6 @@ void setup() {
     Serial.println("DMP Initialization Failure...");
   }
 
-  motorOne.attach(
-    MOTOR_ONE_ESC_PIN,
-    MIN_ESC_INPUT,
-    MAX_ESC_INPUT,
-    true,
-    false
-  );
-  motorTwo.attach(
-    MOTOR_TWO_ESC_PIN,
-    MIN_ESC_INPUT,
-    MAX_ESC_INPUT,
-    false,
-    false
-  );
-  motorThree.attach(
-    MOTOR_THREE_ESC_PIN,
-    MIN_ESC_INPUT,
-    MAX_ESC_INPUT,
-    false,
-    true
-  );
-  motorFour.attach(
-    MOTOR_FOUR_ESC_PIN,
-    MIN_ESC_INPUT,
-    MAX_ESC_INPUT,
-    true,
-    true
-  );
-
   if (STABILIZE_MODE) {
     rollAngleController.begin();
     pitchAngleController.begin();
@@ -250,7 +223,7 @@ void loop() {
     );
   }
 
-  int throttleContribution = map(
+  int throttleInput = map(
     throttleStickSetting,
     MIN_THROTTLE_STICK_POSITION,
     MAX_THROTTLE_STICK_POSITION,
@@ -281,7 +254,7 @@ void loop() {
       MAX_ROLL_RATE_DEG_PER_SEC
     );
   }
-  float rollContribution = rollRateController.compute(
+  float rollInput = rollRateController.compute(
     referenceRollRate,
     measuredRollRate
   );
@@ -309,7 +282,7 @@ void loop() {
       MAX_PITCH_RATE_DEG_PER_SEC
     );
   }
-  float pitchContribution = pitchRateController.compute(
+  float pitchInput = pitchRateController.compute(
     referencePitchRate,
     measuredPitchRate
   );
@@ -321,34 +294,16 @@ void loop() {
     MIN_YAW_RATE_DEG_PER_SEC,
     MAX_YAW_RATE_DEG_PER_SEC
   );
-  float yawContribution = yawRateController.compute(
+  float yawInput = yawRateController.compute(
     referenceYawRate,
     measuredYawRate
   );
 
-  motorOne.setSpeed(
-    throttleContribution,
-    yawContribution,
-    pitchContribution,
-    rollContribution
-  );
-  motorTwo.setSpeed(
-    throttleContribution,
-    yawContribution,
-    pitchContribution,
-    rollContribution
-  );
-  motorThree.setSpeed(
-    throttleContribution,
-    yawContribution,
-    pitchContribution,
-    rollContribution
-  );
-  motorFour.setSpeed(
-    throttleContribution,
-    yawContribution,
-    pitchContribution,
-    rollContribution
+  drone.sendControlInputs(
+    throttleInput,
+    yawInput,
+    pitchInput,
+    rollInput
   );
 
   delay(1000 / PID_FREQUENCY_HZ);
