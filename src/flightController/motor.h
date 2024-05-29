@@ -28,4 +28,5 @@ class Motor {
       float pitch,
       float roll
     );
+    bool isMotorCcw();
 };

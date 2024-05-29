@@ -46,11 +46,13 @@ float Motor::mixMotorInputs(
   float pitch,
   float roll
 ) {
-  bool isCcwMotor = (_bow && !_port) || (!_bow && _port);
-
   float motorInput = throttle;
-  motorInput = motorInput + ((isCcwMotor) ? yaw : -yaw);
+  motorInput = motorInput + (isMotorCcw() ? yaw : -yaw);
   motorInput = motorInput + ((_bow) ? pitch : -pitch);
   motorInput = motorInput + ((_port) ? roll : -roll);
   return motorInput;
+}
+
+bool Motor::isMotorCcw() {
+  return (_bow && !_port) || (!_bow && _port);
 }

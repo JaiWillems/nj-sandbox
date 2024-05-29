@@ -1,8 +1,8 @@
-#include <PIDController.h>
 #include <I2Cdev.h>
 #include <MPU6050_6Axis_MotionApps20.h>
 #include <SoftwareSerial.h>
 
+#include "PidController.h"
 #include "motor.h"
 
 // *** DRONE LEVEL SETTINGS ***
@@ -137,11 +137,41 @@ Motor motorFour(
   true
 );
 
-PIDController rollAngleController;
-PIDController pitchAngleController;
-PIDController rollRateController;
-PIDController pitchRateController;
-PIDController yawRateController;
+PidController rollAngleController(
+  ROLL_ANGLE_KP,
+  ROLL_ANGLE_KI,
+  ROLL_ANGLE_KD,
+  MIN_ROLL_RATE_DEG_PER_SEC,
+  MAX_ROLL_RATE_DEG_PER_SEC
+);
+PidController pitchAngleController(
+  PITCH_ANGLE_KP,
+  PITCH_ANGLE_KI,
+  PITCH_ANGLE_KD,
+  MIN_PITCH_RATE_DEG_PER_SEC,
+  MAX_PITCH_RATE_DEG_PER_SEC
+);
+PidController rollRateController(
+  ROLL_RATE_KP,
+  ROLL_RATE_KI,
+  ROLL_RATE_KD,
+  MIN_ESC_INPUT_FROM_PID,
+  MAX_ESC_INPUT_FROM_PID
+);
+PidController pitchRateController(
+  PITCH_RATE_KP,
+  PITCH_RATE_KI,
+  PITCH_RATE_KD,
+  MIN_ESC_INPUT_FROM_PID,
+  MAX_ESC_INPUT_FROM_PID
+);
+PidController yawRateController(
+  YAW_RATE_KP,
+  YAW_RATE_KI,
+  YAW_RATE_KD,
+  MIN_ESC_INPUT_FROM_PID,
+  MAX_ESC_INPUT_FROM_PID
+);
 
 void setup() {
 
@@ -168,48 +198,12 @@ void setup() {
   }
 
   if (STABILIZE_MODE) {
-    initializePidController(
-      &rollAngleController,
-      ROLL_ANGLE_KP,
-      ROLL_ANGLE_KI,
-      ROLL_ANGLE_KD,
-      MIN_ROLL_RATE_DEG_PER_SEC,
-      MAX_ROLL_RATE_DEG_PER_SEC
-    );
-    initializePidController(
-      &pitchAngleController,
-      PITCH_ANGLE_KP,
-      PITCH_ANGLE_KI,
-      PITCH_ANGLE_KD,
-      MIN_PITCH_RATE_DEG_PER_SEC,
-      MAX_PITCH_RATE_DEG_PER_SEC
-    );
+    rollAngleController.begin();
+    pitchAngleController.begin();
   }
-
-  initializePidController(
-    &rollRateController,
-    ROLL_RATE_KP,
-    ROLL_RATE_KI,
-    ROLL_RATE_KD,
-    MIN_ESC_INPUT_FROM_PID,
-    MAX_ESC_INPUT_FROM_PID
-  );
-  initializePidController(
-    &pitchRateController,
-    PITCH_RATE_KP,
-    PITCH_RATE_KI,
-    PITCH_RATE_KD,
-    MIN_ESC_INPUT_FROM_PID,
-    MAX_ESC_INPUT_FROM_PID
-  );
-  initializePidController(
-    &yawRateController,
-    YAW_RATE_KP,
-    YAW_RATE_KI,
-    YAW_RATE_KD,
-    MIN_ESC_INPUT_FROM_PID,
-    MAX_ESC_INPUT_FROM_PID
-  );
+  rollRateController.begin();
+  pitchRateController.begin();
+  yawRateController.begin();
 }
 
 void loop() {
@@ -289,8 +283,7 @@ void loop() {
       MIN_ROLL_ANGLE_DEG,
       MAX_ROLL_ANGLE_DEG
     );
-    referenceRollRate = computePidIteration(
-      &rollAngleController,
+    referenceRollRate = rollAngleController.compute(
       referenceRollAngle,
       measuredRollAngle
     );
@@ -304,8 +297,7 @@ void loop() {
       MAX_ROLL_RATE_DEG_PER_SEC
     );
   }
-  float rollContribution = computePidIteration(
-    &rollRateController,
+  float rollContribution = rollRateController.compute(
     referenceRollRate,
     measuredRollRate
   );
@@ -319,8 +311,7 @@ void loop() {
       MIN_PITCH_ANGLE_DEG,
       MAX_PITCH_ANGLE_DEG
     );
-    referencePitchRate = computePidIteration(
-      &pitchAngleController,
+    referencePitchRate = pitchAngleController.compute(
       referencePitchAngle,
       measuredPitchAngle
     );
@@ -334,8 +325,7 @@ void loop() {
       MAX_PITCH_RATE_DEG_PER_SEC
     );
   }
-  float pitchContribution = computePidIteration(
-    &pitchRateController,
+  float pitchContribution = pitchRateController.compute(
     referencePitchRate,
     measuredPitchRate
   );
@@ -347,8 +337,7 @@ void loop() {
     MIN_YAW_RATE_DEG_PER_SEC,
     MAX_YAW_RATE_DEG_PER_SEC
   );
-  float yawContribution = computePidIteration(
-    &yawRateController,
+  float yawContribution = yawRateController.compute(
     referenceYawRate,
     measuredYawRate
   );
@@ -379,27 +368,4 @@ void loop() {
   );
 
   delay(1000 / PID_FREQUENCY_HZ);
-}
-
-void initializePidController(
-  PIDController* pid,
-  float kp,
-  float ki,
-  float kd,
-  float minLimit,
-  float maxLimit
-) {
-  (*pid).begin();
-  (*pid).tune(kp, ki, kd);
-  (*pid).limit(minLimit, maxLimit);
-  (*pid).minimize(1);
-}
-
-float computePidIteration(
-  PIDController* pid,
-  float reference,
-  float measured
-) {
-  (*pid).setpoint(reference);
-  return (*pid).compute(measured);
 }
