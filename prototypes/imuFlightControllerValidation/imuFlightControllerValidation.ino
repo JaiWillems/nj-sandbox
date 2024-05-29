@@ -5,9 +5,12 @@
 
 // *** DEBUG SETTINGS ***
 
-bool PRINT_MOTOR_OUTPUTS = false;
-bool PRINT_IMU_DATA = false;
+bool PRINT_IMU_DATA = true;
+bool PLOT_RATE_DATA = false;
+bool PLOT_ANGLE_DATA = false;
+bool PLOT_ANGLE_PID_DATA = false;
 bool PRINT_YAW_RATE_PID_INFORMATION = false;
+bool PRINT_MOTOR_OUTPUTS = false;
 
 // *** DRONE LEVEL SETTINGS ***
 
@@ -17,8 +20,8 @@ bool STABILIZE_MODE = true;
 
 int MIN_ESC_INPUT = 1000;
 int MAX_ESC_INPUT = 2000;
-int MIN_ESC_INPUT_FROM_PID = -50;
-int MAX_ESC_INPUT_FROM_PID = 50;
+int MIN_ESC_INPUT_FROM_PID = -100;
+int MAX_ESC_INPUT_FROM_PID = 100;
 
 // *** THROTTLE SETTINGS ***
 
@@ -54,7 +57,7 @@ int MAX_YAW_RATE_DEG_PER_SEC = 180;
 
 // *** PID SETTINGS ***
 
-int PID_FREQUENCY_HZ = 5;
+int PID_FREQUENCY_HZ = 10;
 
 float ROLL_ANGLE_KP = 1.0;
 float ROLL_ANGLE_KI = 0.0;
@@ -94,18 +97,13 @@ PIDController yawRateController;
 void setup() {
 
   Serial.begin(115200);
-  Serial.println("Begin Setup");
 
-  Serial.println("IMU Initializing...");
   imu.initialize();
-  Serial.println("IMU Initialized");
 
-  Serial.println("DMP Initializing...");
   if (imu.dmpInitialize() == 0) {
       imu.CalibrateAccel(6);
       imu.CalibrateGyro(6);
       imu.setDMPEnabled(true);
-      Serial.println("DMP Initialized");
   }
   else {
     Serial.print("DMP Initialization Failed");
@@ -166,13 +164,8 @@ void loop() {
   int pitchStickSetting = 512;
   int yawStickSetting = 512;
 
-  Serial.println("Preparing to retrieve FIFO packet...");
-
   uint8_t fifoBuffer[64];
   if (imu.dmpGetCurrentFIFOPacket(fifoBuffer)) {
-
-    Serial.println("FIFO packet acquired.");
-    Serial.println("Acquiring IMU data...");
 
     Quaternion orientation;
     VectorFloat gravity;
@@ -202,8 +195,6 @@ void loop() {
       &gravity
     );
 
-    Serial.println("All IMU data acquired.");
-
     measuredPitchAngle = ypr[1] * RAD_TO_DEG;
     measuredRollAngle = ypr[2] * RAD_TO_DEG;
   }
@@ -217,6 +208,18 @@ void loop() {
     Serial.print("Yaw Rate:\t"); Serial.print(measuredYawRate); Serial.print("\t");
     Serial.print("Pitch Rate:\t"); Serial.print(measuredPitchRate); Serial.print("\t");
     Serial.print("Roll Rate:\t"); Serial.println(measuredRollRate);
+  }
+  if (PLOT_RATE_DATA) {
+    Serial.print(measuredYawRate);
+    Serial.print(" ");
+    Serial.print(measuredPitchRate);
+    Serial.print(" ");
+    Serial.println(measuredRollRate);
+  }
+  if (PLOT_ANGLE_DATA) {
+    Serial.print(measuredPitchAngle);
+    Serial.print(" ");
+    Serial.println(measuredRollAngle);
   }
 
   int throttleContribution = map(
@@ -241,6 +244,10 @@ void loop() {
       referenceRollAngle,
       measuredRollAngle
     );
+    if (PLOT_ANGLE_PID_DATA) {
+      Serial.print(referenceRollRate);
+      Serial.print(" ");
+    }
   }
   else {
     referenceRollRate = map(
@@ -271,6 +278,9 @@ void loop() {
       referencePitchAngle,
       measuredPitchAngle
     );
+    if (PLOT_ANGLE_PID_DATA) {
+      Serial.println(referencePitchRate);
+    }
   }
   else {
     referencePitchRate = map(
