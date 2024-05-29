@@ -2,6 +2,7 @@
 #include <MPU6050_6Axis_MotionApps20.h>
 #include <SoftwareSerial.h>
 
+#include "Imu.h"
 #include "PidController.h"
 #include "motor.h"
 
@@ -101,12 +102,13 @@ int rollStickSetting = 512;
 int pitchStickSetting = 512;
 int yawStickSetting = 512;
 
-MPU6050 imu;
-float measuredRollAngle;
+Imu imu;
+float measuredYawAngle;
 float measuredPitchAngle;
-int16_t measuredRollRate;
-int16_t measuredPitchRate;
+float measuredRollAngle;
 int16_t measuredYawRate;
+int16_t measuredPitchRate;
+int16_t measuredRollRate;
 
 Motor motorOne(
   MOTOR_ONE_ESC_PIN,
@@ -178,9 +180,7 @@ void setup() {
   Serial.begin(9600);
   cdhComms.begin(9600);
 
-  Wire.begin();
   imu.initialize();
-
   if (imu.testConnection()) {
     Serial.print("IMU Connection Successful.");
   }
@@ -188,10 +188,8 @@ void setup() {
     Serial.print("IMU Connection Failed...");
   }
 
-  if (imu.dmpInitialize() == 0) {
-      imu.CalibrateAccel(6);
-      imu.CalibrateGyro(6);
-      imu.setDMPEnabled(true);
+  if (imu.initializeDmp() == 0) {
+    imu.calibrate(6);
   }
   else {
     Serial.println("DMP Initialization Failure...");
@@ -229,41 +227,23 @@ void loop() {
     }
   }
 
-  imu.getRotation(
+  imu.getRotationRates(
     &measuredRollRate,
     &measuredPitchRate,
     &measuredYawRate
   );
 
-  // Negate pitch/yaw rates to get in the drone frame.
-  measuredPitchRate = -measuredPitchRate;
-  measuredYawRate = -measuredYawRate;
-
   uint8_t fifoBuffer[64];
-  if (imu.dmpGetCurrentFIFOPacket(fifoBuffer)) {
+  if (imu.getCurrentFIFOPacket(fifoBuffer)) {
     // TODO: Handle dmpGetCurrentFIFOPacket function
     // when it hangs.
 
-    Quaternion orientation;
-    VectorFloat gravity;
-    float ypr[3];
-
-    imu.dmpGetQuaternion(
-      &orientation,
-      fifoBuffer
+    imu.getYawPitchRollFromDmp(
+      fifoBuffer,
+      &measuredYawAngle,
+      &measuredPitchAngle,
+      &measuredRollAngle
     );
-    imu.dmpGetGravity(
-      &gravity,
-      &orientation
-    );
-    imu.dmpGetYawPitchRoll(
-      ypr,
-      &orientation,
-      &gravity
-    );
-
-    measuredPitchAngle = ypr[1] * RAD_TO_DEG;
-    measuredRollAngle = ypr[2] * RAD_TO_DEG;
   }
 
   int throttleContribution = map(
