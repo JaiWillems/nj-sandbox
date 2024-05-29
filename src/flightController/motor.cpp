@@ -1,8 +1,8 @@
 #include "Arduino.h"
-#include "motor.h"
+#include "Motor.h"
 #include <Servo.h>
 
-Motor::Motor(
+void Motor::attach(
   int pin,
   int minInput,
   int maxInput,

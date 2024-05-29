@@ -3,7 +3,7 @@
 
 class Motor {
   public:
-    Motor(
+    void attach(
       int pin,
       int minInput,
       int maxInput,

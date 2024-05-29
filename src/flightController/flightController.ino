@@ -1,10 +1,9 @@
 #include <I2Cdev.h>
-#include <MPU6050_6Axis_MotionApps20.h>
 #include <SoftwareSerial.h>
 
 #include "Imu.h"
 #include "PidController.h"
-#include "motor.h"
+#include "Motor.h"
 
 // *** DRONE LEVEL SETTINGS ***
 
@@ -110,34 +109,10 @@ int16_t measuredYawRate;
 int16_t measuredPitchRate;
 int16_t measuredRollRate;
 
-Motor motorOne(
-  MOTOR_ONE_ESC_PIN,
-  MIN_ESC_INPUT,
-  MAX_ESC_INPUT,
-  true,
-  false
-);
-Motor motorTwo(
-  MOTOR_TWO_ESC_PIN,
-  MIN_ESC_INPUT,
-  MAX_ESC_INPUT,
-  false,
-  false
-);
-Motor motorThree(
-  MOTOR_THREE_ESC_PIN,
-  MIN_ESC_INPUT,
-  MAX_ESC_INPUT,
-  false,
-  true
-);
-Motor motorFour(
-  MOTOR_FOUR_ESC_PIN,
-  MIN_ESC_INPUT,
-  MAX_ESC_INPUT,
-  true,
-  true
-);
+Motor motorOne;
+Motor motorTwo;
+Motor motorThree;
+Motor motorFour;
 
 PidController rollAngleController(
   ROLL_ANGLE_KP,
@@ -194,6 +169,35 @@ void setup() {
   else {
     Serial.println("DMP Initialization Failure...");
   }
+
+  motorOne.attach(
+    MOTOR_ONE_ESC_PIN,
+    MIN_ESC_INPUT,
+    MAX_ESC_INPUT,
+    true,
+    false
+  );
+  motorTwo.attach(
+    MOTOR_TWO_ESC_PIN,
+    MIN_ESC_INPUT,
+    MAX_ESC_INPUT,
+    false,
+    false
+  );
+  motorThree.attach(
+    MOTOR_THREE_ESC_PIN,
+    MIN_ESC_INPUT,
+    MAX_ESC_INPUT,
+    false,
+    true
+  );
+  motorFour.attach(
+    MOTOR_FOUR_ESC_PIN,
+    MIN_ESC_INPUT,
+    MAX_ESC_INPUT,
+    true,
+    true
+  );
 
   if (STABILIZE_MODE) {
     rollAngleController.begin();
