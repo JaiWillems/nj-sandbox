@@ -2,7 +2,7 @@
 
 class PidController {
   public:
-    PidController(
+    void initialize(
       float kp,
       float ki,
       float kd,

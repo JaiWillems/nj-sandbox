@@ -116,41 +116,11 @@ Drone drone(
   MAX_ESC_INPUT
 );
 
-PidController rollAngleController(
-  ROLL_ANGLE_KP,
-  ROLL_ANGLE_KI,
-  ROLL_ANGLE_KD,
-  MIN_ROLL_RATE_DEG_PER_SEC,
-  MAX_ROLL_RATE_DEG_PER_SEC
-);
-PidController pitchAngleController(
-  PITCH_ANGLE_KP,
-  PITCH_ANGLE_KI,
-  PITCH_ANGLE_KD,
-  MIN_PITCH_RATE_DEG_PER_SEC,
-  MAX_PITCH_RATE_DEG_PER_SEC
-);
-PidController rollRateController(
-  ROLL_RATE_KP,
-  ROLL_RATE_KI,
-  ROLL_RATE_KD,
-  MIN_ESC_INPUT_FROM_PID,
-  MAX_ESC_INPUT_FROM_PID
-);
-PidController pitchRateController(
-  PITCH_RATE_KP,
-  PITCH_RATE_KI,
-  PITCH_RATE_KD,
-  MIN_ESC_INPUT_FROM_PID,
-  MAX_ESC_INPUT_FROM_PID
-);
-PidController yawRateController(
-  YAW_RATE_KP,
-  YAW_RATE_KI,
-  YAW_RATE_KD,
-  MIN_ESC_INPUT_FROM_PID,
-  MAX_ESC_INPUT_FROM_PID
-);
+PidController rollAngleController;
+PidController pitchAngleController;
+PidController rollRateController;
+PidController pitchRateController;
+PidController yawRateController;
 
 void setup() {
 
@@ -173,11 +143,46 @@ void setup() {
   }
 
   if (STABILIZE_MODE) {
+    rollAngleController.initialize(
+      ROLL_ANGLE_KP,
+      ROLL_ANGLE_KI,
+      ROLL_ANGLE_KD,
+      MIN_ROLL_RATE_DEG_PER_SEC,
+      MAX_ROLL_RATE_DEG_PER_SEC
+    );
     rollAngleController.begin();
+    pitchAngleController.initialize(
+      PITCH_ANGLE_KP,
+      PITCH_ANGLE_KI,
+      PITCH_ANGLE_KD,
+      MIN_PITCH_RATE_DEG_PER_SEC,
+      MAX_PITCH_RATE_DEG_PER_SEC
+    );
     pitchAngleController.begin();
   }
+  rollRateController.initialize(
+    ROLL_RATE_KP,
+    ROLL_RATE_KI,
+    ROLL_RATE_KD,
+    MIN_ESC_INPUT_FROM_PID,
+    MAX_ESC_INPUT_FROM_PID
+  );
   rollRateController.begin();
+  pitchRateController.initialize(
+    PITCH_RATE_KP,
+    PITCH_RATE_KI,
+    PITCH_RATE_KD,
+    MIN_ESC_INPUT_FROM_PID,
+    MAX_ESC_INPUT_FROM_PID
+  );
   pitchRateController.begin();
+  yawRateController.initialize(
+    YAW_RATE_KP,
+    YAW_RATE_KI,
+    YAW_RATE_KD,
+    MIN_ESC_INPUT_FROM_PID,
+    MAX_ESC_INPUT_FROM_PID
+  );
   yawRateController.begin();
 }
 
@@ -261,7 +266,7 @@ void loop() {
 
   float referencePitchRate;
   if (STABILIZE_MODE) {
-    int referencePitchAngle = map(
+    float referencePitchAngle = map(
       pitchStickSetting,
       MIN_PITCH_STICK_POSITION,
       MAX_PITCH_STICK_POSITION,

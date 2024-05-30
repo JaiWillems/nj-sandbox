@@ -1,6 +1,6 @@
 #include "PidController.h"
 
-PidController::PidController(
+void PidController::initialize(
   float kp,
   float ki,
   float kd,
