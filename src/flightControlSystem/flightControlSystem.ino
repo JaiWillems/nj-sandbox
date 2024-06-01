@@ -1,7 +1,10 @@
 #include <SoftwareSerial.h>
+#include <BMP180.h>
+#include <Wire.h>
 #include "Imu.h"
 #include "PidController.h"
 #include "Drone.h"
+
 
 // *** DRONE LEVEL SETTINGS ***
 
@@ -13,6 +16,9 @@ int MIN_ESC_INPUT = 1000;
 int MAX_ESC_INPUT = 2000;
 int MIN_ESC_INPUT_FROM_PID = -50;
 int MAX_ESC_INPUT_FROM_PID = 50;
+
+int MIN_THROTTLE_INPUT_FROM_PID= MIN_ESC_INPUT- MAX_ESC_INPUT;
+int MAX_THROTTLE_INPUT_FROM_PID= MAX_ESC_INPUT- MIN_ESC_INPUT;
 
 int MOTOR_ONE_ESC_PIN = 10;
 int MOTOR_TWO_ESC_PIN = 9;
@@ -29,6 +35,8 @@ int TX_PIN = 4;
 
 int MIN_THROTTLE_STICK_POSITION = 0;
 int MAX_THROTTLE_STICK_POSITION = 1023;
+int MIN_ALTITUDE_RATE_M_PER_SEC = -2;
+int MAX_ALTITUDE_RATE_M_PER_SEC = 2;
 int MIN_THROTTLE = MIN_ESC_INPUT;
 int MAX_THROTTLE = MIN_ESC_INPUT + 0.85 * (MAX_ESC_INPUT - MIN_ESC_INPUT);
 
@@ -81,6 +89,10 @@ float YAW_RATE_KP = 1.0;
 float YAW_RATE_KI = 0.0;
 float YAW_RATE_KD = 0.0;
 
+float ALTITUDE_KP = 1.0;
+float ALTITUDE_KI = 0.0;
+float ALTITUDE_KD = 0.0;
+
 // *** END OF SETTINGS ***
 
 struct ControlPacket {
@@ -107,6 +119,16 @@ int16_t measuredYawRate;
 int16_t measuredPitchRate;
 int16_t measuredRollRate;
 
+BMP180 bmp(BMP180_ULTRAHIGHRES);
+
+float groundLevelPressure;
+float measuredPressure;
+float measuredAltitude;
+
+float referenceAltitude;
+double previousTime = 0.0;
+double currentTime = 0.0;
+
 Drone drone(
   MOTOR_ONE_ESC_PIN,
   MOTOR_TWO_ESC_PIN,
@@ -116,6 +138,7 @@ Drone drone(
   MAX_ESC_INPUT
 );
 
+PidController altitudeController;
 PidController rollAngleController;
 PidController pitchAngleController;
 PidController rollRateController;
@@ -134,7 +157,12 @@ void setup() {
   else {
     Serial.print("IMU Connection Failed...");
   }
-
+  if (bmp.begin()){
+    Serial.print("BMP Connection Successful...");
+  }
+  else{
+    Serial.print("BMP Connection Failed...");
+  }
   if (imu.initializeDmp() == 0) {
     imu.calibrate(6);
   }
@@ -142,6 +170,14 @@ void setup() {
     Serial.println("DMP Initialization Failure...");
   }
 
+  altitudeController.initialize(
+    ALTITUDE_KP,
+    ALTITUDE_KI,
+    ALTITUDE_KD,
+    MIN_THROTTLE_INPUT_FROM_PID,
+    MAX_THROTTLE_INPUT_FROM_PID
+  );
+  altitudeController.begin();
   if (STABILIZE_MODE) {
     rollAngleController.initialize(
       ROLL_ANGLE_KP,
@@ -160,13 +196,6 @@ void setup() {
     );
     pitchAngleController.begin();
   }
-  rollRateController.initialize(
-    ROLL_RATE_KP,
-    ROLL_RATE_KI,
-    ROLL_RATE_KD,
-    MIN_ESC_INPUT_FROM_PID,
-    MAX_ESC_INPUT_FROM_PID
-  );
   rollRateController.begin();
   pitchRateController.initialize(
     PITCH_RATE_KP,
@@ -184,6 +213,8 @@ void setup() {
     MAX_ESC_INPUT_FROM_PID
   );
   yawRateController.begin();
+
+  groundLevelPressure = bmp.getPressure();
 }
 
 void loop() {
@@ -228,12 +259,27 @@ void loop() {
     );
   }
 
-  int throttleInput = map(
+  measuredPressure = bmp.getPressure();
+  measuredAltitude = 4430 * (1- pow(
+    (measuredPressure/groundLevelPressure),
+    (1/5.255)));
+
+  int referenceAltitudeRate = map(
     throttleStickSetting,
     MIN_THROTTLE_STICK_POSITION,
     MAX_THROTTLE_STICK_POSITION,
-    MIN_THROTTLE,
-    MAX_THROTTLE
+    MIN_ALTITUDE_RATE_M_PER_SEC,
+    MAX_ALTITUDE_RATE_M_PER_SEC
+  );
+  currentTime= millis();
+  double deltaTime = (currentTime - previousTime)/1000;
+  referenceAltitude = referenceAltitude + deltaTime * 
+    referenceAltitudeRate;
+  previousTime= currentTime;
+
+  float throttleInput = altitudeController.compute(
+    referenceAltitude,
+    measuredAltitude
   );
 
   float referenceRollRate;
