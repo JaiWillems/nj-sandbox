@@ -48,6 +48,8 @@ void Motor::attach(
   );
   _minInput = minInput;
   _maxInput = maxInput;
+  
+  setSpeed(MAX_SERVO_INPUT);
 }
 
 void Motor::arm() {
