@@ -29,62 +29,97 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include <util/atomic.h>
 #include "PidController.h"
 
-void PidController::initialize(
-  float kp,
-  float ki,
-  float kd,
-  float minLimit,
-  float maxLimit
-) {
-  _kp = kp;
-  _ki = ki;
-  _kd = kd;
-  _minLimit = minLimit;
-  _maxLimit = maxLimit;
-}
+const int ENC_A_PIN = 3;
+const int ENC_B_PIN = 2;
+const int MOTOR_PWM_PIN = 5;
+const int IN1_PIN = 8;
+const int IN2_PIN = 7;
 
-void PidController::begin() {
-  _previousTime = millis();
-}
+const float KP = 1.0;
+const float KI = 0.0;
+const float KD = 0.0;
 
-float PidController::compute(
-  float reference,
-  float measured
-) {
-  float deltaTime = getDeltaTime();
+const int MIN_LIMIT = 0;
+const int MAX_LIMIT = 1;
 
-  float currentError = reference - measured;
+PidController pid;
 
-  _integralError = _integralError +
-    currentError * deltaTime;
+volatile int measuredCounter = 0;
+long previousTime = 0;
 
-  float derivativeError = (currentError -
-    _previousError) / deltaTime;
-  
-  _previousError = currentError;
+void setup() {
 
-  float input = _kp * currentError +
-    _ki * _integralError +
-    _kd * derivativeError;
+  pinMode(ENC_A_PIN, INPUT);
+  pinMode(ENC_B_PIN, INPUT);
+  pinMode(MOTOR_PWM_PIN, OUTPUT);
+  pinMode(IN1_PIN, OUTPUT);
+  pinMode(IN2_PIN, OUTPUT);
 
-  return saturate(input);
-}
-
-float PidController::getDeltaTime() {
-  float currentTime = millis();
-  float deltaTime = (currentTime - _previousTime) / 1000;
-  _previousTime = currentTime;
-  return deltaTime;
-}
-
-float PidController::saturate(
-  float input
-) {
-  return constrain(
-    input,
-    _minLimit,
-    _maxLimit
+  attachInterrupt(
+    digitalPinToInterrupt(ENC_A_PIN),
+    readEncoder,
+    RISING
   );
+
+  pid.initialize(
+    KP,
+    KI,
+    KD,
+    MIN_LIMIT,
+    MAX_LIMIT
+  );
+  pid.begin();
+}
+
+void loop() {
+
+  int measured = 0;
+  ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+    measured = measuredCounter;
+  }
+
+  int reference = 250 * sin(previousTime / 1e6);
+  setMotor(
+    pid.compute(reference, measured),
+    MOTOR_PWM_PIN,
+    IN1_PIN,
+    IN2_PIN
+  );
+
+  Serial.print(reference);
+  Serial.print(" ");
+  Serial.print(measured);
+  Serial.println();
+
+  previousTime = micros();
+}
+
+void setMotor(
+    int pwmVal,
+    int pwmPin,
+    int in1Pin,
+    int in2Pin
+) {
+  analogWrite(pwmPin, fabs(pwmVal));
+  if (pwmVal > 0) {
+    digitalWrite(in1Pin, LOW);
+    digitalWrite(in2Pin, HIGH);
+  }
+  else {
+    digitalWrite(in1Pin, HIGH);
+    digitalWrite(in2Pin, LOW);
+  }
+}
+
+void readEncoder() {
+  int b = digitalRead(ENC_B_PIN);
+  if (b > 0) {
+    measuredCounter++;
+  }
+  else {
+    measuredCounter--;
+  }
 }
