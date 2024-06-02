@@ -1,4 +1,4 @@
-#include <PIDController.h>
+#include <Arduino.h>
 
 class PidController {
   public:
@@ -15,5 +15,12 @@ class PidController {
       float measured
     );
   private:
-    PIDController _controller;
+    float _kp;
+    float _ki;
+    float _kd;
+    float _minLimit;
+    float _maxLimit;
+    float _previousTime;
+    float _previousError;
+    float _integralError;
 };

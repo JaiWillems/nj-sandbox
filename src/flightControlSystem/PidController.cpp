@@ -7,19 +7,34 @@ void PidController::initialize(
   float minLimit,
   float maxLimit
 ) {
-  _controller.tune(kp, ki, kd);
-  _controller.limit(minLimit, maxLimit);
-  _controller.minimize(1);
+  _kp = kp;
+  _ki = ki;
+  _kd = kd;
+  _minLimit = minLimit;
+  _maxLimit = maxLimit;
 }
 
 void PidController::begin() {
-  _controller.begin();
+  _previousTime = millis();
 }
 
 float PidController::compute(
   float reference,
   float measured
 ) {
-  _controller.setpoint(reference);
-  return _controller.compute(measured);
+  float currentTime = millis();
+  float deltaTime = (currentTime - _previousTime) / 1000;
+
+  float currentError = reference - measured;
+  _integralError = _integralError + currentError * deltaTime;
+  float derivativeError = (currentError - _previousError) / deltaTime;
+  
+  _previousTime = currentTime;
+  _previousError = currentError;
+
+  return constrain(
+    _kp * currentError + _ki * _integralError + _kd * derivativeError,
+    _minLimit,
+    _maxLimit
+  );
 }
