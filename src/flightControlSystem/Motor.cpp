@@ -33,9 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Motor.h"
 #include <Servo.h>
 
-const int ARM_SPEED = 0;
-const int MIN_SERVO_INPUT = 0;
-const int MAX_SERVO_INPUT = 180;
+const int MIN_SERVO_INPUT = 1000;
+const int MAX_SERVO_INPUT = 2000;
 
 void Motor::attach(
   int pin,
@@ -52,7 +51,7 @@ void Motor::attach(
 }
 
 void Motor::arm() {
-  setSpeed(ARM_SPEED);
+  setSpeed(MIN_SERVO_INPUT);
 }
 
 void Motor::setSpeed(

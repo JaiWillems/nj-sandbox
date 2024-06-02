@@ -39,10 +39,10 @@ const int MIN_INPUT = 1000;
 const int MAX_INPUT = 2000;
 
 const int ATTACH_DELAY = 1500;
-const int ARM_DELAY = 5000;
+const int ARM_DELAY = 2000;
 const int SMALL_DELAY = 2000;
 
-const int MOTOR_SPEED = 20;
+const int MOTOR_SPEED = 1200;
 
 Motor motorOne;
 Motor motorTwo;
