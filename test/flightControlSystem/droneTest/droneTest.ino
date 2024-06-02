@@ -29,42 +29,92 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "Motor.h"
+#include "Drone.h"
 
-class Drone {
-  public:
-    void setup(
-      int motorOnePin,
-      int motorTwoPin,
-      int motorThreePin,
-      int motorFourPin,
-      int minMotorInput,
-      int maxMotorInput
-    );
-    void arm();
-    void sendControlInputs(
-      int throttleInput,
-      int yawInput,
-      int pitchInput,
-      int rollInput
-    );
-  private:
-    Motor _motorOne;
-    Motor _motorTwo;
-    Motor _motorThree;
-    Motor _motorFour;
-    int _minMotorInput;
-    int _maxMotorInput;
-    int mixControlInputs(
-      bool bow,
-      bool port,
-      float throttleInput,
-      float yawInput,
-      float pitchInput,
-      float rollInput
-    );
-    bool isMotorCcw(
-      bool bow,
-      bool port
-    );
-};
+const int MOTOR_ONE_PIN = 10;
+const int MOTOR_TWO_PIN = 9;
+const int MOTOR_THREE_PIN = 11;
+const int MOTOR_FOUR_PIN = 6;
+
+const int MIN_MOTOR_INPUT = 1000;
+const int MAX_MOTOR_INPUT = 2000;
+
+const int INPUT_CHANGE_DELAY = 3000;
+
+const int THROTTLE_COMMAND = 1400;
+const int YAW_COMMAND = 100;
+const int PITCH_COMMAND = 100;
+const int ROLL_COMMAND = 100;
+
+Drone drone;
+
+void setup() {
+  drone.setup(
+    MOTOR_ONE_PIN,
+    MOTOR_TWO_PIN,
+    MOTOR_THREE_PIN,
+    MOTOR_FOUR_PIN,
+    MIN_MOTOR_INPUT,
+    MAX_MOTOR_INPUT
+  );
+  drone.arm();
+}
+
+void loop() {
+  drone.sendControlInputs(
+    THROTTLE_COMMAND,
+    0,
+    0,
+    0
+  );
+  delay(INPUT_CHANGE_DELAY);
+  drone.sendControlInputs(
+    THROTTLE_COMMAND,
+    YAW_COMMAND,
+    0,
+    0
+  );
+  delay(INPUT_CHANGE_DELAY);
+  drone.sendControlInputs(
+    THROTTLE_COMMAND,
+    -YAW_COMMAND,
+    0,
+    0
+  );
+  delay(INPUT_CHANGE_DELAY);
+  drone.sendControlInputs(
+    THROTTLE_COMMAND,
+    0,
+    PITCH_COMMAND,
+    0
+  );
+  delay(INPUT_CHANGE_DELAY);
+  drone.sendControlInputs(
+    THROTTLE_COMMAND,
+    0,
+    -PITCH_COMMAND,
+    0
+  );
+  delay(INPUT_CHANGE_DELAY);
+  drone.sendControlInputs(
+    THROTTLE_COMMAND,
+    0,
+    0,
+    ROLL_COMMAND
+  );
+  delay(INPUT_CHANGE_DELAY);
+  drone.sendControlInputs(
+    THROTTLE_COMMAND,
+    0,
+    0,
+    -ROLL_COMMAND
+  );
+  delay(INPUT_CHANGE_DELAY);
+  drone.sendControlInputs(
+    0,
+    0,
+    0,
+    0
+  );
+  delay(INPUT_CHANGE_DELAY);
+}
