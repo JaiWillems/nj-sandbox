@@ -29,22 +29,66 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <Arduino.h>
-#include <Servo.h>
+#include "Motor.h"
 
-class Motor {
-  public:
-    void attach(
-      int pin,
-      int minInput,
-      int maxInput
-    );
-    void arm();
-    void setSpeed(
-      int input
-    );
-  private:
-    Servo _motor;
-    int _minInput;
-    int _maxInput;
-};
+const int MOTOR_ONE_PIN = 10;
+const int MOTOR_TWO_PIN = 9;
+const int MOTOR_THREE_PIN = 11;
+const int MOTOR_FOUR_PIN = 6;
+const int MIN_INPUT = 1000;
+const int MAX_INPUT = 2000;
+
+const int ATTACH_DELAY = 1500;
+const int ARM_DELAY = 5000;
+const int SMALL_DELAY = 2000;
+
+const int MOTOR_SPEED = 20;
+
+Motor motorOne;
+Motor motorTwo;
+Motor motorThree;
+Motor motorFour;
+
+void setup() {
+
+  delay(ATTACH_DELAY);
+
+  motorOne.attach(
+    MOTOR_ONE_PIN,
+    MIN_INPUT,
+    MAX_INPUT
+  );
+  motorTwo.attach(
+    MOTOR_TWO_PIN,
+    MIN_INPUT,
+    MAX_INPUT
+  );
+  motorThree.attach(
+    MOTOR_THREE_PIN,
+    MIN_INPUT,
+    MAX_INPUT
+  );
+  motorFour.attach(
+    MOTOR_FOUR_PIN,
+    MIN_INPUT,
+    MAX_INPUT
+  );
+
+  delay(ARM_DELAY);
+
+  motorOne.arm();
+  motorTwo.arm();
+  motorThree.arm();
+  motorFour.arm();
+}
+
+void loop() {
+  delay(SMALL_DELAY);
+  motorOne.setSpeed(MOTOR_SPEED);
+  delay(SMALL_DELAY);
+  motorTwo.setSpeed(MOTOR_SPEED);
+  delay(SMALL_DELAY);
+  motorThree.setSpeed(MOTOR_SPEED);
+  delay(SMALL_DELAY);
+  motorFour.setSpeed(MOTOR_SPEED);
+}
