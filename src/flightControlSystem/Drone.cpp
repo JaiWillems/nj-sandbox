@@ -87,49 +87,34 @@ void Drone::arm() {
 }
 
 void Drone::sendControlInputs(
-  int throttleInput,
-  int yawInput,
-  int pitchInput,
-  int rollInput
+  ControlCommands controlCommands
 ) {
   _motorOne.setSpeed(
     mixControlInputs(
       MOTOR_ONE_BOW,
       MOTOR_ONE_PORT,
-      throttleInput,
-      yawInput,
-      pitchInput,
-      rollInput
+      controlCommands
     )
   );
   _motorTwo.setSpeed(
     mixControlInputs(
       MOTOR_TWO_BOW,
       MOTOR_TWO_PORT,
-      throttleInput,
-      yawInput,
-      pitchInput,
-      rollInput
+      controlCommands
     )
   );
   _motorThree.setSpeed(
     mixControlInputs(
       MOTOR_THREE_BOW,
       MOTOR_THREE_PORT,
-      throttleInput,
-      yawInput,
-      pitchInput,
-      rollInput
+      controlCommands
     )
   );
   _motorFour.setSpeed(
     mixControlInputs(
       MOTOR_FOUR_BOW,
       MOTOR_FOUR_PORT,
-      throttleInput,
-      yawInput,
-      pitchInput,
-      rollInput
+      controlCommands
     )
   );
 }
@@ -137,11 +122,13 @@ void Drone::sendControlInputs(
 int Drone::mixControlInputs(
   bool bow,
   bool port,
-  float throttleInput,
-  float yawInput,
-  float pitchInput,
-  float rollInput
+  ControlCommands controlCommands
 ) {
+  float throttleInput = controlCommands.throttle;
+  float yawInput = controlCommands.yaw;
+  float pitchInput = controlCommands.pitch;
+  float rollInput = controlCommands.roll;
+
   bool motorCcw = isMotorCcw(bow, port);
 
   int signedYawInput = motorCcw ? yawInput : -yawInput;

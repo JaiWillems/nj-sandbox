@@ -31,34 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "FlightController.h"
 
-const int MIN_ESC_INPUT_FROM_PID = -50;
-const int MAX_ESC_INPUT_FROM_PID = 50;
-
-const float ALTITUDE_KP = 25.0;
-const float ALTITUDE_KI = 0.0;
-const float ALTITUDE_KD = 0.0;
-
-const float YAW_RATE_KP = 1.0;
-const float YAW_RATE_KI = 0.0;
-const float YAW_RATE_KD = 0.0;
-
-const float PITCH_KP = 1.0;
-const float PITCH_KI = 0.0;
-const float PITCH_KD = 0.0;
-
-const float PITCH_RATE_KP = 1.0;
-const float PITCH_RATE_KI = 0.0;
-const float PITCH_RATE_KD = 0.0;
-
-const float ROLL_KP = 1.0;
-const float ROLL_KI = 0.0;
-const float ROLL_KD = 0.0;
-
-const float ROLL_RATE_KP = 1.0;
-const float ROLL_RATE_KI = 0.0;
-const float ROLL_RATE_KD = 0.0;
-
-void FlightController::begin(
+void FlightController::setup(
   bool stabilizeMode
 ) {
   _stabilizeMode = stabilizeMode;
@@ -114,11 +87,11 @@ void FlightController::begin(
   _rollRateController.begin();
 }
 
-FlightControllerResult FlightController::compute(
+ControlCommands FlightController::compute(
   StateVector referenceState,
   StateVector measuredState
 ) {
-  FlightControllerResult result;
+  ControlCommands result;
 
   result.throttle = _altitudeController.compute(
     referenceState.altitude,

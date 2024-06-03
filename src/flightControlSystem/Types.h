@@ -29,19 +29,24 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-StateVector {
-  int altitude;
-  int yawRate;
-  int yaw;
-  int pitchRate;
-  int pitch;
-  int rollRate;
-  int roll;
-}
+#ifndef Types_h
+#define Types_h
 
-FlightControllerResult {
-  int throttle;
-  int yaw;
-  int pitch;
-  int roll;
-}
+struct StateVector {
+  float altitude;
+  int yawRate;
+  float yaw;
+  int pitchRate;
+  float pitch;
+  int rollRate;
+  float roll;
+};
+
+struct ControlCommands {
+  float throttle;
+  float yaw;
+  float pitch;
+  float roll;
+};
+
+#endif

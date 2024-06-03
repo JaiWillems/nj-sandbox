@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class Ultrasonic {
   public:
-    void begin(
+    void setup(
       int trigPin,
       int echoPin
     );

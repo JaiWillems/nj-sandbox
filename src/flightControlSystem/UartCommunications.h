@@ -29,29 +29,22 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <I2Cdev.h>
-#include <MPU6050_6Axis_MotionApps20.h>
+#include <Arduino.h>
+#include <SoftwareSerial.h>
+#include "Types.h"
 
-class Imu {
+class UartCommunications {
   public:
-    void setup();
-    bool testConnection();
-    bool initializeDmp();
-    void calibrate(uint8_t loops);
-    void getRotationRates(
-      int16_t* x,
-      int16_t* y,
-      int16_t* z
+    void setup(
+      int rxPin,
+      int txPin,
+      int baudRate
     );
-    uint8_t getCurrentFIFOPacket(
-      uint8_t* fifoBuffer
-    );
-    void getYawPitchRollFromDmp(
-      uint8_t* fifoBuffer,
-      float* yaw,
-      float* pitch,
-      float* roll
-    );
+    bool isPacketAvailable();
+    ControlCommands deserialize();
   private:
-    MPU6050 _mpu;
+    int _rxPin;
+    int _txPin;
+    int _baudRate;
+    ControlCommands _controlCommands;
 };

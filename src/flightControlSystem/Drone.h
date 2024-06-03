@@ -30,6 +30,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "Motor.h"
+#include "Types.h"
 
 class Drone {
   public:
@@ -43,10 +44,7 @@ class Drone {
     );
     void arm();
     void sendControlInputs(
-      int throttleInput,
-      int yawInput,
-      int pitchInput,
-      int rollInput
+      ControlCommands controlCommands
     );
   private:
     Motor _motorOne;
@@ -58,10 +56,7 @@ class Drone {
     int mixControlInputs(
       bool bow,
       bool port,
-      float throttleInput,
-      float yawInput,
-      float pitchInput,
-      float rollInput
+      ControlCommands controlCommands
     );
     bool isMotorCcw(
       bool bow,

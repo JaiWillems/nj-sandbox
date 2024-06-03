@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 const int PULSE_DURATION_MICROS = 300000;
 const float SPEED_OF_SOUND_M_PER_MICROS = 0.000343;
 
-void Ultrasonic::begin(
+void Ultrasonic::setup(
   int trigPin,
   int echoPin
 ) {

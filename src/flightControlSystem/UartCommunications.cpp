@@ -29,29 +29,49 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <I2Cdev.h>
-#include <MPU6050_6Axis_MotionApps20.h>
+#include "UartCommunications.h"
 
-class Imu {
-  public:
-    void setup();
-    bool testConnection();
-    bool initializeDmp();
-    void calibrate(uint8_t loops);
-    void getRotationRates(
-      int16_t* x,
-      int16_t* y,
-      int16_t* z
-    );
-    uint8_t getCurrentFIFOPacket(
-      uint8_t* fifoBuffer
-    );
-    void getYawPitchRollFromDmp(
-      uint8_t* fifoBuffer,
-      float* yaw,
-      float* pitch,
-      float* roll
-    );
-  private:
-    MPU6050 _mpu;
-};
+const int START_MARKER = 255;
+
+void UartCommunications::setup(
+  int rxPin,
+  int txPin,
+  int baudRate
+) {
+  _rxPin = rxPin;
+  _txPin = txPin;
+  _baudRate = baudRate;
+}
+
+bool UartCommunications::isPacketAvailable() {
+  SoftwareSerial serial = SoftwareSerial(
+    _rxPin,
+    _txPin
+  );
+  serial.begin(_baudRate);
+  return serial.available() > sizeof(_controlCommands) + 1;
+}
+
+ControlCommands UartCommunications::deserialize() {
+  SoftwareSerial serial = SoftwareSerial(
+    _rxPin,
+    _txPin
+  );
+  serial.begin(_baudRate);
+
+  byte* structStart = reinterpret_cast<byte*>(&_controlCommands);
+
+  byte data = serial.read();
+
+  if (data == START_MARKER) {
+
+    for (byte n = 0; n < sizeof(_controlCommands); n++) {
+      *(structStart + n) = serial.read();
+    }
+    while (serial.available() > 0) {
+      byte dumpTheData = serial.read();
+    }
+  }
+
+  return _controlCommands;
+}
