@@ -40,8 +40,8 @@ void FlightController::setup(
     ALTITUDE_KP,
     ALTITUDE_KI,
     ALTITUDE_KD,
-    MIN_ESC_INPUT_FROM_PID,
-    MAX_ESC_INPUT_FROM_PID
+    MIN_THROTTLE_INPUT_FROM_PID,
+    MAX_THROTTLE_INPUT_FROM_PID
   );
   _yawRateController.initialize(
     YAW_RATE_KP,
@@ -93,7 +93,7 @@ ControlCommands FlightController::compute(
 ) {
   ControlCommands result;
 
-  result.throttle = _altitudeController.compute(
+  result.throttle = MOTOR_INPUT_TO_HOVER + _altitudeController.compute(
     referenceState.altitude,
     measuredState.altitude
   );
