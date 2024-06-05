@@ -2,7 +2,7 @@
 #include <nRF24L01.h>
 #include <RF24.h>
 
-const int COMMANDING_FREQUENCY_HZ = 10;
+const int COMMANDING_FREQUENCY_HZ = 100;
 
 const int THRUST_AXIS_PIN = A1;
 const int YAW_AXIS_PIN = A2;
@@ -16,11 +16,11 @@ const byte writeAddress[6] = "00001";
 
 RF24 radio(CE_PIN, CSN_PIN);
 
-struct ControlPacket {
-  int thrustInput;
-  int yawInput;
-  int pitchInput;
-  int rollInput;
+struct ControlCommands {
+  float throttle;
+  float yaw;
+  float pitch;
+  float roll;
 };
 
 void setup() {
@@ -43,14 +43,14 @@ void loop() {
   int pitchInput = analogRead(PITCH_AXIS_PIN);
   int rollInput = analogRead(ROLL_AXIS_PIN);
 
-  struct ControlPacket controlPacket = {
+  struct ControlCommands controlCommands = {
     thrustInput,
     yawInput,
     pitchInput,
     rollInput
   };
 
-  radio.write(&controlPacket, sizeof(controlPacket));
+  radio.write(&controlCommands, sizeof(controlCommands));
 
   delay(1000 / COMMANDING_FREQUENCY_HZ);
 }
