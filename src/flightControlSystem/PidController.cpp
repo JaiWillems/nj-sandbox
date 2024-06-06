@@ -56,27 +56,30 @@ float PidController::compute(
   float deltaTime = getDeltaTime();
 
   float currentError = reference - measured;
-
   _integralError = _integralError +
     currentError * deltaTime;
-
   float derivativeError = (currentError -
     _previousError) / deltaTime;
-  
+
   _previousError = currentError;
 
-  float input = _kp * currentError +
-    _ki * _integralError +
-    _kd * derivativeError;
-
-  return saturate(input);
+  return getInput(
+    currentError,
+    _integralError,
+    derivativeError
+  );
 }
 
-float PidController::getDeltaTime() {
-  float currentTime = millis();
-  float deltaTime = (currentTime - _previousTime) / 1000;
-  _previousTime = currentTime;
-  return deltaTime;
+float PidController::getInput(
+  float error,
+  float integralError,
+  float derivativeError
+) {
+  return saturate(
+    _kp * error +
+    _ki * integralError +
+    _kd * derivativeError
+  );
 }
 
 float PidController::saturate(
@@ -87,4 +90,31 @@ float PidController::saturate(
     _minLimit,
     _maxLimit
   );
+}
+
+float PidController::compute(
+  float reference,
+  float measured,
+  float measuredDerivative
+) {
+  float deltaTime = getDeltaTime();
+
+  float currentError = reference - measured;
+  _integralError = _integralError +
+    currentError * deltaTime;
+
+  _previousError = currentError;
+
+  return getInput(
+    currentError,
+    _integralError,
+    measuredDerivative
+  );
+}
+
+float PidController::getDeltaTime() {
+  float currentTime = millis();
+  float deltaTime = (currentTime - _previousTime) / 1000;
+  _previousTime = currentTime;
+  return deltaTime;
 }

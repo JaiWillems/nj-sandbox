@@ -45,6 +45,11 @@ class PidController {
       float reference,
       float measured
     );
+    float compute(
+      float reference,
+      float measured,
+      float measuredDerivative
+    );
   private:
     float _kp;
     float _ki;
@@ -55,6 +60,11 @@ class PidController {
     float _previousError;
     float _integralError;
     float getDeltaTime();
+    float getInput(
+      float error,
+      float integralError,
+      float derivativeError
+    );
     float saturate(
       float input
     );
