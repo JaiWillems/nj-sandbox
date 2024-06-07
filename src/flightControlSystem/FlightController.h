@@ -36,15 +36,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class FlightController {
   public:
-    void setup(
-      FlightModeFSM* flightModeFSM
-    );
+    FlightModeFSM flightModeFSM;
+    void setup();
     ControlCommands compute(
       StateVector referenceState,
       StateVector measuredState
     );
   private:
-    FlightModeFSM* _flightModeFSM;
     PidController _altitudeController;
     PidController _yawController;
     PidController _pitchController;

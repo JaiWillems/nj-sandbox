@@ -36,7 +36,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Imu.h"
 #include "UartCommunications.h"
 #include "FlightController.h"
-#include "FlightModeFSM.h"
 
 // *** PINS ***
 
@@ -66,8 +65,6 @@ ControlCommands controlCommands;
 float previousAltitude;
 int previousTime;
 
-FlightModeFSM flightModeFSM;
-
 void setup() {
 
   drone.setup(
@@ -80,6 +77,8 @@ void setup() {
   );
   drone.arm();
 
+  flightController.setup();
+
   ultrasonic.setup(
     ULTRASONIC_TRIG_PIN,
     ULTRASONIC_ECHO_PIN
@@ -88,7 +87,9 @@ void setup() {
 
   imu.setup();
   if (!imu.initializeDmp()) {
-    flightModeFSM.setMode(ERROR);
+    flightController.flightModeFSM.setMode(
+      ERROR
+    );
   }
   imu.calibrate(IMU_CALIBRATION_LOOPS);
 
@@ -97,14 +98,10 @@ void setup() {
     UART_TX_PIN,
     UART_BAUD_RATE
   );
-
-  flightController.setup(
-    &flightModeFSM
-  );
 }
 
 void loop() {
-  if (!flightModeFSM.isMode(ERROR)) {
+  if (!flightController.flightModeFSM.isMode(ERROR)) {
     if (uartCommunications.isPacketAvailable()) {
       controlCommands = uartCommunications.deserialize();
     }

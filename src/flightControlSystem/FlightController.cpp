@@ -31,10 +31,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "FlightController.h"
 
-void FlightController::setup(
-  FlightModeFSM* flightModeFSM
-) {
-  _flightModeFSM = flightModeFSM;
+void FlightController::setup() {
+  flightModeFSM = flightModeFSM;
 
   _altitudeController.initialize(
     ALTITUDE_KP,
@@ -77,11 +75,11 @@ ControlCommands FlightController::compute(
 ) {
   ControlCommands result;
 
-  if ((*_flightModeFSM).isMode(TAKEOFF)) {
+  if (flightModeFSM.isMode(TAKEOFF)) {
     result.throttle = (1 + TAKEOFF_GAIN) *
       MOTOR_INPUT_TO_HOVER;
   }
-  else if ((*_flightModeFSM).isMode(LANDING)) {
+  else if (flightModeFSM.isMode(LANDING)) {
     result.throttle = (1 - LANDING_GAIN) *
       MOTOR_INPUT_TO_HOVER;
   }
