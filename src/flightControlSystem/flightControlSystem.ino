@@ -30,11 +30,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "Settings.h"
+#include "Types.h"
 #include "Drone.h"
 #include "Ultrasonic.h"
 #include "Imu.h"
 #include "UartCommunications.h"
 #include "FlightController.h"
+#include "FlightModeFSM.h"
 
 bool STABILIZE_MODE = false;
 
@@ -66,6 +68,8 @@ ControlCommands controlCommands;
 float previousAltitude;
 int previousTime;
 
+FlightModeFSM flightModeFsm;
+
 void setup() {
 
   drone.setup(
@@ -86,7 +90,7 @@ void setup() {
 
   imu.setup();
   if (STABILIZE_MODE && !imu.initializeDmp()) {
-    STABILIZE_MODE = false;
+    flightModeFsm.setMode(ERROR);
   }
   imu.calibrate(IMU_CALIBRATION_LOOPS);
 
@@ -100,20 +104,21 @@ void setup() {
 }
 
 void loop() {
+  if (!flightModeFsm.isMode(ERROR)) {
+    if (uartCommunications.isPacketAvailable()) {
+      controlCommands = uartCommunications.deserialize();
+    }
 
-  if (uartCommunications.isPacketAvailable()) {
-    controlCommands = uartCommunications.deserialize();
+    StateVector referenceState = getReferenceState();
+    StateVector measuredState = getMeasuredState();
+
+    drone.sendControlInputs(
+      flightController.compute(
+        referenceState,
+        measuredState
+      )
+    );
   }
-
-  StateVector referenceState = getReferenceState();
-  StateVector measuredState = getMeasuredState();
-
-  drone.sendControlInputs(
-    flightController.compute(
-      referenceState,
-      measuredState
-    )
-  );
 }
 
 StateVector getReferenceState() {
