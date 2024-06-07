@@ -31,8 +31,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "FlightModeFSM.h"
 
+// Columns are fromMode, rows are toMode.
+const int KARNAUGH_MAP[5][5] = {
+  {1, 0, 0, 1, 0},
+  {1, 1, 0, 0, 0},
+  {0, 1, 1, 0, 0},
+  {0, 1, 1, 1, 0},
+  {1, 1, 1, 1, 1}
+};
+
 FlightModeFSM::FlightModeFSM() {
-  _currentMode = NOMINAL;
+  _currentMode = OFF;
 }
 
 bool FlightModeFSM::setMode(
@@ -52,10 +61,10 @@ bool FlightModeFSM::isValidTransition(
   FlightMode fromMode,
   FlightMode toMode
 ) {
-  if (fromMode == ERROR && toMode == NOMINAL) {
-    return false;
+  if (KARNAUGH_MAP[toMode][fromMode]) {
+    return true;
   }
-  return true;
+  return false;
 }
 
 bool FlightModeFSM::isMode(

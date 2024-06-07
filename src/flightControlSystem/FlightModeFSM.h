@@ -29,9 +29,15 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#ifndef FlightModeFSM_h
+#define FlightModeFSM_h
+
 enum FlightMode {
-  NOMINAL,
-  ERROR
+  OFF = 0,
+  TAKEOFF = 1,
+  NOMINAL = 2,
+  LANDING = 3,
+  ERROR = 4
 };
 
 class FlightModeFSM {
@@ -50,3 +56,5 @@ class FlightModeFSM {
       FlightMode toMode
     );
 };
+
+#endif

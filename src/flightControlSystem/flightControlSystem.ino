@@ -38,8 +38,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "FlightController.h"
 #include "FlightModeFSM.h"
 
-bool STABILIZE_MODE = false;
-
 // *** PINS ***
 
 const int MOTOR_ONE_PIN = 10;
@@ -68,7 +66,7 @@ ControlCommands controlCommands;
 float previousAltitude;
 int previousTime;
 
-FlightModeFSM flightModeFsm;
+FlightModeFSM flightModeFSM;
 
 void setup() {
 
@@ -89,8 +87,8 @@ void setup() {
   ultrasonic.calibrate();
 
   imu.setup();
-  if (STABILIZE_MODE && !imu.initializeDmp()) {
-    flightModeFsm.setMode(ERROR);
+  if (!imu.initializeDmp()) {
+    flightModeFSM.setMode(ERROR);
   }
   imu.calibrate(IMU_CALIBRATION_LOOPS);
 
@@ -100,11 +98,13 @@ void setup() {
     UART_BAUD_RATE
   );
 
-  flightController.setup(STABILIZE_MODE);
+  flightController.setup(
+    &flightModeFSM
+  );
 }
 
 void loop() {
-  if (!flightModeFsm.isMode(ERROR)) {
+  if (!flightModeFSM.isMode(ERROR)) {
     if (uartCommunications.isPacketAvailable()) {
       controlCommands = uartCommunications.deserialize();
     }
@@ -144,29 +144,15 @@ StateVector getReferenceState() {
     controlCommands.pitch,
     MIN_PITCH_STICK_POSITION,
     MAX_PITCH_STICK_POSITION,
-    MIN_PITCH_ANGLE_DEG,
-    MAX_PITCH_ANGLE_DEG
-  );
-  referenceState.pitchRate = map(
-    controlCommands.pitch,
-    MIN_PITCH_STICK_POSITION,
-    MAX_PITCH_STICK_POSITION,
-    MIN_PITCH_RATE_DEG_PER_SEC,
-    MAX_PITCH_RATE_DEG_PER_SEC
+    MIN_PITCH_DEG,
+    MAX_PITCH_DEG
   );
   referenceState.roll = map(
     controlCommands.roll,
     MIN_ROLL_STICK_POSITION,
     MAX_ROLL_STICK_POSITION,
-    MIN_ROLL_ANGLE_DEG,
-    MAX_ROLL_ANGLE_DEG
-  );
-  referenceState.rollRate = map(
-    controlCommands.roll,
-    MIN_ROLL_STICK_POSITION,
-    MAX_ROLL_STICK_POSITION,
-    MIN_ROLL_RATE_DEG_PER_SEC,
-    MAX_ROLL_RATE_DEG_PER_SEC
+    MIN_ROLL_DEG,
+    MAX_ROLL_DEG
   );
   return referenceState;
 }
@@ -197,7 +183,7 @@ StateVector getMeasuredState() {
     &measuredState.yawRate
   );
   uint8_t fifoBuffer[64];
-  if (STABILIZE_MODE && imu.getCurrentFIFOPacket(fifoBuffer)) {
+  if (imu.getCurrentFIFOPacket(fifoBuffer)) {
     imu.getYawPitchRollFromDmp(
       fifoBuffer,
       &measuredState.yaw,
