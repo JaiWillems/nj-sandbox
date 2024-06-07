@@ -31,60 +31,42 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "FlightController.h"
 
-void FlightController::setup(
-  bool stabilizeMode
-) {
-  _stabilizeMode = stabilizeMode;
+void FlightController::setup() {
+  flightModeFSM = flightModeFSM;
 
   _altitudeController.initialize(
     ALTITUDE_KP,
     ALTITUDE_KI,
     ALTITUDE_KD,
-    MIN_THROTTLE_INPUT_FROM_PID,
-    MAX_THROTTLE_INPUT_FROM_PID
+    MIN_THROTTLE_PID_INPUT,
+    MAX_THROTTLE_PID_INPUT
   );
-  _yawRateController.initialize(
-    YAW_RATE_KP,
-    YAW_RATE_KI,
-    YAW_RATE_KD,
-    MIN_ESC_INPUT_FROM_PID,
-    MAX_ESC_INPUT_FROM_PID
+  _yawController.initialize(
+    YAW_KP,
+    YAW_KI,
+    YAW_KD,
+    MIN_MOTOR_PID_INPUT,
+    MAX_MOTOR_PID_INPUT
   );
   _pitchController.initialize(
     PITCH_KP,
     PITCH_KI,
     PITCH_KD,
-    MIN_PITCH_RATE_DEG_PER_SEC,
-    MAX_PITCH_RATE_DEG_PER_SEC
-  );
-  _pitchRateController.initialize(
-    PITCH_RATE_KP,
-    PITCH_RATE_KI,
-    PITCH_RATE_KD,
-    MIN_ESC_INPUT_FROM_PID,
-    MAX_ESC_INPUT_FROM_PID
+    MIN_MOTOR_PID_INPUT,
+    MAX_MOTOR_PID_INPUT
   );
   _rollController.initialize(
     ROLL_KP,
     ROLL_KI,
     ROLL_KD,
-    MIN_ROLL_RATE_DEG_PER_SEC,
-    MAX_ROLL_RATE_DEG_PER_SEC
-  );
-  _rollRateController.initialize(
-    ROLL_RATE_KP,
-    ROLL_RATE_KI,
-    ROLL_RATE_KD,
-    MIN_ESC_INPUT_FROM_PID,
-    MAX_ESC_INPUT_FROM_PID
+    MIN_MOTOR_PID_INPUT,
+    MAX_MOTOR_PID_INPUT
   );
 
   _altitudeController.begin();
-  _yawRateController.begin();
+  _yawController.begin();
   _pitchController.begin();
-  _pitchRateController.begin();
   _rollController.begin();
-  _rollRateController.begin();
 }
 
 ControlCommands FlightController::compute(
@@ -93,37 +75,37 @@ ControlCommands FlightController::compute(
 ) {
   ControlCommands result;
 
-  result.throttle = MOTOR_INPUT_TO_HOVER + _altitudeController.compute(
-    referenceState.altitude,
-    measuredState.altitude
-  );
-
-  result.yaw = _yawRateController.compute(
-    referenceState.yawRate,
-    measuredState.yawRate
-  );
-
-  float referencePitchRate = referenceState.pitchRate;
-  if (_stabilizeMode) {
-    referencePitchRate = _pitchController.compute(
-      referenceState.pitch,
-      measuredState.pitch
-    );
+  if (flightModeFSM.isMode(TAKEOFF)) {
+    result.throttle = (1 + TAKEOFF_GAIN) *
+      MOTOR_INPUT_TO_HOVER;
   }
+  else if (flightModeFSM.isMode(LANDING)) {
+    result.throttle = (1 - LANDING_GAIN) *
+      MOTOR_INPUT_TO_HOVER;
+  }
+  else {
+    result.throttle = MOTOR_INPUT_TO_HOVER +
+      _altitudeController.compute(
+        referenceState.altitude,
+        measuredState.altitude
+      );
+  }
+
+  result.yaw = _yawController.compute(
+    0,
+    0,
+    referenceState.yawRate
+  );
+
   result.pitch = _pitchController.compute(
-    referencePitchRate,
+    referenceState.pitch,
+    measuredState.pitch,
     measuredState.pitchRate
   );
 
-  float referenceRollRate = referenceState.rollRate;
-  if (_stabilizeMode) {
-    referenceRollRate = _pitchController.compute(
-      referenceState.roll,
-      measuredState.roll
-    );
-  }
   result.roll = _rollController.compute(
-    referenceRollRate,
+    referenceState.roll,
+    measuredState.roll,
     measuredState.rollRate
   );
 
