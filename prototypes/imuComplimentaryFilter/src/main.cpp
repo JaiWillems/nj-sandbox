@@ -203,12 +203,3 @@ float complementaryFilter(float previousAngle, float accelAngle, float gyroAngle
   previousAngle = accelerationContribution + gyroContribution;
   return previousAngle;
 }
-
-float complementaryFilter(float previousAngle, float accelAngle, float gyroAngle, float dt, float alpha)
-{
-  float gyro = gyroAngle * dt;
-  float accelerationContribution = (1 - alpha) * accelAngle;
-  float gyroContribution = alpha * (previousAngle + gyro);
-  previousAngle = accelerationContribution + gyroContribution;
-  return previousAngle;
-}

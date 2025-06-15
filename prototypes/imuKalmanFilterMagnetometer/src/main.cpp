@@ -7,12 +7,20 @@
 #define CONFIG 0x1A
 #define ACCEL_CONF 0x1C
 #define GYRO_CONF 0x1B
+#define INT_PIN_CFG 0x37
 #define ACCEL_XOUT_H 0x3B
 #define ACCEL_YOUT_H 0x3D
 #define ACCEL_ZOUT_H 0x3F
 #define GYRO_XOUT_H 0x43
 #define GYRO_YOUT_H 0x45
 #define GYRO_ZOUT_H 0x47
+
+#define QMC5883_ADDR 0x0D
+#define MAG_XOUT_L 0x00
+#define MAG_YOUT_L 0x02
+#define MAG_ZOUT_L 0x04
+#define SET_MODE 0x09
+#define PERIOD_REG 0x0B
 
 #define CALIBRATION_SAMPLES 1000
 float accelXOffset = 0;
@@ -46,7 +54,8 @@ float kalmanState[] = {0, 0};
 void IMUsetup();
 void IMUconfig();
 void IMUcalibrate();
-int16_t readValues(uint8_t addr, uint8_t start);
+int16_t readValues(uint8_t addr, uint8_t start, int type);
+void setI2CBypassEnabled();
 float calculateMovingAverage(float sum[], int sumLength, float sensorReading, int &index);
 void kalmanFilter(float state, float uncertainty, float accelInput, float gyroInput);
 void setup()
@@ -63,13 +72,19 @@ void loop()
 {
   float accelX, accelY, accelZ, gyroX, gyroY, gyroZ;
   float filterAccelX, filterAccelY, filterAccelZ, filterGyroX, filterGyroY, filterGyroZ;
-  accelX = (readValues(MPU_ADDR, ACCEL_XOUT_H) - accelXOffset) / 16384.0;
-  accelY = (readValues(MPU_ADDR, ACCEL_YOUT_H) - accelYOffset) / 16384.0;
-  accelZ = (readValues(MPU_ADDR, ACCEL_ZOUT_H) - accelZOffset) / 16384.0;
+  float magX, magY, magZ;
 
-  gyroX = (readValues(MPU_ADDR, GYRO_XOUT_H) - gyroXOffset) / 131.0;
-  gyroY = (readValues(MPU_ADDR, GYRO_YOUT_H) - gyroYOffset) / 131.0;
-  gyroZ = (readValues(MPU_ADDR, GYRO_ZOUT_H) - gyroZOffset) / 131.0;
+  accelX = (readValues(MPU_ADDR, ACCEL_XOUT_H, 0) - accelXOffset) / 16384.0;
+  accelY = (readValues(MPU_ADDR, ACCEL_YOUT_H, 0) - accelYOffset) / 16384.0;
+  accelZ = (readValues(MPU_ADDR, ACCEL_ZOUT_H, 0) - accelZOffset) / 16384.0;
+
+  gyroX = (readValues(MPU_ADDR, GYRO_XOUT_H, 0) - gyroXOffset) / 131.0;
+  gyroY = (readValues(MPU_ADDR, GYRO_YOUT_H, 0) - gyroYOffset) / 131.0;
+  gyroZ = (readValues(MPU_ADDR, GYRO_ZOUT_H, 0) - gyroZOffset) / 131.0;
+
+  magX = readValues(QMC5883_ADDR, MAG_XOUT_L, 1);
+  magY = readValues(QMC5883_ADDR, MAG_YOUT_L, 1);
+  magZ = readValues(QMC5883_ADDR, MAG_ZOUT_L, 1);
 
   filterAccelX = calculateMovingAverage(accelXSum, numberReadings, accelX, index);
   filterAccelY = calculateMovingAverage(accelYSum, numberReadings, accelY, index);
@@ -81,6 +96,7 @@ void loop()
 
   float accelRoll = atan2(filterAccelY, filterAccelZ) * 180.0 / PI;
   float accelPitch = atan2((-filterAccelX), sqrt(filterAccelY * filterAccelY + filterAccelZ * filterAccelZ)) * 180.0 / PI;
+  float magYaw = atan2(magY, magX) * 180.0 / PI;
 
   kalmanFilter(kalmanPitch, uncertaintyPitch, accelPitch, filterGyroY);
   kalmanPitch = kalmanState[0];
@@ -89,18 +105,14 @@ void loop()
   kalmanRoll = kalmanState[0];
   uncertaintyRoll = kalmanState[1];
 
-  // Serial.print(kalmanPitch);
-  // Serial.print(" ");
-  // Serial.print(kalmanRoll);
-  // Serial.print(" ");
-
   float filterKalmanPitch = calculateMovingAverage(kalmanPitchSum, numberReadings, kalmanPitch, index);
   float filterKalmanRoll = calculateMovingAverage(kalmanRollSum, numberReadings, kalmanRoll, index);
+
   Serial.print(int(filterKalmanPitch));
-  Serial.print(" ");
+  Serial.print(",");
   Serial.print(int(filterKalmanRoll));
   Serial.print(",");
-  Serial.println(int(filterGyroZ);
+  Serial.println(int(magYaw));
 }
 void IMUsetup()
 {
@@ -108,6 +120,9 @@ void IMUsetup()
   Wire.write(PWR_MGMT_1);
   Wire.write(0x00);
   Wire.endTransmission(true);
+
+  setI2CBypassEnabled();
+  
 }
 void IMUconfig()
 {
@@ -128,28 +143,37 @@ void IMUconfig()
   Wire.write(0x09);
   Wire.endTransmission(true);
 }
-int16_t readValues(uint8_t addr, uint8_t start)
-{
+void setI2CBypassEnabled() {
+  Wire.beginTransmission(MPU_ADDR);
+  Wire.write(INT_PIN_CFG);
+  Wire.write(0x02);
+  Wire.endTransmission(true);
+}
+int16_t readValues(uint8_t addr, uint8_t start, int type) {
   Wire.beginTransmission(addr);
   Wire.write(start);
   Wire.endTransmission(false);
   Wire.requestFrom(addr, 2, true);
-  uint8_t highByte = Wire.read();
-  uint8_t lowByte = Wire.read();
-  float accel = (highByte << 8) | lowByte;
-  return accel;
+  uint8_t highByte, lowByte;
+  if (type == 0) {
+    highByte = Wire.read();
+    lowByte = Wire.read();
+  } else {
+    lowByte = Wire.read();
+    highByte = Wire.read();
+  }
+  int16_t value = (highByte << 8) | lowByte;
+  return value;
 }
 
-void IMUcalibrate()
-{
-  for (int element = 0; element < CALIBRATION_SAMPLES; element++)
-  {
-    int16_t ax = readValues(MPU_ADDR, ACCEL_XOUT_H);
-    int16_t ay = readValues(MPU_ADDR, ACCEL_YOUT_H);
-    int16_t az = readValues(MPU_ADDR, ACCEL_ZOUT_H);
-    int16_t gx = readValues(MPU_ADDR, GYRO_XOUT_H);
-    int16_t gy = readValues(MPU_ADDR, GYRO_YOUT_H);
-    int16_t gz = readValues(MPU_ADDR, GYRO_ZOUT_H);
+void IMUcalibrate() {
+  for (int i = 0; i < CALIBRATION_SAMPLES; i++) {
+    int16_t ax = readValues(MPU_ADDR, ACCEL_XOUT_H, 0);
+    int16_t ay = readValues(MPU_ADDR, ACCEL_YOUT_H, 0);
+    int16_t az = readValues(MPU_ADDR, ACCEL_ZOUT_H, 0);
+    int16_t gx = readValues(MPU_ADDR, GYRO_XOUT_H, 0);
+    int16_t gy = readValues(MPU_ADDR, GYRO_YOUT_H, 0);
+    int16_t gz = readValues(MPU_ADDR, GYRO_ZOUT_H, 0);
 
     accelXOffset += ax;
     accelYOffset += ay;
@@ -157,6 +181,8 @@ void IMUcalibrate()
     gyroXOffset += gx;
     gyroYOffset += gy;
     gyroZOffset += gz;
+
+    delay(10);
   }
 
   accelXOffset /= CALIBRATION_SAMPLES;
@@ -167,8 +193,8 @@ void IMUcalibrate()
   gyroZOffset /= CALIBRATION_SAMPLES;
 
   accelZOffset -= 16384.0;
-  delay(10);
 }
+
 
 float calculateMovingAverage(float sum[], int sumLength, float sensorReading, int &index)
 {
