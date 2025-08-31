@@ -32,22 +32,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Settings.h"
 #include "Types.h"
 #include "PidController.h"
+#include "FlightModeFSM.h"
 
 class FlightController {
   public:
-    void setup(
-      bool stabilizeMode
-    );
+    FlightModeFSM flightModeFSM;
+    void setup();
     ControlCommands compute(
       StateVector referenceState,
       StateVector measuredState
     );
   private:
-    bool _stabilizeMode;
     PidController _altitudeController;
-    PidController _yawRateController;
+    PidController _yawController;
     PidController _pitchController;
-    PidController _pitchRateController;
     PidController _rollController;
-    PidController _rollRateController;
 };

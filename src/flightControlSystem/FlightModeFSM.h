@@ -29,43 +29,32 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <Arduino.h>
+#ifndef FlightModeFSM_h
+#define FlightModeFSM_h
 
-class PidController {
+enum FlightMode {
+  OFF = 0,
+  TAKEOFF = 1,
+  NOMINAL = 2,
+  LANDING = 3,
+  ERROR = 4
+};
+
+class FlightModeFSM {
   public:
-    void initialize(
-      float kp,
-      float ki,
-      float kd,
-      float minLimit,
-      float maxLimit
+    FlightModeFSM();
+    bool setMode(
+      FlightMode newMode
     );
-    void begin();
-    float compute(
-      float reference,
-      float measured
-    );
-    float compute(
-      float reference,
-      float measured,
-      float measuredDerivative
+    bool isMode(
+      FlightMode mode
     );
   private:
-    float _kp;
-    float _ki;
-    float _kd;
-    float _minLimit;
-    float _maxLimit;
-    float _previousTime;
-    float _previousError;
-    float _integralError;
-    float getDeltaTime();
-    float getInput(
-      float error,
-      float integralError,
-      float derivativeError
-    );
-    float saturate(
-      float input
+    FlightMode _currentMode;
+    bool isValidTransition(
+      FlightMode fromMode,
+      FlightMode toMode
     );
 };
+
+#endif

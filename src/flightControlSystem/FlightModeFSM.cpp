@@ -29,43 +29,46 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <Arduino.h>
+#include "FlightModeFSM.h"
 
-class PidController {
-  public:
-    void initialize(
-      float kp,
-      float ki,
-      float kd,
-      float minLimit,
-      float maxLimit
-    );
-    void begin();
-    float compute(
-      float reference,
-      float measured
-    );
-    float compute(
-      float reference,
-      float measured,
-      float measuredDerivative
-    );
-  private:
-    float _kp;
-    float _ki;
-    float _kd;
-    float _minLimit;
-    float _maxLimit;
-    float _previousTime;
-    float _previousError;
-    float _integralError;
-    float getDeltaTime();
-    float getInput(
-      float error,
-      float integralError,
-      float derivativeError
-    );
-    float saturate(
-      float input
-    );
+// Columns are fromMode, rows are toMode.
+const int KARNAUGH_MAP[5][5] = {
+  {1, 0, 0, 1, 0},
+  {1, 1, 0, 0, 0},
+  {0, 1, 1, 0, 0},
+  {0, 1, 1, 1, 0},
+  {1, 1, 1, 1, 1}
 };
+
+FlightModeFSM::FlightModeFSM() {
+  _currentMode = OFF;
+}
+
+bool FlightModeFSM::setMode(
+  FlightMode newMode
+) {
+  bool doSetMode = isValidTransition(
+    _currentMode,
+    newMode
+  );
+  if (doSetMode) {
+    _currentMode = newMode;
+  }
+  return doSetMode;
+}
+
+bool FlightModeFSM::isValidTransition(
+  FlightMode fromMode,
+  FlightMode toMode
+) {
+  if (KARNAUGH_MAP[toMode][fromMode]) {
+    return true;
+  }
+  return false;
+}
+
+bool FlightModeFSM::isMode(
+  FlightMode mode
+) {
+  return _currentMode == mode;
+}
