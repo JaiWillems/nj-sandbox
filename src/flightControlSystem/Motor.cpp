@@ -35,19 +35,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 const int MIN_SERVO_INPUT = 1000;
 const int MAX_SERVO_INPUT = 2000;
+const int OFFSET = 1000;
 
 void Motor::attach(
-  int pin,
-  int minInput,
-  int maxInput
+  int pin
 ) {
   _motor.attach(
     pin,
-    minInput,
-    maxInput
+    MIN_SERVO_INPUT,
+    MAX_SERVO_INPUT
   );
-  _minInput = minInput;
-  _maxInput = maxInput;
   
   setSpeed(MAX_SERVO_INPUT);
 }
@@ -61,7 +58,7 @@ void Motor::setSpeed(
 ) {
   _motor.write(
     constrain(
-      input,
+      input + OFFSET,
       MIN_SERVO_INPUT,
       MAX_SERVO_INPUT
     )

@@ -38,9 +38,7 @@ class Drone {
       int motorOnePin,
       int motorTwoPin,
       int motorThreePin,
-      int motorFourPin,
-      int minMotorInput,
-      int maxMotorInput
+      int motorFourPin
     );
     void arm();
     void sendControlInputs(
@@ -51,8 +49,6 @@ class Drone {
     Motor _motorTwo;
     Motor _motorThree;
     Motor _motorFour;
-    int _minMotorInput;
-    int _maxMotorInput;
     int mixControlInputs(
       bool bow,
       bool port,

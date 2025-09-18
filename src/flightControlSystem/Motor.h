@@ -35,9 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class Motor {
   public:
     void attach(
-      int pin,
-      int minInput,
-      int maxInput
+      int pin
     );
     void arm();
     void setSpeed(
@@ -45,6 +43,4 @@ class Motor {
     );
   private:
     Servo _motor;
-    int _minInput;
-    int _maxInput;
 };

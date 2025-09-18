@@ -71,9 +71,7 @@ void setup() {
     MOTOR_ONE_PIN,
     MOTOR_TWO_PIN,
     MOTOR_THREE_PIN,
-    MOTOR_FOUR_PIN,
-    MIN_MOTOR_INPUT,
-    MAX_MOTOR_INPUT
+    MOTOR_FOUR_PIN
   );
   drone.arm();
 

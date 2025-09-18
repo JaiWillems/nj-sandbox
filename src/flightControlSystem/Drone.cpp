@@ -49,32 +49,20 @@ void Drone::setup(
   int motorOnePin,
   int motorTwoPin,
   int motorThreePin,
-  int motorFourPin,
-  int minMotorInput,
-  int maxMotorInput
+  int motorFourPin
 ) {
   _motorOne.attach(
-    motorOnePin,
-    minMotorInput,
-    maxMotorInput
+    motorOnePin
   );
   _motorTwo.attach(
-    motorTwoPin,
-    minMotorInput,
-    maxMotorInput
+    motorTwoPin
   );
   _motorThree.attach(
-    motorThreePin,
-    minMotorInput,
-    maxMotorInput
+    motorThreePin
   );
   _motorFour.attach(
-    motorFourPin,
-    minMotorInput,
-    maxMotorInput
+    motorFourPin
   );
-  _minMotorInput = minMotorInput;
-  _maxMotorInput = maxMotorInput;
 }
 
 void Drone::arm() {
