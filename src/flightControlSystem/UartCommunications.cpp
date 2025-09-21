@@ -33,43 +33,38 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 const int START_MARKER = 255;
 
-void UartCommunications::setup(
+UartCommunications::UartCommunications(
   int rxPin,
-  int txPin,
+  int txPin
+) {
+  _serial = new SoftwareSerial(
+    rxPin,
+    txPin
+  );
+}
+
+void UartCommunications::begin(
   int baudRate
 ) {
-  _rxPin = rxPin;
-  _txPin = txPin;
-  _baudRate = baudRate;
+  _serial->begin(baudRate);
 }
 
 bool UartCommunications::isPacketAvailable() {
-  SoftwareSerial serial = SoftwareSerial(
-    _rxPin,
-    _txPin
-  );
-  serial.begin(_baudRate);
-  return serial.available() > sizeof(_controlCommands) + 1;
+  return _serial->available() > sizeof(_controlCommands) + 1;
 }
 
 ControlCommands UartCommunications::deserialize() {
-  SoftwareSerial serial = SoftwareSerial(
-    _rxPin,
-    _txPin
-  );
-  serial.begin(_baudRate);
-
   byte* structStart = reinterpret_cast<byte*>(&_controlCommands);
 
-  byte data = serial.read();
+  byte data = _serial->read();
 
   if (data == START_MARKER) {
 
     for (byte n = 0; n < sizeof(_controlCommands); n++) {
-      *(structStart + n) = serial.read();
+      *(structStart + n) = _serial->read();
     }
-    while (serial.available() > 0) {
-      byte dumpTheData = serial.read();
+    while (_serial->available() > 0) {
+      byte dumpTheData = _serial->read();
     }
   }
 

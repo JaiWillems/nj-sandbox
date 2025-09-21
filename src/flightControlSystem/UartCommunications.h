@@ -35,16 +35,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class UartCommunications {
   public:
-    void setup(
+    UartCommunications(
       int rxPin,
-      int txPin,
+      int txPin
+    );
+    void begin(
       int baudRate
     );
     bool isPacketAvailable();
     ControlCommands deserialize();
   private:
-    int _rxPin;
-    int _txPin;
-    int _baudRate;
+    SoftwareSerial* _serial;
     ControlCommands _controlCommands;
 };
