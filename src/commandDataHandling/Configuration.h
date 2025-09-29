@@ -29,50 +29,21 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "Configuration.h"
-#include "Settings.h"
-#include "Types.h"
+#ifndef Configuration_h
+#define Configuration_h
 
-#include <SPI.h>
-#include <nRF24L01.h>
-#include <RF24.h>
-#include <SoftwareSerial.h>
+// *** TRANSCEIVER ***
 
-FlightInputs flightInputs;
+const int CE_PIN = 5;
+const int CSN_PIN = 6;
+const uint32_t SPI_SPEED = 4000000;
+const byte readAddress[6] = "00001";
 
-RF24 radio(
-  CE_PIN,
-  CSN_PIN,
-  SPI_SPEED
-);
+// *** UART ***
 
-SoftwareSerial uartCommunications(
-  RX_PIN,
-  TX_PIN
-);
+const int RX_PIN = 9;
+const int TX_PIN = 10;
+const int UART_BAUD_RATE = 9600;
+const byte START_MARKER = 255;
 
-void setup() {
-  radio.begin();
-  radio.openReadingPipe(0, readAddress);
-  radio.setPALevel(RF24_PA_MIN);
-  radio.startListening();
-
-  uartCommunications.begin(UART_BAUD_RATE);
-}
-
-void loop() {
-  if (radio.available()) {
-    radio.read(
-      &flightInputs,
-      sizeof(flightInputs)
-    );
-  }
-
-  uartCommunications.write(START_MARKER);
-  uartCommunications.write(
-    (char*)&flightInputs,
-    sizeof(flightInputs)
-  );
-
-  delay(1000 / COMMANDING_FREQUENCY_HZ);
-}
+#endif

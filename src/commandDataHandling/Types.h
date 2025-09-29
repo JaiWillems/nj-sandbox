@@ -29,50 +29,14 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "Configuration.h"
-#include "Settings.h"
-#include "Types.h"
+#ifndef Types_h
+#define Types_h
 
-#include <SPI.h>
-#include <nRF24L01.h>
-#include <RF24.h>
-#include <SoftwareSerial.h>
+struct FlightInputs {
+  float throttle;
+  float yaw;
+  float pitch;
+  float roll;
+};
 
-FlightInputs flightInputs;
-
-RF24 radio(
-  CE_PIN,
-  CSN_PIN,
-  SPI_SPEED
-);
-
-SoftwareSerial uartCommunications(
-  RX_PIN,
-  TX_PIN
-);
-
-void setup() {
-  radio.begin();
-  radio.openReadingPipe(0, readAddress);
-  radio.setPALevel(RF24_PA_MIN);
-  radio.startListening();
-
-  uartCommunications.begin(UART_BAUD_RATE);
-}
-
-void loop() {
-  if (radio.available()) {
-    radio.read(
-      &flightInputs,
-      sizeof(flightInputs)
-    );
-  }
-
-  uartCommunications.write(START_MARKER);
-  uartCommunications.write(
-    (char*)&flightInputs,
-    sizeof(flightInputs)
-  );
-
-  delay(1000 / COMMANDING_FREQUENCY_HZ);
-}
+#endif
