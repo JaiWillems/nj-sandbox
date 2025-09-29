@@ -29,86 +29,28 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "Configuration.h"
-#include "Settings.h"
-#include "Types.h"
+#ifndef Settings_h
+#define Settings_h
 
-#include <SPI.h>
-#include <nRF24L01.h>
-#include <RF24.h>
+// *** GENERAL ***
 
-RF24 radio(
-  CE_PIN,
-  CSN_PIN,
-  SPI_SPEED
-);
+const int COMMANDING_FREQUENCY_HZ = 75;
 
-void setup() {
-  pinMode(THRUST_AXIS_PIN, INPUT);
-  pinMode(YAW_AXIS_PIN, INPUT);
-  pinMode(PITCH_AXIS_PIN, INPUT);
-  pinMode(ROLL_AXIS_PIN, INPUT);
+// *** CONTROL MAPPING ***
 
-  radio.begin();
-  radio.openWritingPipe(writeAddress);
-  radio.setPALevel(RF24_PA_MIN);
-  radio.stopListening();
-}
+const int MIN_THROTTLE_AUTHORITY = 0;
+const int MAX_THROTTLE_AUTHORITY = 1000;
 
-void loop() {
-  FlightInputs flightInputs = mapInputs(
-    readControlInputs()
-  );
+const int YAW_AUTHORITY = 100;
+const int MIN_YAW_AUTHORITY = -YAW_AUTHORITY;
+const int MAX_YAW_AUTHORITY = YAW_AUTHORITY;
 
-  bool result = radio.write(
-    &flightInputs,
-    sizeof(flightInputs)
-  );
+const int PITCH_AUTHORITY = 100;
+const int MIN_PITCH_AUTHORITY = PITCH_AUTHORITY;
+const int MAX_PITCH_AUTHORITY = -PITCH_AUTHORITY;
 
-  delay(1000 / COMMANDING_FREQUENCY_HZ);
-}
+const int ROLL_AUTHORITY = 100;
+const int MIN_ROLL_AUTHORITY = -ROLL_AUTHORITY;
+const int MAX_ROLL_AUTHORITY = ROLL_AUTHORITY;
 
-ControlInputs readControlInputs() {
-  return {
-    analogRead(THRUST_AXIS_PIN),
-    analogRead(YAW_AXIS_PIN),
-    analogRead(PITCH_AXIS_PIN),
-    analogRead(ROLL_AXIS_PIN)
-  };
-}
-
-FlightInputs mapInputs(
-  ControlInputs controlInputs
-) {
-  return {
-    mapInput(
-      controlInputs.throttle,
-      MIN_THROTTLE_AUTHORITY,
-      MAX_THROTTLE_AUTHORITY
-    ),
-    mapInput(
-      controlInputs.yaw,
-      MIN_YAW_AUTHORITY,
-      MAX_YAW_AUTHORITY
-    ),
-    mapInput(
-      controlInputs.pitch,
-      MIN_PITCH_AUTHORITY,
-      MAX_PITCH_AUTHORITY
-    ),
-    mapInput(
-      controlInputs.roll,
-      MIN_ROLL_AUTHORITY,
-      MAX_ROLL_AUTHORITY
-    )
-  };
-}
-
-float mapInput(
-  float value,
-  int range_min,
-  int range_max
-) {
-  float slope = (float) (range_max - range_min) / (MAX_CONTROL_INPUT - MIN_CONTROL_INPUT);
-  return slope * value + range_min;
-}
+#endif
