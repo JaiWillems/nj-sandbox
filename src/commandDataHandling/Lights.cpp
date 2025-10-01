@@ -29,62 +29,81 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "Configuration.h"
-#include "Settings.h"
-#include "Types.h"
 #include "Lights.h"
 
-#include <SPI.h>
-#include <nRF24L01.h>
-#include <RF24.h>
-#include <SoftwareSerial.h>
+void Lights::setup(
+    uint8_t lightOnePin,
+    uint8_t lightTwoPin,
+    uint8_t lightThreePin,
+    uint8_t lightFourPin
+) {
+    _lightOnePin = lightOnePin;
+    _lightTwoPin = lightTwoPin;
+    _lightThreePin = lightThreePin;
+    _lightFourPin = lightFourPin;
 
-FlightInputs flightInputs;
+    pinMode(
+        lightOnePin,
+        OUTPUT
+    );
+    pinMode(
+        lightTwoPin,
+        OUTPUT
+    );
+    pinMode(
+        lightThreePin,
+        OUTPUT
+    );
+    pinMode(
+        lightFourPin,
+        OUTPUT
+    );
 
-Lights lights;
+    _state = LOW;
+    _elapsedTime = millis();
+};
 
-RF24 radio(
-  CE_PIN,
-  CSN_PIN,
-  SPI_SPEED
-);
-
-SoftwareSerial uartCommunications(
-  RX_PIN,
-  TX_PIN
-);
-
-void setup() {
-  lights.setup(
-    NAV_LIGHT_ONE_PIN,
-    NAV_LIGHT_TWO_PIN,
-    NAV_LIGHT_THREE_PIN,
-    NAV_LIGHT_FOUR_PIN
-  );
-
-  radio.begin();
-  radio.openReadingPipe(0, readAddress);
-  radio.setPALevel(RF24_PA_MIN);
-  radio.startListening();
-
-  uartCommunications.begin(UART_BAUD_RATE);
+void Lights::blinkingRefresh() {
+    unsigned long _stateDuration = millis() - _elapsedTime;
+    if (_state == LOW && _stateDuration > NAV_LIGHTS_OFF_DURATION_MS) {
+        on();
+    } else if (_state == HIGH && _stateDuration > NAV_LIGHTS_ON_DURATION_MS) {
+        off();
+    }
 }
 
-void loop() {
-  lights.blinkingRefresh();
-
-  if (radio.available()) {
-    radio.read(
-      &flightInputs,
-      sizeof(flightInputs)
+void Lights::on() {
+    setState(
+        HIGH
     );
-  }
+};
 
-  uartCommunications.write(START_MARKER);
-  uartCommunications.write(
-    (char*)&flightInputs,
-    sizeof(flightInputs)
-  );
+void Lights::off() {
+    setState(
+        LOW
+    );
+};
 
-  delay(1000 / COMMANDING_FREQUENCY_HZ);
+void Lights::setState(
+    uint8_t value
+) {
+    digitalWrite(
+        _lightOnePin,
+        value
+    );
+    digitalWrite(
+        _lightTwoPin,
+        value
+    );
+    digitalWrite(
+        _lightThreePin,
+        value
+    );
+    digitalWrite(
+        _lightFourPin,
+        value
+    );
+
+    _state = value;
+    _elapsedTime = millis();
 }

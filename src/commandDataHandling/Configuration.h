@@ -32,6 +32,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef Configuration_h
 #define Configuration_h
 
+// *** NAVIGATION LIGHTS ***
+
+const uint8_t NAV_LIGHT_ONE_PIN = 4;
+const uint8_t NAV_LIGHT_TWO_PIN = 8;
+const uint8_t NAV_LIGHT_THREE_PIN = 7;
+const uint8_t NAV_LIGHT_FOUR_PIN = 2;
+
 // *** TRANSCEIVER ***
 
 const int CE_PIN = 5;

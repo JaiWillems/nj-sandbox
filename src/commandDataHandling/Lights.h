@@ -29,62 +29,28 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "Configuration.h"
+#include <Arduino.h>
 #include "Settings.h"
-#include "Types.h"
-#include "Lights.h"
 
-#include <SPI.h>
-#include <nRF24L01.h>
-#include <RF24.h>
-#include <SoftwareSerial.h>
-
-FlightInputs flightInputs;
-
-Lights lights;
-
-RF24 radio(
-  CE_PIN,
-  CSN_PIN,
-  SPI_SPEED
-);
-
-SoftwareSerial uartCommunications(
-  RX_PIN,
-  TX_PIN
-);
-
-void setup() {
-  lights.setup(
-    NAV_LIGHT_ONE_PIN,
-    NAV_LIGHT_TWO_PIN,
-    NAV_LIGHT_THREE_PIN,
-    NAV_LIGHT_FOUR_PIN
-  );
-
-  radio.begin();
-  radio.openReadingPipe(0, readAddress);
-  radio.setPALevel(RF24_PA_MIN);
-  radio.startListening();
-
-  uartCommunications.begin(UART_BAUD_RATE);
-}
-
-void loop() {
-  lights.blinkingRefresh();
-
-  if (radio.available()) {
-    radio.read(
-      &flightInputs,
-      sizeof(flightInputs)
-    );
-  }
-
-  uartCommunications.write(START_MARKER);
-  uartCommunications.write(
-    (char*)&flightInputs,
-    sizeof(flightInputs)
-  );
-
-  delay(1000 / COMMANDING_FREQUENCY_HZ);
-}
+class Lights {
+    public:
+        void setup(
+            uint8_t lightOnePin,
+            uint8_t lightTwoPin,
+            uint8_t lightThreePin,
+            uint8_t lightFourPin
+        );
+        void blinkingRefresh();
+        void on();
+        void off();
+    private:
+        uint8_t _lightOnePin;
+        uint8_t _lightTwoPin;
+        uint8_t _lightThreePin;
+        uint8_t _lightFourPin;
+        uint8_t _state;
+        unsigned long _elapsedTime;
+        void setState(
+            uint8_t value
+        );
+};
