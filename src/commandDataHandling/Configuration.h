@@ -41,16 +41,16 @@ const uint8_t NAV_LIGHT_FOUR_PIN = 2;
 
 // *** TRANSCEIVER ***
 
-const int CE_PIN = 5;
-const int CSN_PIN = 6;
+const uint8_t CE_PIN = 5;
+const uint8_t CSN_PIN = 6;
 const uint32_t SPI_SPEED = 4000000;
 const byte readAddress[6] = "00001";
 
 // *** UART ***
 
-const int RX_PIN = 9;
-const int TX_PIN = 10;
-const int UART_BAUD_RATE = 9600;
-const byte START_MARKER = 255;
+const uint8_t RX_PIN = 9;
+const uint8_t TX_PIN = 10;
+const uint16_t UART_BAUD_RATE = 9600;
+const uint8_t START_MARKER = 255;
 
 #endif
