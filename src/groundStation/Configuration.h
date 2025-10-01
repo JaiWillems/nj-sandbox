@@ -47,6 +47,6 @@ const uint8_t ROLL_AXIS_PIN = A3;
 const uint8_t CE_PIN = 7;
 const uint8_t CSN_PIN = 8;
 const uint32_t SPI_SPEED = 4000000;
-const byte writeAddress[6] = "00001";
+const byte WRITE_ADDRESS[6] = "00001";
 
 #endif

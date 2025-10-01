@@ -44,7 +44,7 @@ const uint8_t NAV_LIGHT_FOUR_PIN = 2;
 const uint8_t CE_PIN = 5;
 const uint8_t CSN_PIN = 6;
 const uint32_t SPI_SPEED = 4000000;
-const byte readAddress[6] = "00001";
+const byte READ_ADDRESS[6] = "00001";
 
 // *** UART ***
 

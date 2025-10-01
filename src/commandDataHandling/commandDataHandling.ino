@@ -44,47 +44,47 @@ FlightInputs flightInputs;
 Lights lights;
 
 RF24 radio(
-  CE_PIN,
-  CSN_PIN,
-  SPI_SPEED
+    CE_PIN,
+    CSN_PIN,
+    SPI_SPEED
 );
 
 SoftwareSerial uartCommunications(
-  RX_PIN,
-  TX_PIN
+    RX_PIN,
+    TX_PIN
 );
 
 void setup() {
-  lights.setup(
-    NAV_LIGHT_ONE_PIN,
-    NAV_LIGHT_TWO_PIN,
-    NAV_LIGHT_THREE_PIN,
-    NAV_LIGHT_FOUR_PIN
-  );
+    lights.setup(
+        NAV_LIGHT_ONE_PIN,
+        NAV_LIGHT_TWO_PIN,
+        NAV_LIGHT_THREE_PIN,
+        NAV_LIGHT_FOUR_PIN
+    );
 
-  radio.begin();
-  radio.openReadingPipe(0, readAddress);
-  radio.setPALevel(RF24_PA_MIN);
-  radio.startListening();
+    radio.begin();
+    radio.openReadingPipe(0, READ_ADDRESS);
+    radio.setPALevel(RF24_PA_MIN);
+    radio.startListening();
 
-  uartCommunications.begin(UART_BAUD_RATE);
+    uartCommunications.begin(UART_BAUD_RATE);
 }
 
 void loop() {
-  lights.blinkingRefresh();
+    lights.blinkingRefresh();
 
-  if (radio.available()) {
-    radio.read(
-      &flightInputs,
-      sizeof(flightInputs)
+    if (radio.available()) {
+        radio.read(
+            &flightInputs,
+            sizeof(flightInputs)
+        );
+    }
+
+    uartCommunications.write(START_MARKER);
+    uartCommunications.write(
+        (char*)&flightInputs,
+        sizeof(flightInputs)
     );
-  }
 
-  uartCommunications.write(START_MARKER);
-  uartCommunications.write(
-    (char*)&flightInputs,
-    sizeof(flightInputs)
-  );
-
-  delay(1000 / COMMANDING_FREQUENCY_HZ);
+    delay(1000 / COMMANDING_FREQUENCY_HZ);
 }
