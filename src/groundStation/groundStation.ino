@@ -105,9 +105,9 @@ FlightInputs mapInputs(
 }
 
 float mapInput(
-  float value,
-  int range_min,
-  int range_max
+  uint16_t value,
+  int16_t range_min,
+  int16_t range_max
 ) {
   float slope = (float) (range_max - range_min) / (MAX_CONTROL_INPUT - MIN_CONTROL_INPUT);
   return slope * value + range_min;

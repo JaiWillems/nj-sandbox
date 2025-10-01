@@ -34,18 +34,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // *** CONTROL ***
 
-const int MIN_CONTROL_INPUT = 0;
-const int MAX_CONTROL_INPUT = 1023;
+const uint16_t MIN_CONTROL_INPUT = 0;
+const uint16_t MAX_CONTROL_INPUT = 1023;
 
-const int THRUST_AXIS_PIN = A1;
-const int YAW_AXIS_PIN = A2;
-const int PITCH_AXIS_PIN = A4;
-const int ROLL_AXIS_PIN = A3;
+const uint8_t THRUST_AXIS_PIN = A1;
+const uint8_t YAW_AXIS_PIN = A2;
+const uint8_t PITCH_AXIS_PIN = A4;
+const uint8_t ROLL_AXIS_PIN = A3;
 
 // *** TRANSCEIVER ***
 
-const int CE_PIN = 7;
-const int CSN_PIN = 8;
+const uint8_t CE_PIN = 7;
+const uint8_t CSN_PIN = 8;
 const uint32_t SPI_SPEED = 4000000;
 const byte writeAddress[6] = "00001";
 

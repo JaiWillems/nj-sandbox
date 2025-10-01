@@ -33,10 +33,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define Types_h
 
 struct ControlInputs {
-  float throttle;
-  float yaw;
-  float pitch;
-  float roll;
+  uint16_t throttle;
+  uint16_t yaw;
+  uint16_t pitch;
+  uint16_t roll;
 };
 
 struct FlightInputs {
