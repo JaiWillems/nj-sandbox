@@ -1,7 +1,7 @@
 /*
 BSD 3-Clause License
 
-Copyright (c) 2024, Nishant Kumar, Jai Willems
+Copyright (c) 2025, Nishant Kumar, Jai Willems
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
@@ -34,41 +34,41 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // *** MOTOR ***
 
-const int MOTOR_INPUT_TO_HOVER = 450;
+const uint16_t MOTOR_INPUT_TO_HOVER = 450;
 
 // *** CONTROL MAPPING ***
 
-const int MIN_THROTTLE_STICK_POSITION = 0;
-const int MAX_THROTTLE_STICK_POSITION = 1023;
+const uint16_t MIN_THROTTLE_STICK_POSITION = 0;
+const uint16_t MAX_THROTTLE_STICK_POSITION = 1023;
 const float MIN_ALTITUDE_RATE_M_PER_SEC = -0.5;
 const float MAX_ALTITUDE_RATE_M_PER_SEC = 0.5;
 
-const int MIN_YAW_STICK_POSITION = 0;
-const int MAX_YAW_STICK_POSITION = 1023;
-const int MIN_YAW_RATE_DEG_PER_SEC = -180;
-const int MAX_YAW_RATE_DEG_PER_SEC = 180;
+const uint16_t MIN_YAW_STICK_POSITION = 0;
+const uint16_t MAX_YAW_STICK_POSITION = 1023;
+const int16_t MIN_YAW_RATE_DEG_PER_SEC = -180;
+const int16_t MAX_YAW_RATE_DEG_PER_SEC = 180;
 
-const int MIN_PITCH_STICK_POSITION = 1023;
-const int MAX_PITCH_STICK_POSITION = 0;
-const int MIN_PITCH_DEG = -60;
-const int MAX_PITCH_DEG = 60;
+const uint16_t MIN_PITCH_STICK_POSITION = 1023;
+const uint16_t MAX_PITCH_STICK_POSITION = 0;
+const int8_t MIN_PITCH_DEG = -60;
+const int8_t MAX_PITCH_DEG = 60;
 
-const int MIN_ROLL_STICK_POSITION = 0;
-const int MAX_ROLL_STICK_POSITION = 1023;
-const int MIN_ROLL_DEG = -60;
-const int MAX_ROLL_DEG = 60;
+const uint16_t MIN_ROLL_STICK_POSITION = 0;
+const uint16_t MAX_ROLL_STICK_POSITION = 1023;
+const int8_t MIN_ROLL_DEG = -60;
+const int8_t MAX_ROLL_DEG = 60;
 
 // *** SENSOR ***
 
-const int IMU_CALIBRATION_LOOPS = 6;
-const int UART_BAUD_RATE = 9600;
+const uint8_t IMU_CALIBRATION_LOOPS = 6;
+const uint16_t UART_BAUD_RATE = 9600;
 
 // *** PID ***
 
-const int MIN_THROTTLE_PID_INPUT = -500;
-const int MAX_THROTTLE_PID_INPUT = 500;
-const int MIN_MOTOR_PID_INPUT = -50;
-const int MAX_MOTOR_PID_INPUT = 50;
+const uint16_t MIN_THROTTLE_PID_INPUT = -500;
+const uint16_t MAX_THROTTLE_PID_INPUT = 500;
+const uint8_t MIN_MOTOR_PID_INPUT = -50;
+const uint8_t MAX_MOTOR_PID_INPUT = 50;
 
 const float TAKEOFF_GAIN = 0.1;
 const float LANDING_GAIN = 0.1;

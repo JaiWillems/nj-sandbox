@@ -1,7 +1,7 @@
 /*
 BSD 3-Clause License
 
-Copyright (c) 2024, Nishant Kumar, Jai Willems
+Copyright (c) 2025, Nishant Kumar, Jai Willems
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
@@ -33,14 +33,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <Servo.h>
 
 class Motor {
-  public:
-    void attach(
-      int pin
-    );
-    void arm();
-    void setSpeed(
-      int input
-    );
-  private:
-    Servo _motor;
+	public:
+		void attach(
+			uint8_t pin
+		);
+		void arm();
+		void setSpeed(
+			uint16_t input
+		);
+	private:
+		Servo _motor;
 };

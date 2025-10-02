@@ -1,7 +1,7 @@
 /*
 BSD 3-Clause License
 
-Copyright (c) 2024, Nishant Kumar, Jai Willems
+Copyright (c) 2025, Nishant Kumar, Jai Willems
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
@@ -34,17 +34,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Types.h"
 
 class UartCommunications {
-  public:
-    UartCommunications(
-      int rxPin,
-      int txPin
-    );
-    void begin(
-      int baudRate
-    );
-    bool isPacketAvailable();
-    ControlCommands deserialize();
-  private:
-    SoftwareSerial* _serial;
-    ControlCommands _controlCommands;
+	public:
+		UartCommunications(
+			uint8_t rxPin,
+			uint8_t txPin
+		);
+		void begin(
+			unsigned long baudRate
+		);
+		bool isPacketAvailable();
+		ControlCommands deserialize();
+	private:
+		SoftwareSerial* _serial;
+		ControlCommands _controlCommands;
 };

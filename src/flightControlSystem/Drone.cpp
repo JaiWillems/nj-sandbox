@@ -1,7 +1,7 @@
 /*
 BSD 3-Clause License
 
-Copyright (c) 2024, Nishant Kumar, Jai Willems
+Copyright (c) 2025, Nishant Kumar, Jai Willems
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
@@ -43,94 +43,97 @@ const bool MOTOR_THREE_PORT = true;
 const bool MOTOR_FOUR_BOW = true;
 const bool MOTOR_FOUR_PORT = true;
 
-const int MOTOR_ARM_TIME = 5000;
+const uint16_t MOTOR_ARM_TIME = 5000;
 
 void Drone::setup(
-  int motorOnePin,
-  int motorTwoPin,
-  int motorThreePin,
-  int motorFourPin
+    uint8_t motorOnePin,
+    uint8_t motorTwoPin,
+    uint8_t motorThreePin,
+    uint8_t motorFourPin
 ) {
-  _motorOne.attach(
-    motorOnePin
-  );
-  _motorTwo.attach(
-    motorTwoPin
-  );
-  _motorThree.attach(
-    motorThreePin
-  );
-  _motorFour.attach(
-    motorFourPin
-  );
+    _motorOne.attach(
+        motorOnePin
+    );
+    _motorTwo.attach(
+        motorTwoPin
+    );
+    _motorThree.attach(
+        motorThreePin
+    );
+    _motorFour.attach(
+        motorFourPin
+    );
 }
 
 void Drone::arm() {
-  _motorOne.arm();
-  _motorTwo.arm();
-  _motorThree.arm();
-  _motorFour.arm();
+    _motorOne.arm();
+    _motorTwo.arm();
+    _motorThree.arm();
+    _motorFour.arm();
   
-  delay(MOTOR_ARM_TIME);
+    delay(MOTOR_ARM_TIME);
 }
 
 void Drone::sendControlInputs(
-  ControlCommands controlCommands
+    ControlCommands controlCommands
 ) {
-  _motorOne.setSpeed(
-    mixControlInputs(
-      MOTOR_ONE_BOW,
-      MOTOR_ONE_PORT,
-      controlCommands
-    )
-  );
-  _motorTwo.setSpeed(
-    mixControlInputs(
-      MOTOR_TWO_BOW,
-      MOTOR_TWO_PORT,
-      controlCommands
-    )
-  );
-  _motorThree.setSpeed(
-    mixControlInputs(
-      MOTOR_THREE_BOW,
-      MOTOR_THREE_PORT,
-      controlCommands
-    )
-  );
-  _motorFour.setSpeed(
-    mixControlInputs(
-      MOTOR_FOUR_BOW,
-      MOTOR_FOUR_PORT,
-      controlCommands
-    )
-  );
+    _motorOne.setSpeed(
+        mixControlInputs(
+            MOTOR_ONE_BOW,
+            MOTOR_ONE_PORT,
+            controlCommands
+        )
+    );
+    _motorTwo.setSpeed(
+        mixControlInputs(
+            MOTOR_TWO_BOW,
+            MOTOR_TWO_PORT,
+            controlCommands
+        )
+    );
+    _motorThree.setSpeed(
+        mixControlInputs(
+            MOTOR_THREE_BOW,
+            MOTOR_THREE_PORT,
+            controlCommands
+        )
+    );
+    _motorFour.setSpeed(
+        mixControlInputs(
+            MOTOR_FOUR_BOW,
+            MOTOR_FOUR_PORT,
+            controlCommands
+        )
+    );
 }
 
 int Drone::mixControlInputs(
-  bool bow,
-  bool port,
-  ControlCommands controlCommands
+    bool bow,
+    bool port,
+    ControlCommands controlCommands
 ) {
-  float throttleInput = controlCommands.throttle;
-  float yawInput = controlCommands.yaw;
-  float pitchInput = controlCommands.pitch;
-  float rollInput = controlCommands.roll;
+    float throttleInput = controlCommands.throttle;
+    float yawInput = controlCommands.yaw;
+    float pitchInput = controlCommands.pitch;
+    float rollInput = controlCommands.roll;
 
-  bool motorCcw = isMotorCcw(bow, port);
+    bool motorCcw = isMotorCcw(bow, port);
 
-  int signedYawInput = motorCcw ? yawInput : -yawInput;
-  int signedPitchInput = bow ? pitchInput : -pitchInput;
-  int signedRollInput = port ? rollInput : -rollInput;
+    float signedYawInput = motorCcw ? yawInput : -yawInput;
+    float signedPitchInput = bow ? pitchInput : -pitchInput;
+    float signedRollInput = port ? rollInput : -rollInput;
 
-  float motorInput = throttleInput;
-  motorInput = motorInput + signedYawInput;
-  motorInput = motorInput + signedPitchInput;
-  motorInput = motorInput + signedRollInput;
+    float motorInput = throttleInput;
+    motorInput = motorInput + signedYawInput;
+    motorInput = motorInput + signedPitchInput;
+    motorInput = motorInput + signedRollInput;
 
-  return motorInput;
+    return motorInput;
 }
 
-bool Drone::isMotorCcw(bool bow, bool port) {
-  return (bow && !port) || (!bow && port);
+bool Drone::isMotorCcw(
+    bool bow,
+    bool port
+) {
+    return (bow && !port) || (!bow && port);
 }

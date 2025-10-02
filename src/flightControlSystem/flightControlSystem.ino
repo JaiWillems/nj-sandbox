@@ -1,7 +1,7 @@
 /*
 BSD 3-Clause License
 
-Copyright (c) 2024, Nishant Kumar, Jai Willems
+Copyright (c) 2025, Nishant Kumar, Jai Willems
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
@@ -29,162 +29,53 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include <SoftwareSerial.h>
 #include "Settings.h"
 #include "Types.h"
 #include "Drone.h"
-#include "Ultrasonic.h"
-#include "Imu.h"
 #include "UartCommunications.h"
-#include "FlightController.h"
 
 // *** PINS ***
 
-const int MOTOR_ONE_PIN = 10;
-const int MOTOR_TWO_PIN = 9;
-const int MOTOR_THREE_PIN = 11;
-const int MOTOR_FOUR_PIN = 6;
+const uint8_t MOTOR_ONE_PIN = 10;
+const uint8_t MOTOR_TWO_PIN = 9;
+const uint8_t MOTOR_THREE_PIN = 11;
+const uint8_t MOTOR_FOUR_PIN = 6;
 
-const int ULTRASONIC_TRIG_PIN = 12;
-const int ULTRASONIC_ECHO_PIN = 13;
-
-const int UART_RX_PIN = 3;
-const int UART_TX_PIN = 4;
+const uint8_t UART_RX_PIN = 3;
+const uint8_t UART_TX_PIN = 4;
 
 // *** INITIALIZATIONS ***
 
 Drone drone;
-Ultrasonic ultrasonic;
-Imu imu;
-UartCommunications uartCommunications;
-FlightController flightController;
+
+UartCommunications uartCommunications(
+    UART_RX_PIN,
+    UART_TX_PIN
+);
 
 ControlCommands controlCommands;
 
-// *** OTHER ***
-
-float previousAltitude;
-int previousTime;
-
 void setup() {
-
-  drone.setup(
-    MOTOR_ONE_PIN,
-    MOTOR_TWO_PIN,
-    MOTOR_THREE_PIN,
-    MOTOR_FOUR_PIN
-  );
-  drone.arm();
-
-  flightController.setup();
-
-  ultrasonic.setup(
-    ULTRASONIC_TRIG_PIN,
-    ULTRASONIC_ECHO_PIN
-  );
-  ultrasonic.calibrate();
-
-  imu.setup();
-  if (!imu.initializeDmp()) {
-    flightController.flightModeFSM.setMode(
-      ERROR
+    uartCommunications.begin(
+        UART_BAUD_RATE
     );
-  }
-  imu.calibrate(IMU_CALIBRATION_LOOPS);
 
-  uartCommunications.setup(
-    UART_RX_PIN,
-    UART_TX_PIN,
-    UART_BAUD_RATE
-  );
+    drone.setup(
+        MOTOR_ONE_PIN,
+        MOTOR_TWO_PIN,
+        MOTOR_THREE_PIN,
+        MOTOR_FOUR_PIN
+    );
 }
 
 void loop() {
-  if (!flightController.flightModeFSM.isMode(ERROR)) {
     if (uartCommunications.isPacketAvailable()) {
-      controlCommands = uartCommunications.deserialize();
+        controlCommands = uartCommunications.deserialize();
     }
 
-    StateVector referenceState = getReferenceState();
-    StateVector measuredState = getMeasuredState();
-
     drone.sendControlInputs(
-      flightController.compute(
-        referenceState,
-        measuredState
-      )
+        controlCommands
     );
-  }
-}
-
-StateVector getReferenceState() {
-  StateVector referenceState;
-  float referenceAltitudeRate = intToFloatRangeMap(
-    controlCommands.throttle,
-    MIN_THROTTLE_STICK_POSITION,
-    MAX_THROTTLE_STICK_POSITION,
-    MIN_ALTITUDE_RATE_M_PER_SEC,
-    MAX_ALTITUDE_RATE_M_PER_SEC
-  );
-  referenceState.altitude = previousAltitude +
-    getDeltaTime() * referenceAltitudeRate;
-  previousAltitude = referenceState.altitude;
-  referenceState.yawRate = map(
-    controlCommands.yaw,
-    MIN_YAW_STICK_POSITION,
-    MAX_YAW_STICK_POSITION,
-    MIN_YAW_RATE_DEG_PER_SEC,
-    MAX_YAW_RATE_DEG_PER_SEC
-  );
-  referenceState.pitch = map(
-    controlCommands.pitch,
-    MIN_PITCH_STICK_POSITION,
-    MAX_PITCH_STICK_POSITION,
-    MIN_PITCH_DEG,
-    MAX_PITCH_DEG
-  );
-  referenceState.roll = map(
-    controlCommands.roll,
-    MIN_ROLL_STICK_POSITION,
-    MAX_ROLL_STICK_POSITION,
-    MIN_ROLL_DEG,
-    MAX_ROLL_DEG
-  );
-  return referenceState;
-}
-
-float intToFloatRangeMap(
-  int value,
-  int minIn,
-  int maxIn,
-  float minOut,
-  float maxOut
-) {
-  return (maxOut - minOut) * value / (maxIn - minIn) + minOut;
-}
-
-float getDeltaTime() {
-  int currentTime = millis();
-  float deltaTime = (currentTime - previousTime) / 1000;
-  previousTime = currentTime;
-  return deltaTime;
-}
-
-StateVector getMeasuredState() {
-  StateVector measuredState;
-  measuredState.altitude = ultrasonic.getRelativeDistance();
-  imu.getRotationRates(
-    &measuredState.rollRate,
-    &measuredState.pitchRate,
-    &measuredState.yawRate
-  );
-  uint8_t fifoBuffer[64];
-  if (imu.getCurrentFIFOPacket(fifoBuffer)) {
-    imu.getYawPitchRollFromDmp(
-      fifoBuffer,
-      &measuredState.yaw,
-      &measuredState.pitch,
-      &measuredState.roll
-    );
-  }
-  return measuredState;
+    delay(10);
 }
