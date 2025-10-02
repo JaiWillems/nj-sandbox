@@ -29,6 +29,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include <Arduino.h>
 #include "Configuration.h"
 #include "Types.h"
 #include "Motor.h"
@@ -42,18 +43,18 @@ class Drone {
             uint8_t motorFourPin
         );
         void arm();
-        void sendControlInputs(
-            ControlCommands controlCommands
+        void sendFlightInputs(
+            FlightInputs flightInputs
         );
     private:
         Motor _motorOne;
         Motor _motorTwo;
         Motor _motorThree;
         Motor _motorFour;
-        int mixControlInputs(
+        int mixFlightInputs(
             bool bow,
             bool port,
-            ControlCommands controlCommands
+            FlightInputs flightInputs
         );
         bool isMotorCcw(
             bool bow,

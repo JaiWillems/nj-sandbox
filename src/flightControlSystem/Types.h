@@ -32,17 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef Types_h
 #define Types_h
 
-struct StateVector {
-	float altitude;
-	int yawRate;
-	float yaw;
-	int pitchRate;
-	float pitch;
-	int rollRate;
-	float roll;
-};
-
-struct ControlCommands {
+struct FlightInputs {
 	float throttle;
 	float yaw;
 	float pitch;

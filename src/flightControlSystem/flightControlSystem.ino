@@ -43,7 +43,7 @@ UartCommunications uartCommunications(
     UART_TX_PIN
 );
 
-ControlCommands controlCommands;
+FlightInputs flightInputs;
 
 void setup() {
     uartCommunications.begin(
@@ -60,11 +60,11 @@ void setup() {
 
 void loop() {
     if (uartCommunications.isPacketAvailable()) {
-        controlCommands = uartCommunications.deserialize();
+        flightInputs = uartCommunications.deserialize();
     }
 
-    drone.sendControlInputs(
-        controlCommands
+    drone.sendFlightInputs(
+        flightInputs
     );
     delay(10);
 }

@@ -60,48 +60,48 @@ void Drone::arm() {
     delay(MOTOR_ARM_TIME);
 }
 
-void Drone::sendControlInputs(
-    ControlCommands controlCommands
+void Drone::sendFlightInputs(
+    FlightInputs flightInputs
 ) {
     _motorOne.setSpeed(
-        mixControlInputs(
+        mixFlightInputs(
             MOTOR_ONE_BOW,
             MOTOR_ONE_PORT,
-            controlCommands
+            flightInputs
         )
     );
     _motorTwo.setSpeed(
-        mixControlInputs(
+        mixFlightInputs(
             MOTOR_TWO_BOW,
             MOTOR_TWO_PORT,
-            controlCommands
+            flightInputs
         )
     );
     _motorThree.setSpeed(
-        mixControlInputs(
+        mixFlightInputs(
             MOTOR_THREE_BOW,
             MOTOR_THREE_PORT,
-            controlCommands
+            flightInputs
         )
     );
     _motorFour.setSpeed(
-        mixControlInputs(
+        mixFlightInputs(
             MOTOR_FOUR_BOW,
             MOTOR_FOUR_PORT,
-            controlCommands
+            flightInputs
         )
     );
 }
 
-int Drone::mixControlInputs(
+int Drone::mixFlightInputs(
     bool bow,
     bool port,
-    ControlCommands controlCommands
+    FlightInputs flightInputs
 ) {
-    float throttleInput = controlCommands.throttle;
-    float yawInput = controlCommands.yaw;
-    float pitchInput = controlCommands.pitch;
-    float rollInput = controlCommands.roll;
+    float throttleInput = flightInputs.throttle;
+    float yawInput = flightInputs.yaw;
+    float pitchInput = flightInputs.pitch;
+    float rollInput = flightInputs.roll;
 
     bool motorCcw = isMotorCcw(bow, port);
 

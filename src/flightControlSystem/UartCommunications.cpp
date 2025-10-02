@@ -48,17 +48,17 @@ void UartCommunications::begin(
 }
 
 bool UartCommunications::isPacketAvailable() {
-	return _serial->available() > sizeof(_controlCommands) + 1;
+	return _serial->available() > sizeof(_flightInputs) + 1;
 }
 
-ControlCommands UartCommunications::deserialize() {
-	byte* structStart = reinterpret_cast<byte*>(&_controlCommands);
+FlightInputs UartCommunications::deserialize() {
+	byte* structStart = reinterpret_cast<byte*>(&_flightInputs);
 
 	byte data = _serial->read();
 
 	if (data == START_MARKER) {
 
-		for (byte n = 0; n < sizeof(_controlCommands); n++) {
+		for (byte n = 0; n < sizeof(_flightInputs); n++) {
 			*(structStart + n) = _serial->read();
 		}
 		while (_serial->available() > 0) {
@@ -66,5 +66,5 @@ ControlCommands UartCommunications::deserialize() {
 		}
 	}
 
-	return _controlCommands;
+	return _flightInputs;
 }

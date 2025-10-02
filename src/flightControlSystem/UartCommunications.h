@@ -44,8 +44,8 @@ class UartCommunications {
 			unsigned long baudRate
 		);
 		bool isPacketAvailable();
-		ControlCommands deserialize();
+		FlightInputs deserialize();
 	private:
 		SoftwareSerial* _serial;
-		ControlCommands _controlCommands;
+		FlightInputs _flightInputs;
 };
