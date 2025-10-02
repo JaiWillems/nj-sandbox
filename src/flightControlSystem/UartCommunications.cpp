@@ -31,8 +31,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "UartCommunications.h"
 
-const uint8_t START_MARKER = 255;
-
 UartCommunications::UartCommunications(
 	uint8_t rxPin,
 	uint8_t txPin

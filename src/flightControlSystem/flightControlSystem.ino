@@ -30,22 +30,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include <SoftwareSerial.h>
+#include "Configuration.h"
 #include "Settings.h"
 #include "Types.h"
 #include "Drone.h"
 #include "UartCommunications.h"
-
-// *** PINS ***
-
-const uint8_t MOTOR_ONE_PIN = 10;
-const uint8_t MOTOR_TWO_PIN = 9;
-const uint8_t MOTOR_THREE_PIN = 11;
-const uint8_t MOTOR_FOUR_PIN = 6;
-
-const uint8_t UART_RX_PIN = 3;
-const uint8_t UART_TX_PIN = 4;
-
-// *** INITIALIZATIONS ***
 
 Drone drone;
 

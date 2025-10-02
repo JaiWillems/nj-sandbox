@@ -31,6 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <Arduino.h>
 #include <SoftwareSerial.h>
+#include "Configuration.h"
 #include "Types.h"
 
 class UartCommunications {

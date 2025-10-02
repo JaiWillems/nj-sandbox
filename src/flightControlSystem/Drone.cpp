@@ -31,20 +31,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "Drone.h"
 
-const bool MOTOR_ONE_BOW = true;
-const bool MOTOR_ONE_PORT = false;
-
-const bool MOTOR_TWO_BOW = false;
-const bool MOTOR_TWO_PORT = false;
-
-const bool MOTOR_THREE_BOW = false;
-const bool MOTOR_THREE_PORT = true;
-
-const bool MOTOR_FOUR_BOW = true;
-const bool MOTOR_FOUR_PORT = true;
-
-const uint16_t MOTOR_ARM_TIME = 5000;
-
 void Drone::setup(
     uint8_t motorOnePin,
     uint8_t motorTwoPin,
