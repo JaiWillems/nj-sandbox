@@ -32,4 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef Settings_h
 #define Settings_h
 
+// *** GENERAL ***
+
+const uint8_t COMMANDING_FREQUENCY_HZ = 100;
+
 #endif

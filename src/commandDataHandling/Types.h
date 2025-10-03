@@ -32,11 +32,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef Types_h
 #define Types_h
 
+// Keep memory small to reduce communication latencies.
 struct FlightInputs {
-   float throttle;
-   float yaw;
-   float pitch;
-   float roll;
+   int16_t throttle;
+   int8_t yaw;
+   int8_t pitch;
+   int8_t roll;
 };
 
 #endif

@@ -33,17 +33,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define Types_h
 
 struct ControlInputs {
-    uint16_t throttle;
-    uint16_t yaw;
-    uint16_t pitch;
-    uint16_t roll;
+    int16_t throttle;
+    int16_t yaw;
+    int16_t pitch;
+    int16_t roll;
 };
 
+// Keep memory small to reduce communication latencies.
 struct FlightInputs {
-    float throttle;
-    float yaw;
-    float pitch;
-    float roll;
+    int16_t throttle;
+    int8_t yaw;
+    int8_t pitch;
+    int8_t roll;
 };
 
 #endif

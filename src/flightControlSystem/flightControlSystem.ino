@@ -29,12 +29,13 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <SoftwareSerial.h>
 #include "Configuration.h"
 #include "Settings.h"
 #include "Types.h"
 #include "Drone.h"
 #include "UartCommunications.h"
+
+#include <SoftwareSerial.h>
 
 Drone drone;
 
@@ -66,5 +67,6 @@ void loop() {
     drone.sendFlightInputs(
         flightInputs
     );
-    delay(10);
+
+    delay(1000 / COMMANDING_FREQUENCY_HZ);
 }

@@ -32,6 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Configuration.h"
 #include "Settings.h"
 #include "Types.h"
+#include "Utils.h"
 
 #include <SPI.h>
 #include <nRF24L01.h>
@@ -50,7 +51,7 @@ void setup() {
     pinMode(ROLL_AXIS_PIN, INPUT);
 
     radio.begin();
-    radio.openWritingPipe(writeAddress);
+    radio.openWritingPipe(WRITE_ADDRESS);
     radio.setPALevel(RF24_PA_MIN);
     radio.stopListening();
 }
@@ -60,7 +61,7 @@ void loop() {
         readControlInputs()
     );
 
-    bool result = radio.write(
+    radio.write(
         &flightInputs,
         sizeof(flightInputs)
     );
@@ -102,13 +103,4 @@ FlightInputs mapInputs(
             MAX_ROLL_AUTHORITY
         )
     };
-}
-
-float mapInput(
-    uint16_t value,
-    int16_t range_min,
-    int16_t range_max
-) {
-    float slope = (float) (range_max - range_min) / (MAX_CONTROL_INPUT - MIN_CONTROL_INPUT);
-    return slope * value + range_min;
 }

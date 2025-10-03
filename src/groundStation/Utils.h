@@ -29,24 +29,18 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef Configuration_h
-#define Configuration_h
+#ifndef Utils_h
+#define Utils_h
 
-// *** CONTROL ***
+template <typename T>
 
-const int16_t MIN_CONTROL_INPUT = 0;
-const int16_t MAX_CONTROL_INPUT = 1023;
-
-const uint8_t THRUST_AXIS_PIN = A1;
-const uint8_t YAW_AXIS_PIN = A2;
-const uint8_t PITCH_AXIS_PIN = A4;
-const uint8_t ROLL_AXIS_PIN = A3;
-
-// *** TRANSCEIVER ***
-
-const uint8_t CE_PIN = 7;
-const uint8_t CSN_PIN = 8;
-const uint32_t SPI_SPEED = 4000000;
-const byte WRITE_ADDRESS[6] = "00001";
+T mapInput(
+    uint16_t value,
+    T range_min,
+    T range_max
+) {
+    float slope = (float) (range_max - range_min) / (MAX_CONTROL_INPUT - MIN_CONTROL_INPUT);
+    return slope * value + range_min;
+}
 
 #endif
