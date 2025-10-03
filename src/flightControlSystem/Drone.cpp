@@ -93,23 +93,23 @@ void Drone::sendFlightInputs(
     );
 }
 
-int Drone::mixFlightInputs(
+int16_t Drone::mixFlightInputs(
     bool bow,
     bool port,
     FlightInputs flightInputs
 ) {
-    float throttleInput = flightInputs.throttle;
-    float yawInput = flightInputs.yaw;
-    float pitchInput = flightInputs.pitch;
-    float rollInput = flightInputs.roll;
+    int16_t throttleInput = flightInputs.throttle;
+    int8_t yawInput = flightInputs.yaw;
+    int8_t pitchInput = flightInputs.pitch;
+    int8_t rollInput = flightInputs.roll;
 
     bool motorCcw = isMotorCcw(bow, port);
 
-    float signedYawInput = motorCcw ? yawInput : -yawInput;
-    float signedPitchInput = bow ? pitchInput : -pitchInput;
-    float signedRollInput = port ? rollInput : -rollInput;
+    int8_t signedYawInput = motorCcw ? yawInput : -yawInput;
+    int8_t signedPitchInput = bow ? pitchInput : -pitchInput;
+    int8_t signedRollInput = port ? rollInput : -rollInput;
 
-    float motorInput = throttleInput;
+    int16_t motorInput = throttleInput;
     motorInput = motorInput + signedYawInput;
     motorInput = motorInput + signedPitchInput;
     motorInput = motorInput + signedRollInput;
