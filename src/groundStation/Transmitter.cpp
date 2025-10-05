@@ -29,72 +29,30 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "Configuration.h"
-#include "Settings.h"
-#include "Types.h"
-#include "Utils.h"
 #include "Transmitter.h"
 
-Transmitter transmitter;
-
-void setup() {
-    pinMode(THRUST_AXIS_PIN, INPUT);
-    pinMode(YAW_AXIS_PIN, INPUT);
-    pinMode(PITCH_AXIS_PIN, INPUT);
-    pinMode(ROLL_AXIS_PIN, INPUT);
-
-    transmitter.setup(
-        CE_PIN,
-        CSN_PIN,
-        SPI_SPEED,
-        WRITE_ADDRESS
-    );
-}
-
-void loop() {
-    FlightInputs flightInputs = mapInputs(
-        readControlInputs()
-    );
-
-    transmitter.write(
-        flightInputs
-    );
-
-    delay(1000 / COMMANDING_FREQUENCY_HZ);
-}
-
-ControlInputs readControlInputs() {
-    return {
-        analogRead(THRUST_AXIS_PIN),
-        analogRead(YAW_AXIS_PIN),
-        analogRead(PITCH_AXIS_PIN),
-        analogRead(ROLL_AXIS_PIN)
-    };
-}
-
-FlightInputs mapInputs(
-    ControlInputs controlInputs
+void Transmitter::setup(
+    uint8_t cePin,
+    uint8_t csnPin,
+    uint8_t spiSpeed,
+    byte writeAddress[6]
 ) {
-    return {
-        mapInput(
-            controlInputs.throttle,
-            MIN_THROTTLE_AUTHORITY,
-            MAX_THROTTLE_AUTHORITY
-        ),
-        mapInput(
-            controlInputs.yaw,
-            MIN_YAW_AUTHORITY,
-            MAX_YAW_AUTHORITY
-        ),
-        mapInput(
-            controlInputs.pitch,
-            MIN_PITCH_AUTHORITY,
-            MAX_PITCH_AUTHORITY
-        ),
-        mapInput(
-            controlInputs.roll,
-            MIN_ROLL_AUTHORITY,
-            MAX_ROLL_AUTHORITY
-        )
-    };
+    _transmitter = new RF24(
+        cePin,
+        csnPin,
+        spiSpeed
+    );
+    _transmitter->begin();
+    _transmitter->openWritingPipe(writeAddress);
+    _transmitter->setPALevel(RF24_PA_MIN);
+    _transmitter->stopListening();
+}
+
+void Transmitter::write(
+    FlightInputs flightInputs
+) {
+    _transmitter->write(
+        &flightInputs,
+        sizeof(flightInputs)
+    );
 }

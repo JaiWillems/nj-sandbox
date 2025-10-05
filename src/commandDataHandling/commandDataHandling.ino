@@ -31,23 +31,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "Configuration.h"
 #include "Settings.h"
-#include "Types.h"
 #include "Lights.h"
+#include "Receiver.h"
 #include "UartCommunications.h"
 
-#include <SPI.h>
-#include <nRF24L01.h>
-#include <RF24.h>
-#include <SoftwareSerial.h>
-
-
 Lights lights;
-RF24 radio(
-    CE_PIN,
-    CSN_PIN,
-    SPI_SPEED
-);
-FlightInputs flightInputs;
+Receiver receiver;
 UartCommunications uartCommunications;
 
 void setup() {
@@ -58,10 +47,12 @@ void setup() {
         NAV_LIGHT_FOUR_PIN
     );
 
-    radio.begin();
-    radio.openReadingPipe(0, READ_ADDRESS);
-    radio.setPALevel(RF24_PA_MIN);
-    radio.startListening();
+    receiver.setup(
+        CE_PIN,
+        CSN_PIN,
+        SPI_SPEED,
+        READ_ADDRESS
+    );
 
     uartCommunications.setup(
         UART_RX_PIN,
@@ -73,16 +64,11 @@ void setup() {
 void loop() {
     lights.blinkingRefresh();
 
-    if (radio.available()) {
-        radio.read(
-            &flightInputs,
-            sizeof(flightInputs)
+    if (receiver.available()) {
+        uartCommunications.write(
+            receiver.read()
         );
     }
-
-    uartCommunications.write(
-        flightInputs
-    );
 
     delay(1000 / COMMANDING_FREQUENCY_HZ);
 }
