@@ -37,17 +37,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <SoftwareSerial.h>
 
+UartCommunications uartCommunications;
 Drone drone;
-
-UartCommunications uartCommunications(
-    UART_RX_PIN,
-    UART_TX_PIN
-);
-
 FlightInputs flightInputs;
 
 void setup() {
-    uartCommunications.begin(
+    uartCommunications.setup(
+        UART_RX_PIN,
+        UART_TX_PIN,
         UART_BAUD_RATE
     );
 
@@ -60,8 +57,8 @@ void setup() {
 }
 
 void loop() {
-    if (uartCommunications.isPacketAvailable()) {
-        flightInputs = uartCommunications.deserialize();
+    if (uartCommunications.available()) {
+        flightInputs = uartCommunications.read();
     }
 
     drone.sendFlightInputs(

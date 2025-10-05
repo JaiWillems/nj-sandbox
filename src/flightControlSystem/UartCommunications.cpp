@@ -31,27 +31,23 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "UartCommunications.h"
 
-UartCommunications::UartCommunications(
+void UartCommunications::setup(
 	uint8_t rxPin,
-	uint8_t txPin
+	uint8_t txPin,
+	unsigned long baudRate
 ) {
 	_serial = new SoftwareSerial(
 		rxPin,
 		txPin
 	);
-}
-
-void UartCommunications::begin(
-	unsigned long baudRate
-) {
 	_serial->begin(baudRate);
 }
 
-bool UartCommunications::isPacketAvailable() {
+bool UartCommunications::available() {
 	return _serial->available() > sizeof(_flightInputs) + 1;
 }
 
-FlightInputs UartCommunications::deserialize() {
+FlightInputs UartCommunications::read() {
 	byte* structStart = reinterpret_cast<byte*>(&_flightInputs);
 
 	byte data = _serial->read();

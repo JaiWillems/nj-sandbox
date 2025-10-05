@@ -36,15 +36,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class UartCommunications {
 	public:
-		UartCommunications(
+		void setup(
 			uint8_t rxPin,
-			uint8_t txPin
-		);
-		void begin(
+			uint8_t txPin,
 			unsigned long baudRate
 		);
-		bool isPacketAvailable();
-		FlightInputs deserialize();
+		bool available();
+		FlightInputs read();
 	private:
 		SoftwareSerial* _serial;
 		FlightInputs _flightInputs;

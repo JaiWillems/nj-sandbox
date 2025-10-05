@@ -29,28 +29,21 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef Configuration_h
-#define Configuration_h
+#include <Arduino.h>
+#include <SoftwareSerial.h>
+#include "Types.h"
+#include "Configuration.h"
 
-// *** NAVIGATION LIGHTS ***
-
-const uint8_t NAV_LIGHT_ONE_PIN = 4;
-const uint8_t NAV_LIGHT_TWO_PIN = 8;
-const uint8_t NAV_LIGHT_THREE_PIN = 7;
-const uint8_t NAV_LIGHT_FOUR_PIN = 2;
-
-// *** TRANSCEIVER ***
-
-const uint8_t CE_PIN = 5;
-const uint8_t CSN_PIN = 6;
-const uint32_t SPI_SPEED = 4000000;
-const byte READ_ADDRESS[6] = "00001";
-
-// *** UART ***
-
-const uint8_t UART_RX_PIN = 9;
-const uint8_t UART_TX_PIN = 10;
-const uint16_t UART_BAUD_RATE = 9600;
-const uint8_t START_MARKER = 255;
-
-#endif
+class UartCommunications {
+    public:
+        void setup(
+            uint8_t rxPin,
+            uint8_t txPin,
+            unsigned long baudRate
+        );
+        void write(
+            FlightInputs flightInputs
+        );
+    private:
+        SoftwareSerial* _serial;
+};
