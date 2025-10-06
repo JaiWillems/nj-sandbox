@@ -1,7 +1,7 @@
 /*
 BSD 3-Clause License
 
-Copyright (c) 2024, Nishant Kumar, Jai Willems
+Copyright (c) 2025, Nishant Kumar, Jai Willems
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
@@ -29,22 +29,35 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "Settings.h"
-#include "Types.h"
-#include "PidController.h"
-#include "FlightModeFSM.h"
+#ifndef Configuration_h
+#define Configuration_h
 
-class FlightController {
-  public:
-    FlightModeFSM flightModeFSM;
-    void setup();
-    ControlCommands compute(
-      StateVector referenceState,
-      StateVector measuredState
-    );
-  private:
-    PidController _altitudeController;
-    PidController _yawController;
-    PidController _pitchController;
-    PidController _rollController;
-};
+// *** MOTORS ***
+
+const uint8_t MOTOR_ONE_PIN = 10;
+const bool MOTOR_ONE_BOW = true;
+const bool MOTOR_ONE_PORT = false;
+
+const uint8_t MOTOR_TWO_PIN = 9;
+const bool MOTOR_TWO_BOW = false;
+const bool MOTOR_TWO_PORT = false;
+
+const uint8_t MOTOR_THREE_PIN = 11;
+const bool MOTOR_THREE_BOW = false;
+const bool MOTOR_THREE_PORT = true;
+
+const uint8_t MOTOR_FOUR_PIN = 6;
+const bool MOTOR_FOUR_BOW = true;
+const bool MOTOR_FOUR_PORT = true;
+
+const uint16_t MOTOR_ARM_TIME = 5000;
+
+// *** UART ***
+
+const uint8_t UART_RX_PIN = 3;
+const uint8_t UART_TX_PIN = 4;
+const uint16_t UART_BAUD_RATE = 9600;
+const uint8_t START_MARKER = 255;
+
+
+#endif

@@ -1,7 +1,7 @@
 /*
 BSD 3-Clause License
 
-Copyright (c) 2024, Nishant Kumar, Jai Willems
+Copyright (c) 2025, Nishant Kumar, Jai Willems
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
@@ -29,32 +29,15 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FlightModeFSM_h
-#define FlightModeFSM_h
+#ifndef Types_h
+#define Types_h
 
-enum FlightMode {
-  OFF = 0,
-  TAKEOFF = 1,
-  NOMINAL = 2,
-  LANDING = 3,
-  ERROR = 4
-};
-
-class FlightModeFSM {
-  public:
-    FlightModeFSM();
-    bool setMode(
-      FlightMode newMode
-    );
-    bool isMode(
-      FlightMode mode
-    );
-  private:
-    FlightMode _currentMode;
-    bool isValidTransition(
-      FlightMode fromMode,
-      FlightMode toMode
-    );
+// Keep memory small to reduce communication latencies.
+struct FlightInputs {
+   int16_t throttle;
+   int8_t yaw;
+   int8_t pitch;
+   int8_t roll;
 };
 
 #endif

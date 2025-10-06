@@ -1,7 +1,7 @@
 /*
 BSD 3-Clause License
 
-Copyright (c) 2024, Nishant Kumar, Jai Willems
+Copyright (c) 2025, Nishant Kumar, Jai Willems
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
@@ -32,21 +32,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef Types_h
 #define Types_h
 
-struct StateVector {
-  float altitude;
-  int yawRate;
-  float yaw;
-  int pitchRate;
-  float pitch;
-  int rollRate;
-  float roll;
-};
-
-struct ControlCommands {
-  float throttle;
-  float yaw;
-  float pitch;
-  float roll;
+// Keep memory small to reduce communication latencies.
+struct FlightInputs {
+	int16_t throttle;
+	int8_t yaw;
+	int8_t pitch;
+	int8_t roll;
 };
 
 #endif

@@ -1,7 +1,7 @@
 /*
 BSD 3-Clause License
 
-Copyright (c) 2024, Nishant Kumar, Jai Willems
+Copyright (c) 2025, Nishant Kumar, Jai Willems
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
@@ -31,47 +31,36 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "UartCommunications.h"
 
-const int START_MARKER = 255;
-
 void UartCommunications::setup(
-  int rxPin,
-  int txPin,
-  int baudRate
+	uint8_t rxPin,
+	uint8_t txPin,
+	unsigned long baudRate
 ) {
-  _rxPin = rxPin;
-  _txPin = txPin;
-  _baudRate = baudRate;
+	_serial = new SoftwareSerial(
+		rxPin,
+		txPin
+	);
+	_serial->begin(baudRate);
 }
 
-bool UartCommunications::isPacketAvailable() {
-  SoftwareSerial serial = SoftwareSerial(
-    _rxPin,
-    _txPin
-  );
-  serial.begin(_baudRate);
-  return serial.available() > sizeof(_controlCommands) + 1;
+bool UartCommunications::available() {
+	return _serial->available() > sizeof(_flightInputs) + 1;
 }
 
-ControlCommands UartCommunications::deserialize() {
-  SoftwareSerial serial = SoftwareSerial(
-    _rxPin,
-    _txPin
-  );
-  serial.begin(_baudRate);
+FlightInputs UartCommunications::read() {
+	byte* structStart = reinterpret_cast<byte*>(&_flightInputs);
 
-  byte* structStart = reinterpret_cast<byte*>(&_controlCommands);
+	byte data = _serial->read();
 
-  byte data = serial.read();
+	if (data == START_MARKER) {
 
-  if (data == START_MARKER) {
+		for (byte n = 0; n < sizeof(_flightInputs); n++) {
+			*(structStart + n) = _serial->read();
+		}
+		while (_serial->available() > 0) {
+			byte dumpTheData = _serial->read();
+		}
+	}
 
-    for (byte n = 0; n < sizeof(_controlCommands); n++) {
-      *(structStart + n) = serial.read();
-    }
-    while (serial.available() > 0) {
-      byte dumpTheData = serial.read();
-    }
-  }
-
-  return _controlCommands;
+	return _flightInputs;
 }

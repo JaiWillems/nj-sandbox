@@ -1,7 +1,7 @@
 /*
 BSD 3-Clause License
 
-Copyright (c) 2024, Nishant Kumar, Jai Willems
+Copyright (c) 2025, Nishant Kumar, Jai Willems
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
@@ -31,118 +31,95 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "Drone.h"
 
-const bool MOTOR_ONE_BOW = true;
-const bool MOTOR_ONE_PORT = false;
-
-const bool MOTOR_TWO_BOW = false;
-const bool MOTOR_TWO_PORT = false;
-
-const bool MOTOR_THREE_BOW = false;
-const bool MOTOR_THREE_PORT = true;
-
-const bool MOTOR_FOUR_BOW = true;
-const bool MOTOR_FOUR_PORT = true;
-
-const int MOTOR_ARM_TIME = 5000;
-
 void Drone::setup(
-  int motorOnePin,
-  int motorTwoPin,
-  int motorThreePin,
-  int motorFourPin,
-  int minMotorInput,
-  int maxMotorInput
+    uint8_t motorOnePin,
+    uint8_t motorTwoPin,
+    uint8_t motorThreePin,
+    uint8_t motorFourPin
 ) {
-  _motorOne.attach(
-    motorOnePin,
-    minMotorInput,
-    maxMotorInput
-  );
-  _motorTwo.attach(
-    motorTwoPin,
-    minMotorInput,
-    maxMotorInput
-  );
-  _motorThree.attach(
-    motorThreePin,
-    minMotorInput,
-    maxMotorInput
-  );
-  _motorFour.attach(
-    motorFourPin,
-    minMotorInput,
-    maxMotorInput
-  );
-  _minMotorInput = minMotorInput;
-  _maxMotorInput = maxMotorInput;
+    _motorOne.attach(
+        motorOnePin
+    );
+    _motorTwo.attach(
+        motorTwoPin
+    );
+    _motorThree.attach(
+        motorThreePin
+    );
+    _motorFour.attach(
+        motorFourPin
+    );
 }
 
 void Drone::arm() {
-  _motorOne.arm();
-  _motorTwo.arm();
-  _motorThree.arm();
-  _motorFour.arm();
+    _motorOne.arm();
+    _motorTwo.arm();
+    _motorThree.arm();
+    _motorFour.arm();
   
-  delay(MOTOR_ARM_TIME);
+    delay(MOTOR_ARM_TIME);
 }
 
-void Drone::sendControlInputs(
-  ControlCommands controlCommands
+void Drone::sendFlightInputs(
+    FlightInputs flightInputs
 ) {
-  _motorOne.setSpeed(
-    mixControlInputs(
-      MOTOR_ONE_BOW,
-      MOTOR_ONE_PORT,
-      controlCommands
-    )
-  );
-  _motorTwo.setSpeed(
-    mixControlInputs(
-      MOTOR_TWO_BOW,
-      MOTOR_TWO_PORT,
-      controlCommands
-    )
-  );
-  _motorThree.setSpeed(
-    mixControlInputs(
-      MOTOR_THREE_BOW,
-      MOTOR_THREE_PORT,
-      controlCommands
-    )
-  );
-  _motorFour.setSpeed(
-    mixControlInputs(
-      MOTOR_FOUR_BOW,
-      MOTOR_FOUR_PORT,
-      controlCommands
-    )
-  );
+    _motorOne.setSpeed(
+        mixFlightInputs(
+            MOTOR_ONE_BOW,
+            MOTOR_ONE_PORT,
+            flightInputs
+        )
+    );
+    _motorTwo.setSpeed(
+        mixFlightInputs(
+            MOTOR_TWO_BOW,
+            MOTOR_TWO_PORT,
+            flightInputs
+        )
+    );
+    _motorThree.setSpeed(
+        mixFlightInputs(
+            MOTOR_THREE_BOW,
+            MOTOR_THREE_PORT,
+            flightInputs
+        )
+    );
+    _motorFour.setSpeed(
+        mixFlightInputs(
+            MOTOR_FOUR_BOW,
+            MOTOR_FOUR_PORT,
+            flightInputs
+        )
+    );
 }
 
-int Drone::mixControlInputs(
-  bool bow,
-  bool port,
-  ControlCommands controlCommands
+int16_t Drone::mixFlightInputs(
+    bool bow,
+    bool port,
+    FlightInputs flightInputs
 ) {
-  float throttleInput = controlCommands.throttle;
-  float yawInput = controlCommands.yaw;
-  float pitchInput = controlCommands.pitch;
-  float rollInput = controlCommands.roll;
+    int16_t throttleInput = flightInputs.throttle;
+    int8_t yawInput = flightInputs.yaw;
+    int8_t pitchInput = flightInputs.pitch;
+    int8_t rollInput = flightInputs.roll;
 
-  bool motorCcw = isMotorCcw(bow, port);
+    bool motorCcw = isMotorCcw(bow, port);
 
-  int signedYawInput = motorCcw ? yawInput : -yawInput;
-  int signedPitchInput = bow ? pitchInput : -pitchInput;
-  int signedRollInput = port ? rollInput : -rollInput;
+    int8_t signedYawInput = motorCcw ? yawInput : -yawInput;
+    int8_t signedPitchInput = bow ? pitchInput : -pitchInput;
+    int8_t signedRollInput = port ? rollInput : -rollInput;
 
-  float motorInput = throttleInput;
-  motorInput = motorInput + signedYawInput;
-  motorInput = motorInput + signedPitchInput;
-  motorInput = motorInput + signedRollInput;
+    int16_t motorInput = throttleInput;
+    motorInput = motorInput + signedYawInput;
+    motorInput = motorInput + signedPitchInput;
+    motorInput = motorInput + signedRollInput;
 
-  return motorInput;
+    return motorInput;
 }
 
-bool Drone::isMotorCcw(bool bow, bool port) {
-  return (bow && !port) || (!bow && port);
+bool Drone::isMotorCcw(
+    bool bow,
+    bool port
+) {
+    return (bow && !port) || (!bow && port);
 }

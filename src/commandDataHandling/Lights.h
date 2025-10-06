@@ -29,72 +29,28 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "Configuration.h"
+#include <Arduino.h>
 #include "Settings.h"
-#include "Types.h"
-#include "Utils.h"
-#include "Transmitter.h"
 
-Transmitter transmitter;
-
-void setup() {
-    pinMode(THRUST_AXIS_PIN, INPUT);
-    pinMode(YAW_AXIS_PIN, INPUT);
-    pinMode(PITCH_AXIS_PIN, INPUT);
-    pinMode(ROLL_AXIS_PIN, INPUT);
-
-    transmitter.setup(
-        CE_PIN,
-        CSN_PIN,
-        SPI_SPEED,
-        WRITE_ADDRESS
-    );
-}
-
-void loop() {
-    FlightInputs flightInputs = mapInputs(
-        readControlInputs()
-    );
-
-    transmitter.write(
-        flightInputs
-    );
-
-    delay(1000 / COMMANDING_FREQUENCY_HZ);
-}
-
-ControlInputs readControlInputs() {
-    return {
-        analogRead(THRUST_AXIS_PIN),
-        analogRead(YAW_AXIS_PIN),
-        analogRead(PITCH_AXIS_PIN),
-        analogRead(ROLL_AXIS_PIN)
-    };
-}
-
-FlightInputs mapInputs(
-    ControlInputs controlInputs
-) {
-    return {
-        mapInput(
-            controlInputs.throttle,
-            MIN_THROTTLE_AUTHORITY,
-            MAX_THROTTLE_AUTHORITY
-        ),
-        mapInput(
-            controlInputs.yaw,
-            MIN_YAW_AUTHORITY,
-            MAX_YAW_AUTHORITY
-        ),
-        mapInput(
-            controlInputs.pitch,
-            MIN_PITCH_AUTHORITY,
-            MAX_PITCH_AUTHORITY
-        ),
-        mapInput(
-            controlInputs.roll,
-            MIN_ROLL_AUTHORITY,
-            MAX_ROLL_AUTHORITY
-        )
-    };
-}
+class Lights {
+    public:
+        void setup(
+            uint8_t lightOnePin,
+            uint8_t lightTwoPin,
+            uint8_t lightThreePin,
+            uint8_t lightFourPin
+        );
+        void blinkingRefresh();
+        void on();
+        void off();
+    private:
+        uint8_t _lightOnePin;
+        uint8_t _lightTwoPin;
+        uint8_t _lightThreePin;
+        uint8_t _lightFourPin;
+        uint8_t _state;
+        unsigned long _elapsedTime;
+        void setState(
+            uint8_t value
+        );
+};

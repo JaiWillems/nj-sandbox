@@ -1,7 +1,7 @@
 /*
 BSD 3-Clause License
 
-Copyright (c) 2024, Nishant Kumar, Jai Willems
+Copyright (c) 2025, Nishant Kumar, Jai Willems
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
@@ -29,19 +29,30 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <Arduino.h>
+#include "Transmitter.h"
 
-class Ultrasonic {
-  public:
-    void setup(
-      int trigPin,
-      int echoPin
+void Transmitter::setup(
+    uint8_t cePin,
+    uint8_t csnPin,
+    uint8_t spiSpeed,
+    byte writeAddress[6]
+) {
+    _transmitter = new RF24(
+        cePin,
+        csnPin,
+        spiSpeed
     );
-    void calibrate();
-    float getAbsoluteDistance();
-    float getRelativeDistance();
-  private:
-    int _trigPin;
-    int _echoPin;
-    float _referenceDistance;
-};
+    _transmitter->begin();
+    _transmitter->openWritingPipe(writeAddress);
+    _transmitter->setPALevel(RF24_PA_MIN);
+    _transmitter->stopListening();
+}
+
+void Transmitter::write(
+    FlightInputs flightInputs
+) {
+    _transmitter->write(
+        &flightInputs,
+        sizeof(flightInputs)
+    );
+}

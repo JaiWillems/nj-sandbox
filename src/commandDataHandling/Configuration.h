@@ -1,7 +1,7 @@
 /*
 BSD 3-Clause License
 
-Copyright (c) 2024, Nishant Kumar, Jai Willems
+Copyright (c) 2025, Nishant Kumar, Jai Willems
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
@@ -29,29 +29,28 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <I2Cdev.h>
-#include <MPU6050_6Axis_MotionApps20.h>
+#ifndef Configuration_h
+#define Configuration_h
 
-class Imu {
-  public:
-    void setup();
-    bool testConnection();
-    bool initializeDmp();
-    void calibrate(uint8_t loops);
-    void getRotationRates(
-      int16_t* x,
-      int16_t* y,
-      int16_t* z
-    );
-    uint8_t getCurrentFIFOPacket(
-      uint8_t* fifoBuffer
-    );
-    void getYawPitchRollFromDmp(
-      uint8_t* fifoBuffer,
-      float* yaw,
-      float* pitch,
-      float* roll
-    );
-  private:
-    MPU6050 _mpu;
-};
+// *** NAVIGATION LIGHTS ***
+
+const uint8_t NAV_LIGHT_ONE_PIN = 4;
+const uint8_t NAV_LIGHT_TWO_PIN = 8;
+const uint8_t NAV_LIGHT_THREE_PIN = 7;
+const uint8_t NAV_LIGHT_FOUR_PIN = 2;
+
+// *** TRANSCEIVER ***
+
+const uint8_t CE_PIN = 5;
+const uint8_t CSN_PIN = 6;
+const uint32_t SPI_SPEED = 4000000;
+const byte READ_ADDRESS[6] = "00001";
+
+// *** UART ***
+
+const uint8_t UART_RX_PIN = 9;
+const uint8_t UART_TX_PIN = 10;
+const uint16_t UART_BAUD_RATE = 9600;
+const uint8_t START_MARKER = 255;
+
+#endif

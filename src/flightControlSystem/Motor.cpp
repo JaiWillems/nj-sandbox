@@ -1,7 +1,7 @@
 /*
 BSD 3-Clause License
 
-Copyright (c) 2024, Nishant Kumar, Jai Willems
+Copyright (c) 2025, Nishant Kumar, Jai Willems
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
@@ -29,41 +29,36 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "Arduino.h"
 #include "Motor.h"
-#include <Servo.h>
 
-const int MIN_SERVO_INPUT = 1000;
-const int MAX_SERVO_INPUT = 2000;
+const uint16_t MIN_SERVO_INPUT = 1000;
+const uint16_t MAX_SERVO_INPUT = 2000;
+const uint16_t OFFSET = 1000;
 
 void Motor::attach(
-  int pin,
-  int minInput,
-  int maxInput
+	uint8_t pin
 ) {
-  _motor.attach(
-    pin,
-    minInput,
-    maxInput
-  );
-  _minInput = minInput;
-  _maxInput = maxInput;
+	_motor.attach(
+		pin,
+		MIN_SERVO_INPUT,
+		MAX_SERVO_INPUT
+	);
   
-  setSpeed(MAX_SERVO_INPUT);
+	setSpeed(MAX_SERVO_INPUT);
 }
 
 void Motor::arm() {
-  setSpeed(MIN_SERVO_INPUT);
+	setSpeed(MIN_SERVO_INPUT);
 }
 
 void Motor::setSpeed(
-  int input
+	uint16_t input
 ) {
-  _motor.write(
-    constrain(
-      input,
-      MIN_SERVO_INPUT,
-      MAX_SERVO_INPUT
-    )
-  );
+	_motor.write(
+		constrain(
+			input + OFFSET,
+			MIN_SERVO_INPUT,
+			MAX_SERVO_INPUT
+		)
+	);
 }

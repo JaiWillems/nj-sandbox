@@ -1,7 +1,7 @@
 /*
 BSD 3-Clause License
 
-Copyright (c) 2024, Nishant Kumar, Jai Willems
+Copyright (c) 2025, Nishant Kumar, Jai Willems
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
@@ -29,73 +29,18 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "Imu.h"
+#ifndef Utils_h
+#define Utils_h
 
-void Imu::setup() {
-  Wire.begin();
-  _mpu.initialize();
-}
+template <typename T>
 
-bool Imu::testConnection() {
-  return _mpu.testConnection();
-}
-
-bool Imu::initializeDmp() {
-  uint8_t result = _mpu.dmpInitialize();
-  if (result == 0) {
-    _mpu.setDMPEnabled(true);
-  }
-  return result == 0;
-}
-
-void Imu::calibrate(uint8_t loops) {
-  _mpu.CalibrateAccel(loops);
-  _mpu.CalibrateGyro(loops);
-}
-
-void Imu::getRotationRates(
-  int16_t* x,
-  int16_t* y,
-  int16_t* z
+T mapInput(
+    uint16_t value,
+    T range_min,
+    T range_max
 ) {
-  _mpu.getRotation(x, y, z);
-  (*y) = -(*y);
-  (*z) = -(*z);
+    float slope = (float) (range_max - range_min) / (MAX_CONTROL_INPUT - MIN_CONTROL_INPUT);
+    return slope * value + range_min;
 }
 
-uint8_t Imu::getCurrentFIFOPacket(
-  uint8_t* fifoBuffer
-) {
-  return _mpu.dmpGetCurrentFIFOPacket(
-    fifoBuffer
-  );
-}
-
-void Imu::getYawPitchRollFromDmp(
-  uint8_t* fifoBuffer,
-  float* yaw,
-  float* pitch,
-  float* roll
-) {
-  Quaternion orientation;
-  VectorFloat gravity;
-  float ypr[3];
-
-  _mpu.dmpGetQuaternion(
-    &orientation,
-    fifoBuffer
-  );
-  _mpu.dmpGetGravity(
-    &gravity,
-    &orientation
-  );
-  _mpu.dmpGetYawPitchRoll(
-    ypr,
-    &orientation,
-    &gravity
-  );
-
-  (*yaw) = ypr[0] * RAD_TO_DEG;
-  (*pitch) = ypr[1] * RAD_TO_DEG;
-  (*roll) = ypr[2] * RAD_TO_DEG;
-}
+#endif

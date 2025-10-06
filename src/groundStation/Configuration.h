@@ -1,7 +1,7 @@
 /*
 BSD 3-Clause License
 
-Copyright (c) 2024, Nishant Kumar, Jai Willems
+Copyright (c) 2025, Nishant Kumar, Jai Willems
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
@@ -29,43 +29,24 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <Arduino.h>
+#ifndef Configuration_h
+#define Configuration_h
 
-class PidController {
-  public:
-    void initialize(
-      float kp,
-      float ki,
-      float kd,
-      float minLimit,
-      float maxLimit
-    );
-    void begin();
-    float compute(
-      float reference,
-      float measured
-    );
-    float compute(
-      float reference,
-      float measured,
-      float measuredDerivative
-    );
-  private:
-    float _kp;
-    float _ki;
-    float _kd;
-    float _minLimit;
-    float _maxLimit;
-    float _previousTime;
-    float _previousError;
-    float _integralError;
-    float getDeltaTime();
-    float getInput(
-      float error,
-      float integralError,
-      float derivativeError
-    );
-    float saturate(
-      float input
-    );
-};
+// *** CONTROL ***
+
+const int16_t MIN_CONTROL_INPUT = 0;
+const int16_t MAX_CONTROL_INPUT = 1023;
+
+const uint8_t THRUST_AXIS_PIN = A1;
+const uint8_t YAW_AXIS_PIN = A2;
+const uint8_t PITCH_AXIS_PIN = A4;
+const uint8_t ROLL_AXIS_PIN = A3;
+
+// *** TRANSCEIVER ***
+
+const uint8_t CE_PIN = 7;
+const uint8_t CSN_PIN = 8;
+const uint32_t SPI_SPEED = 4000000;
+const byte WRITE_ADDRESS[6] = "00001";
+
+#endif

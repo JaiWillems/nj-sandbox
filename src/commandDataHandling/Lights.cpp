@@ -29,72 +29,81 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "Configuration.h"
-#include "Settings.h"
-#include "Types.h"
-#include "Utils.h"
-#include "Transmitter.h"
+#include "Lights.h"
 
-Transmitter transmitter;
-
-void setup() {
-    pinMode(THRUST_AXIS_PIN, INPUT);
-    pinMode(YAW_AXIS_PIN, INPUT);
-    pinMode(PITCH_AXIS_PIN, INPUT);
-    pinMode(ROLL_AXIS_PIN, INPUT);
-
-    transmitter.setup(
-        CE_PIN,
-        CSN_PIN,
-        SPI_SPEED,
-        WRITE_ADDRESS
-    );
-}
-
-void loop() {
-    FlightInputs flightInputs = mapInputs(
-        readControlInputs()
-    );
-
-    transmitter.write(
-        flightInputs
-    );
-
-    delay(1000 / COMMANDING_FREQUENCY_HZ);
-}
-
-ControlInputs readControlInputs() {
-    return {
-        analogRead(THRUST_AXIS_PIN),
-        analogRead(YAW_AXIS_PIN),
-        analogRead(PITCH_AXIS_PIN),
-        analogRead(ROLL_AXIS_PIN)
-    };
-}
-
-FlightInputs mapInputs(
-    ControlInputs controlInputs
+void Lights::setup(
+    uint8_t lightOnePin,
+    uint8_t lightTwoPin,
+    uint8_t lightThreePin,
+    uint8_t lightFourPin
 ) {
-    return {
-        mapInput(
-            controlInputs.throttle,
-            MIN_THROTTLE_AUTHORITY,
-            MAX_THROTTLE_AUTHORITY
-        ),
-        mapInput(
-            controlInputs.yaw,
-            MIN_YAW_AUTHORITY,
-            MAX_YAW_AUTHORITY
-        ),
-        mapInput(
-            controlInputs.pitch,
-            MIN_PITCH_AUTHORITY,
-            MAX_PITCH_AUTHORITY
-        ),
-        mapInput(
-            controlInputs.roll,
-            MIN_ROLL_AUTHORITY,
-            MAX_ROLL_AUTHORITY
-        )
-    };
+    _lightOnePin = lightOnePin;
+    _lightTwoPin = lightTwoPin;
+    _lightThreePin = lightThreePin;
+    _lightFourPin = lightFourPin;
+
+    pinMode(
+        lightOnePin,
+        OUTPUT
+    );
+    pinMode(
+        lightTwoPin,
+        OUTPUT
+    );
+    pinMode(
+        lightThreePin,
+        OUTPUT
+    );
+    pinMode(
+        lightFourPin,
+        OUTPUT
+    );
+
+    _state = LOW;
+    _elapsedTime = millis();
+};
+
+void Lights::blinkingRefresh() {
+    unsigned long _stateDuration = millis() - _elapsedTime;
+    if (_state == LOW && _stateDuration > NAV_LIGHTS_OFF_DURATION_MS) {
+        on();
+    } else if (_state == HIGH && _stateDuration > NAV_LIGHTS_ON_DURATION_MS) {
+        off();
+    }
+}
+
+void Lights::on() {
+    setState(
+        HIGH
+    );
+};
+
+void Lights::off() {
+    setState(
+        LOW
+    );
+};
+
+void Lights::setState(
+    uint8_t value
+) {
+    digitalWrite(
+        _lightOnePin,
+        value
+    );
+    digitalWrite(
+        _lightTwoPin,
+        value
+    );
+    digitalWrite(
+        _lightThreePin,
+        value
+    );
+    digitalWrite(
+        _lightFourPin,
+        value
+    );
+
+    _state = value;
+    _elapsedTime = millis();
 }

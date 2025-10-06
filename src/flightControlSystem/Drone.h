@@ -1,7 +1,7 @@
 /*
 BSD 3-Clause License
 
-Copyright (c) 2024, Nishant Kumar, Jai Willems
+Copyright (c) 2025, Nishant Kumar, Jai Willems
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
@@ -29,37 +29,35 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "Motor.h"
+#include <Arduino.h>
+#include "Configuration.h"
 #include "Types.h"
+#include "Motor.h"
 
 class Drone {
-  public:
-    void setup(
-      int motorOnePin,
-      int motorTwoPin,
-      int motorThreePin,
-      int motorFourPin,
-      int minMotorInput,
-      int maxMotorInput
-    );
-    void arm();
-    void sendControlInputs(
-      ControlCommands controlCommands
-    );
-  private:
-    Motor _motorOne;
-    Motor _motorTwo;
-    Motor _motorThree;
-    Motor _motorFour;
-    int _minMotorInput;
-    int _maxMotorInput;
-    int mixControlInputs(
-      bool bow,
-      bool port,
-      ControlCommands controlCommands
-    );
-    bool isMotorCcw(
-      bool bow,
-      bool port
-    );
+    public:
+        void setup(
+            uint8_t motorOnePin,
+            uint8_t motorTwoPin,
+            uint8_t motorThreePin,
+            uint8_t motorFourPin
+        );
+        void arm();
+        void sendFlightInputs(
+            FlightInputs flightInputs
+        );
+    private:
+        Motor _motorOne;
+        Motor _motorTwo;
+        Motor _motorThree;
+        Motor _motorFour;
+        int mixFlightInputs(
+            bool bow,
+            bool port,
+            FlightInputs flightInputs
+        );
+        bool isMotorCcw(
+            bool bow,
+            bool port
+        );
 };

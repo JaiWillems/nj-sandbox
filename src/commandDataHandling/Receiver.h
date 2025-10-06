@@ -1,7 +1,7 @@
 /*
 BSD 3-Clause License
 
-Copyright (c) 2024, Nishant Kumar, Jai Willems
+Copyright (c) 2025, Nishant Kumar, Jai Willems
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
@@ -29,46 +29,23 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "FlightModeFSM.h"
+#include <Arduino.h>
+#include <SPI.h>
+#include <nRF24L01.h>
+#include <RF24.h>
+#include "Types.h"
 
-// Columns are fromMode, rows are toMode.
-const int KARNAUGH_MAP[5][5] = {
-  {1, 0, 0, 1, 0},
-  {1, 1, 0, 0, 0},
-  {0, 1, 1, 0, 0},
-  {0, 1, 1, 1, 0},
-  {1, 1, 1, 1, 1}
+class Receiver {
+    public:
+        void setup(
+            uint8_t cePin,
+            uint8_t csnPin,
+            uint8_t spispeed,
+            byte readAddress[6]
+        );
+        bool available();
+        FlightInputs read();
+    private:
+        RF24* _receiver;
+        FlightInputs _flightInputs;
 };
-
-FlightModeFSM::FlightModeFSM() {
-  _currentMode = OFF;
-}
-
-bool FlightModeFSM::setMode(
-  FlightMode newMode
-) {
-  bool doSetMode = isValidTransition(
-    _currentMode,
-    newMode
-  );
-  if (doSetMode) {
-    _currentMode = newMode;
-  }
-  return doSetMode;
-}
-
-bool FlightModeFSM::isValidTransition(
-  FlightMode fromMode,
-  FlightMode toMode
-) {
-  if (KARNAUGH_MAP[toMode][fromMode]) {
-    return true;
-  }
-  return false;
-}
-
-bool FlightModeFSM::isMode(
-  FlightMode mode
-) {
-  return _currentMode == mode;
-}

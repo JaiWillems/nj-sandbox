@@ -1,7 +1,7 @@
 /*
 BSD 3-Clause License
 
-Copyright (c) 2024, Nishant Kumar, Jai Willems
+Copyright (c) 2025, Nishant Kumar, Jai Willems
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
@@ -31,20 +31,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <Arduino.h>
 #include <SoftwareSerial.h>
+#include "Configuration.h"
 #include "Types.h"
 
 class UartCommunications {
-  public:
-    void setup(
-      int rxPin,
-      int txPin,
-      int baudRate
-    );
-    bool isPacketAvailable();
-    ControlCommands deserialize();
-  private:
-    int _rxPin;
-    int _txPin;
-    int _baudRate;
-    ControlCommands _controlCommands;
+	public:
+		void setup(
+			uint8_t rxPin,
+			uint8_t txPin,
+			unsigned long baudRate
+		);
+		bool available();
+		FlightInputs read();
+	private:
+		SoftwareSerial* _serial;
+		FlightInputs _flightInputs;
 };

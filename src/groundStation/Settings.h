@@ -29,72 +29,31 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "Configuration.h"
-#include "Settings.h"
-#include "Types.h"
-#include "Utils.h"
-#include "Transmitter.h"
+#ifndef Settings_h
+#define Settings_h
 
-Transmitter transmitter;
+// *** GENERAL ***
 
-void setup() {
-    pinMode(THRUST_AXIS_PIN, INPUT);
-    pinMode(YAW_AXIS_PIN, INPUT);
-    pinMode(PITCH_AXIS_PIN, INPUT);
-    pinMode(ROLL_AXIS_PIN, INPUT);
+const uint8_t COMMANDING_FREQUENCY_HZ = 40;
 
-    transmitter.setup(
-        CE_PIN,
-        CSN_PIN,
-        SPI_SPEED,
-        WRITE_ADDRESS
-    );
-}
+// *** CONTROL MAPPING ***
 
-void loop() {
-    FlightInputs flightInputs = mapInputs(
-        readControlInputs()
-    );
+const int16_t MIN_THROTTLE_AUTHORITY = 0;
+const int16_t MAX_THROTTLE_AUTHORITY = 1000;
 
-    transmitter.write(
-        flightInputs
-    );
+// Max yaw authority of 127 for int8_t type.
+const int8_t YAW_AUTHORITY = 100;
+const int8_t MIN_YAW_AUTHORITY = -YAW_AUTHORITY;
+const int8_t MAX_YAW_AUTHORITY = YAW_AUTHORITY;
 
-    delay(1000 / COMMANDING_FREQUENCY_HZ);
-}
+// Max pitch authority of 127 for int8_t type.
+const int8_t PITCH_AUTHORITY = 100;
+const int8_t MIN_PITCH_AUTHORITY = PITCH_AUTHORITY;
+const int8_t MAX_PITCH_AUTHORITY = -PITCH_AUTHORITY;
 
-ControlInputs readControlInputs() {
-    return {
-        analogRead(THRUST_AXIS_PIN),
-        analogRead(YAW_AXIS_PIN),
-        analogRead(PITCH_AXIS_PIN),
-        analogRead(ROLL_AXIS_PIN)
-    };
-}
+// Max roll authority of 127 for int8_t type.
+const int8_t ROLL_AUTHORITY = 100;
+const int8_t MIN_ROLL_AUTHORITY = -ROLL_AUTHORITY;
+const int8_t MAX_ROLL_AUTHORITY = ROLL_AUTHORITY;
 
-FlightInputs mapInputs(
-    ControlInputs controlInputs
-) {
-    return {
-        mapInput(
-            controlInputs.throttle,
-            MIN_THROTTLE_AUTHORITY,
-            MAX_THROTTLE_AUTHORITY
-        ),
-        mapInput(
-            controlInputs.yaw,
-            MIN_YAW_AUTHORITY,
-            MAX_YAW_AUTHORITY
-        ),
-        mapInput(
-            controlInputs.pitch,
-            MIN_PITCH_AUTHORITY,
-            MAX_PITCH_AUTHORITY
-        ),
-        mapInput(
-            controlInputs.roll,
-            MIN_ROLL_AUTHORITY,
-            MAX_ROLL_AUTHORITY
-        )
-    };
-}
+#endif
