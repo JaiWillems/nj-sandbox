@@ -37,7 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 Lights lights;
 Receiver receiver;
-UartCommunications uartCommunications;
+UartCommunications<FlightInputs, DroneState> uartCommunications;
 
 void setup() {
     lights.setup(
@@ -65,7 +65,7 @@ void loop() {
     lights.blinkingRefresh();
 
     if (receiver.available()) {
-        uartCommunications.write(
+        uartCommunications.transmit(
             receiver.read()
         );
     }

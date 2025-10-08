@@ -34,6 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Configuration.h"
 #include "Types.h"
 
+template <typename TxType, typename RxType>
 class UartCommunications {
 	public:
 		void setup(
@@ -41,12 +42,12 @@ class UartCommunications {
 			uint8_t txPin,
 			unsigned long baudRate
 		);
-		void write(
-			DroneState dronestate
+		void transmit(
+			TxType data
 		);
 		bool available();
-		FlightInputs read();
+		RxType receive();
 	private:
 		SoftwareSerial* _serial;
-		FlightInputs _flightInputs;
+		RxType _rxDataBuffer;
 };

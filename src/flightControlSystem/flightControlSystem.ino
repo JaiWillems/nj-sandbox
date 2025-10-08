@@ -37,7 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <SoftwareSerial.h>
 
-UartCommunications uartCommunications;
+UartCommunications<DroneState, FlightInputs> uartCommunications;
 Drone drone;
 FlightInputs flightInputs;
 
@@ -58,7 +58,7 @@ void setup() {
 
 void loop() {
     if (uartCommunications.available()) {
-        flightInputs = uartCommunications.read();
+        flightInputs = uartCommunications.receive();
     }
 
     drone.sendFlightInputs(

@@ -31,7 +31,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "UartCommunications.h"
 
-void UartCommunications::setup(
+template <typename TxType, typename RxType>
+void UartCommunications<TxType, RxType>::setup(
 	uint8_t rxPin,
 	uint8_t txPin,
 	unsigned long baudRate
@@ -43,28 +44,31 @@ void UartCommunications::setup(
 	_serial->begin(baudRate);
 }
 
-void UartCommunications::write(
-	DroneState droneState
+template <typename TxType, typename RxType>
+void UartCommunications<TxType, RxType>::transmit(
+	TxType data
 ) {
 	_serial->write(START_MARKER);
 	_serial->write(
-		(char*)&droneState,
-		sizeof(droneState)
+		(char*)&data,
+		sizeof(data)
 	);
 }
 
-bool UartCommunications::available() {
-	return _serial->available() > sizeof(_flightInputs) + 1;
+template <typename TxType, typename RxType>
+bool UartCommunications<TxType, RxType>::available() {
+	return _serial->available() > sizeof(_rxDataBuffer) + 1;
 }
 
-FlightInputs UartCommunications::read() {
-	byte* structStart = reinterpret_cast<byte*>(&_flightInputs);
+template <typename TxType, typename RxType>
+RxType UartCommunications<TxType, RxType>::receive() {
+	byte* structStart = reinterpret_cast<byte*>(&_rxDataBuffer);
 
 	byte data = _serial->read();
 
 	if (data == START_MARKER) {
 
-		for (byte n = 0; n < sizeof(_flightInputs); n++) {
+		for (byte n = 0; n < sizeof(_rxDataBuffer); n++) {
 			*(structStart + n) = _serial->read();
 		}
 		while (_serial->available() > 0) {
@@ -72,5 +76,7 @@ FlightInputs UartCommunications::read() {
 		}
 	}
 
-	return _flightInputs;
+	return _rxDataBuffer;
 }
+
+template class UartCommunications<DroneState, FlightInputs>;
