@@ -57,26 +57,25 @@ void UartCommunications<TxType, RxType>::transmit(
 
 template <typename TxType, typename RxType>
 bool UartCommunications<TxType, RxType>::available() {
-	return _serial->available() > sizeof(_rxDataBuffer) + 1;
+	return _serial->available() > 0;
 }
 
 template <typename TxType, typename RxType>
 RxType UartCommunications<TxType, RxType>::receive() {
-	byte* structStart = reinterpret_cast<byte*>(&_rxDataBuffer);
+	while (_serial->available()) {
+		byte data = _serial->read();
 
-	byte data = _serial->read();
+		if (data == START_MARKER) {
+			byte* structStart = reinterpret_cast<byte*>(&_rxDataBuffer);
 
-	if (data == START_MARKER) {
-
-		for (byte n = 0; n < sizeof(_rxDataBuffer); n++) {
-			*(structStart + n) = _serial->read();
-		}
-		while (_serial->available() > 0) {
-			byte dumpTheData = _serial->read();
+			for (byte n = 0; n < sizeof(_rxDataBuffer); n++) {
+				while (!_serial->available()) {}
+				*(structStart + n) = _serial->read();
+			}
+			
+			return _rxDataBuffer;
 		}
 	}
-
-	return _rxDataBuffer;
 }
 
 template class UartCommunications<FlightInputs, DroneState>;
