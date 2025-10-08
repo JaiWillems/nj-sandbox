@@ -41,6 +41,9 @@ class UartCommunications {
 			uint8_t txPin,
 			unsigned long baudRate
 		);
+		void write(
+			DroneState dronestate
+		);
 		bool available();
 		FlightInputs read();
 	private:

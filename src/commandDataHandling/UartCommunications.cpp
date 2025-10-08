@@ -52,3 +52,25 @@ void UartCommunications::write(
         sizeof(flightInputs)
     );
 }
+
+bool UartCommunications::available() {
+    return _serial->available() > sizeof(_droneState) + 1;
+}
+
+DroneState UartCommunications::read() {
+	byte* structStart = reinterpret_cast<byte*>(&_droneState);
+
+	byte data = _serial->read();
+
+	if (data == START_MARKER) {
+
+		for (byte n = 0; n < sizeof(_droneState); n++) {
+			*(structStart + n) = _serial->read();
+		}
+		while (_serial->available() > 0) {
+			byte dumpTheData = _serial->read();
+		}
+	}
+
+	return _droneState;
+}

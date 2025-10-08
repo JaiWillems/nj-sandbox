@@ -43,6 +43,16 @@ void UartCommunications::setup(
 	_serial->begin(baudRate);
 }
 
+void UartCommunications::write(
+	DroneState droneState
+) {
+	_serial->write(START_MARKER);
+	_serial->write(
+		(char*)&droneState,
+		sizeof(droneState)
+	);
+}
+
 bool UartCommunications::available() {
 	return _serial->available() > sizeof(_flightInputs) + 1;
 }

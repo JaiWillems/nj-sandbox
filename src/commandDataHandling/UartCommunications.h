@@ -44,6 +44,9 @@ class UartCommunications {
         void write(
             FlightInputs flightInputs
         );
+        bool available();
+        DroneState read();
     private:
         SoftwareSerial* _serial;
+        DroneState _droneState;
 };
