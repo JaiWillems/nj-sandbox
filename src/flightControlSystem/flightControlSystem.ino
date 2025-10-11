@@ -34,18 +34,27 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Types.h"
 #include "Drone.h"
 #include "UartCommunications.h"
+#include "Ultrasonic.h"
 
 #include <SoftwareSerial.h>
 
 UartCommunications uartCommunications;
+Ultrasonic altimiter;
 Drone drone;
 FlightInputs flightInputs;
 
 void setup() {
+    Serial.begin(9600);
+    
     uartCommunications.setup(
         UART_RX_PIN,
         UART_TX_PIN,
         UART_BAUD_RATE
+    );
+
+    altimiter.setup(
+        ULTRASONIC_TRIG_PIN,
+        ULTRASONIC_ECHO_PIN
     );
 
     drone.setup(
@@ -64,6 +73,9 @@ void loop() {
     drone.sendFlightInputs(
         flightInputs
     );
+
+    float distance = altimiter.getAbsoluteDistance();
+    Serial.println(distance);
 
     delay(1000 / COMMANDING_FREQUENCY_HZ);
 }
