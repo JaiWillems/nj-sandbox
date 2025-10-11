@@ -29,39 +29,41 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef Configuration_h
-#define Configuration_h
+#include "Ultrasonic.h"
 
-// *** MOTORS ***
+const int PULSE_DURATION_MICROS = 300000;
+const float SPEED_OF_SOUND_M_PER_MICROS = 0.000343;
 
-const uint8_t MOTOR_ONE_PIN = 10;
-const bool MOTOR_ONE_BOW = true;
-const bool MOTOR_ONE_PORT = false;
+void Ultrasonic::setup(
+  int trigPin,
+  int echoPin
+) {
+  pinMode(trigPin, OUTPUT);
+  pinMode(echoPin, INPUT);
 
-const uint8_t MOTOR_TWO_PIN = 9;
-const bool MOTOR_TWO_BOW = false;
-const bool MOTOR_TWO_PORT = false;
+  _trigPin = trigPin;
+  _echoPin = echoPin;
+}
 
-const uint8_t MOTOR_THREE_PIN = 11;
-const bool MOTOR_THREE_BOW = false;
-const bool MOTOR_THREE_PORT = true;
+void Ultrasonic::calibrate() {
+  _referenceDistance = getAbsoluteDistance();
+}
 
-const uint8_t MOTOR_FOUR_PIN = 6;
-const bool MOTOR_FOUR_BOW = true;
-const bool MOTOR_FOUR_PORT = true;
+float Ultrasonic::getAbsoluteDistance() {
+  digitalWrite(_trigPin, LOW);
+  delayMicroseconds(2);
+  digitalWrite(_trigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(_trigPin, LOW);
 
-const uint16_t MOTOR_ARM_TIME = 5000;
+  long duration = pulseIn(
+    _echoPin,
+    HIGH,
+    PULSE_DURATION_MICROS
+  );
+  return duration * SPEED_OF_SOUND_M_PER_MICROS / 2;
+}
 
-// *** UART ***
-
-const uint8_t UART_RX_PIN = 3;
-const uint8_t UART_TX_PIN = 4;
-const uint16_t UART_BAUD_RATE = 9600;
-const uint8_t START_MARKER = 255;
-
-// *** HC-SR04 SENSOR ***
-
-const uint8_t ULTRASONIC_TRIG_PIN = 12;
-const uint8_t ULTRASONIC_ECHO_PIN = 13;
-
-#endif
+float Ultrasonic::getRelativeDistance() {
+  return getAbsoluteDistance() - _referenceDistance;
+}

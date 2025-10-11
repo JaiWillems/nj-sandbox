@@ -29,39 +29,19 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef Configuration_h
-#define Configuration_h
+#include <Arduino.h>
 
-// *** MOTORS ***
-
-const uint8_t MOTOR_ONE_PIN = 10;
-const bool MOTOR_ONE_BOW = true;
-const bool MOTOR_ONE_PORT = false;
-
-const uint8_t MOTOR_TWO_PIN = 9;
-const bool MOTOR_TWO_BOW = false;
-const bool MOTOR_TWO_PORT = false;
-
-const uint8_t MOTOR_THREE_PIN = 11;
-const bool MOTOR_THREE_BOW = false;
-const bool MOTOR_THREE_PORT = true;
-
-const uint8_t MOTOR_FOUR_PIN = 6;
-const bool MOTOR_FOUR_BOW = true;
-const bool MOTOR_FOUR_PORT = true;
-
-const uint16_t MOTOR_ARM_TIME = 5000;
-
-// *** UART ***
-
-const uint8_t UART_RX_PIN = 3;
-const uint8_t UART_TX_PIN = 4;
-const uint16_t UART_BAUD_RATE = 9600;
-const uint8_t START_MARKER = 255;
-
-// *** HC-SR04 SENSOR ***
-
-const uint8_t ULTRASONIC_TRIG_PIN = 12;
-const uint8_t ULTRASONIC_ECHO_PIN = 13;
-
-#endif
+class Ultrasonic {
+  public:
+    void setup(
+      int trigPin,
+      int echoPin
+    );
+    void calibrate();
+    float getAbsoluteDistance();
+    float getRelativeDistance();
+  private:
+    int _trigPin;
+    int _echoPin;
+    float _referenceDistance;
+};
