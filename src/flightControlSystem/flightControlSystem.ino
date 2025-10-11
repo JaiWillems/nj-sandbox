@@ -56,6 +56,7 @@ void setup() {
         ULTRASONIC_TRIG_PIN,
         ULTRASONIC_ECHO_PIN
     );
+    altimiter.calibrate();
 
     drone.setup(
         MOTOR_ONE_PIN,
