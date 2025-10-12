@@ -38,8 +38,8 @@ class Ultrasonic {
       int echoPin
     );
     void calibrate();
-    float getAbsoluteDistance();
-    float getRelativeDistance();
+    float getDistance();
+    float getCalibratedDistance();
   private:
     int _trigPin;
     int _echoPin;

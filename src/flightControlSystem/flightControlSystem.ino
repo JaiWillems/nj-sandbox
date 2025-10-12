@@ -75,7 +75,7 @@ void loop() {
         flightInputs
     );
 
-    float distance = altimiter.getAbsoluteDistance();
+    float distance = altimiter.getCalibratedDistance();
     Serial.println(distance);
 
     delay(1000 / COMMANDING_FREQUENCY_HZ);

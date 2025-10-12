@@ -38,21 +38,25 @@ void Ultrasonic::setup(
   int trigPin,
   int echoPin
 ) {
-  pinMode(trigPin, OUTPUT);
-  pinMode(echoPin, INPUT);
-
   _trigPin = trigPin;
   _echoPin = echoPin;
+
+  pinMode(_trigPin, OUTPUT);
+  pinMode(_echoPin, INPUT);
 }
 
 void Ultrasonic::calibrate() {
-  _referenceDistance = getAbsoluteDistance();
+  _referenceDistance = getDistance();
+
+  // Delay required for sensor stabilization.
+  delay(10);
 }
 
-float Ultrasonic::getAbsoluteDistance() {
-  pinMode(_trigPin, OUTPUT);
-  pinMode(_echoPin, INPUT);
-  
+// A delay is requried between successive function calls to allow sensor
+// stabilization. If a delay is not used, the pulseIn function will hang.
+// A delay was not incorporated since sufficient delay should exist in
+// the main loop.
+float Ultrasonic::getDistance() {
   digitalWrite(_trigPin, LOW);
   delayMicroseconds(2);
   digitalWrite(_trigPin, HIGH);
@@ -67,6 +71,6 @@ float Ultrasonic::getAbsoluteDistance() {
   return duration * SPEED_OF_SOUND_M_PER_MICROS / 2;
 }
 
-float Ultrasonic::getRelativeDistance() {
-  return getAbsoluteDistance() - _referenceDistance;
+float Ultrasonic::getCalibratedDistance() {
+  return getDistance() - _referenceDistance;
 }

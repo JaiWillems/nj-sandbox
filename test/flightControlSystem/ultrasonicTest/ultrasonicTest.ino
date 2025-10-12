@@ -49,11 +49,11 @@ void setup() {
 }
 
 void loop() {
-  float absoluteDistance = ultrasonic.getAbsoluteDistance();
-  float relativeDistance = ultrasonic.getRelativeDistance();
+  float distance = ultrasonic.getDistance();
+  float calibratedDistance = ultrasonic.getCalibratedDistance();
 
-  Serial.print("Absolute Distance: "); Serial.print(absoluteDistance);
-  Serial.print("\tRelative Distance: "); Serial.println(relativeDistance);
+  Serial.print("Distance: "); Serial.print(distance);
+  Serial.print("\tCalibrated Distance: "); Serial.println(calibratedDistance);
 
   delay(1000 / LOOP_FREQUENCY);
 }
