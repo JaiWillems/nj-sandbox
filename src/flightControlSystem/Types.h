@@ -40,4 +40,14 @@ struct FlightInputs {
 	int8_t roll;
 };
 
+struct StateEstimation {
+   float yaw;
+   float yawRate;
+   float pitch;
+   float pitchRate;
+   float roll;
+   float rollRate;
+   float altitude;
+};
+
 #endif

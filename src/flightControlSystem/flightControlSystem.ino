@@ -35,13 +35,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Drone.h"
 #include "UartCommunications.h"
 #include "Ultrasonic.h"
-
+#include <MPU9250.h>
 #include <SoftwareSerial.h>
 
 UartCommunications uartCommunications;
-Ultrasonic altimiter;
+Ultrasonic altimeter;
 Drone drone;
 FlightInputs flightInputs;
+MPU9250 mpu;
 
 void setup() {
     Serial.begin(9600);
@@ -52,11 +53,18 @@ void setup() {
         UART_BAUD_RATE
     );
 
-    altimiter.setup(
+    mpu.begin();
+    mpu.calibrateAccelGyro();
+    mpu.setMagnetometerOffsets(
+        HARD_IRON_OFFSET,
+        SOFT_IRON_OFFSET
+    );
+
+    altimeter.setup(
         ULTRASONIC_TRIG_PIN,
         ULTRASONIC_ECHO_PIN
     );
-    altimiter.calibrate();
+    altimeter.calibrate();
 
     drone.setup(
         MOTOR_ONE_PIN,
@@ -75,8 +83,38 @@ void loop() {
         flightInputs
     );
 
-    float distance = altimiter.getCalibratedDistance();
-    Serial.println(distance);
+    StateEstimation state = getStateEstimation();
+
+    Serial.print(state.yaw);
+    Serial.print("\t");
+    Serial.print(state.yawRate);
+    Serial.print("\t");
+    Serial.print(state.pitch);
+    Serial.print("\t");
+    Serial.print(state.pitchRate);
+    Serial.print("\t");
+    Serial.print(state.roll);
+    Serial.print("\t");
+    Serial.print(state.rollRate);
+    Serial.print("\t");
+    Serial.println(state.altitude);
 
     delay(1000 / COMMANDING_FREQUENCY_HZ);
 }
+
+StateEstimation getStateEstimation() {
+    Attitude attitude = mpu.getYawPitchRoll();
+    Vector3D gyroscope = mpu.readGyroscope();
+    float altitude = altimeter.getCalibratedDistance();
+
+    StateEstimation state;
+    state.yaw = attitude.yaw;
+    state.yawRate = gyroscope.z;
+    state.pitch = attitude.pitch;
+    state.pitchRate = gyroscope.y;
+    state.roll = attitude.roll;
+    state.rollRate = gyroscope.x;
+    state.altitude = altitude;
+
+    return state;
+};
