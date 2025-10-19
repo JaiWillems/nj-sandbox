@@ -39,4 +39,4 @@ class FlightController {
             FlightInputs flightInputs,
             StateEstimation state
         );
-}
+};
