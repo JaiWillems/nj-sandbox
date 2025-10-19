@@ -59,5 +59,9 @@ const uint8_t UART_TX_PIN = 4;
 const uint16_t UART_BAUD_RATE = 9600;
 const uint8_t START_MARKER = 255;
 
+// *** HC-SR04 SENSOR ***
+
+const uint8_t ULTRASONIC_TRIG_PIN = 12;
+const uint8_t ULTRASONIC_ECHO_PIN = 13;
 
 #endif

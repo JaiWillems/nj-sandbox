@@ -32,21 +32,43 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Configuration.h"
 #include "Settings.h"
 #include "Types.h"
-#include "Drone.h"
 #include "UartCommunications.h"
-
-#include <SoftwareSerial.h>
+#include <MPU9250.h>
+#include "Ultrasonic.h"
+#include "FlightController.h"
+#include "Drone.h"
 
 UartCommunications<DroneState, FlightInputs> uartCommunications;
+MPU9250 mpu;
+Ultrasonic altimeter;
+FlightController flightController;
 Drone drone;
-FlightInputs flightInputs;
+
+FlightInputs userInputs;
 
 void setup() {
+    Serial.begin(9600);
+    
     uartCommunications.setup(
         UART_RX_PIN,
         UART_TX_PIN,
         UART_BAUD_RATE
     );
+
+    mpu.begin();
+    mpu.calibrateAccelGyro();
+    mpu.setMagnetometerOffsets(
+        HARD_IRON_OFFSET,
+        SOFT_IRON_OFFSET
+    );
+
+    altimeter.setup(
+        ULTRASONIC_TRIG_PIN,
+        ULTRASONIC_ECHO_PIN
+    );
+    altimeter.calibrate();
+
+    flightController.begin();
 
     drone.setup(
         MOTOR_ONE_PIN,
@@ -58,12 +80,51 @@ void setup() {
 
 void loop() {
     if (uartCommunications.available()) {
-        flightInputs = uartCommunications.receive();
+        userInputs = uartCommunications.receive();
     }
+
+    StateEstimation state = getStateEstimation();
+
+    Serial.print(state.yaw);
+    Serial.print("\t");
+    Serial.print(state.yawRate);
+    Serial.print("\t");
+    Serial.print(state.pitch);
+    Serial.print("\t");
+    Serial.print(state.pitchRate);
+    Serial.print("\t");
+    Serial.print(state.roll);
+    Serial.print("\t");
+    Serial.print(state.rollRate);
+    Serial.print("\t");
+    Serial.println(state.altitude);
+
+    FlightInputs flightInputs = flightController.compute(
+        userInputs,
+        state
+    );
 
     drone.sendFlightInputs(
         flightInputs
     );
 
+    // TODO: Consider removing the delay.
     delay(1000 / COMMANDING_FREQUENCY_HZ);
 }
+
+StateEstimation getStateEstimation() {
+    Attitude attitude = mpu.getYawPitchRoll();
+    Vector3D gyroscope = mpu.readGyroscope();
+    float altitude = altimeter.getCalibratedDistance();
+
+    StateEstimation state;
+    state.yaw = attitude.yaw;
+    state.yawRate = gyroscope.z;
+    state.pitch = attitude.pitch;
+    state.pitchRate = gyroscope.y;
+    state.roll = attitude.roll;
+    state.rollRate = gyroscope.x;
+    state.altitude = altitude;
+
+    return state;
+};

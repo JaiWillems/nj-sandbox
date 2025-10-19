@@ -1,7 +1,7 @@
 /*
 BSD 3-Clause License
 
-Copyright (c) 2024, Nishant Kumar, Jai Willems
+Copyright (c) 2025, Nishant Kumar, Jai Willems
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
@@ -31,29 +31,46 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "Ultrasonic.h"
 
-const int TRIG_PIN = 12;
-const int ECHO_PIN = 13;
+const int PULSE_DURATION_MICROS = 300000;
+const float SPEED_OF_SOUND_M_PER_MICROS = 0.000343;
 
-const int LOOP_FREQUENCY = 100;
+void Ultrasonic::setup(
+  int trigPin,
+  int echoPin
+) {
+  _trigPin = trigPin;
+  _echoPin = echoPin;
 
-Ultrasonic ultrasonic;
-
-void setup() {
-  Serial.begin(9600);
-
-  ultrasonic.begin(
-    TRIG_PIN,
-    ECHO_PIN
-  );
-  ultrasonic.calibrate();
+  pinMode(_trigPin, OUTPUT);
+  pinMode(_echoPin, INPUT);
 }
 
-void loop() {
-  float distance = ultrasonic.getDistance();
-  float calibratedDistance = ultrasonic.getCalibratedDistance();
+void Ultrasonic::calibrate() {
+  _referenceDistance = getDistance();
 
-  Serial.print("Distance: "); Serial.print(distance);
-  Serial.print("\tCalibrated Distance: "); Serial.println(calibratedDistance);
+  // Delay required for sensor stabilization.
+  delay(10);
+}
 
-  delay(1000 / LOOP_FREQUENCY);
+// A delay is requried between successive function calls to allow sensor
+// stabilization. If a delay is not used, the pulseIn function will hang.
+// A delay was not incorporated since sufficient delay should exist in
+// the main loop.
+float Ultrasonic::getDistance() {
+  digitalWrite(_trigPin, LOW);
+  delayMicroseconds(2);
+  digitalWrite(_trigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(_trigPin, LOW);
+
+  long duration = pulseIn(
+    _echoPin,
+    HIGH,
+    PULSE_DURATION_MICROS
+  );
+  return duration * SPEED_OF_SOUND_M_PER_MICROS / 2;
+}
+
+float Ultrasonic::getCalibratedDistance() {
+  return getDistance() - _referenceDistance;
 }

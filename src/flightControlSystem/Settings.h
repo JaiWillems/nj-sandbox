@@ -32,6 +32,28 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef Settings_h
 #define Settings_h
 
+#include <MPU9250.h>
+
+// *** MAGNETOMETER OFFSETS ***
+
+Vector3D HARD_IRON_OFFSET = {
+    .x = 26.01,
+    .y = 13.85,
+    .z = 10.03
+};
+
+Matrix3x3 SOFT_IRON_OFFSET = {
+    .m11 = 1.004,
+    .m12 = 0.010,
+    .m13 = -0.002,
+    .m21 = 0.010,
+    .m22 = 1.011,
+    .m23 = -0.001,
+    .m31 = -0.002,
+    .m32 = -0.001,
+    .m33 = 0.984
+};
+
 // *** GENERAL ***
 
 const uint8_t COMMANDING_FREQUENCY_HZ = 100;

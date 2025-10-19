@@ -1,7 +1,7 @@
 /*
 BSD 3-Clause License
 
-Copyright (c) 2024, Nishant Kumar, Jai Willems
+Copyright (c) 2025, Nishant Kumar, Jai Willems
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
@@ -29,31 +29,14 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "Ultrasonic.h"
+#include <Arduino.h>
+#include "Types.h"
 
-const int TRIG_PIN = 12;
-const int ECHO_PIN = 13;
-
-const int LOOP_FREQUENCY = 100;
-
-Ultrasonic ultrasonic;
-
-void setup() {
-  Serial.begin(9600);
-
-  ultrasonic.begin(
-    TRIG_PIN,
-    ECHO_PIN
-  );
-  ultrasonic.calibrate();
-}
-
-void loop() {
-  float distance = ultrasonic.getDistance();
-  float calibratedDistance = ultrasonic.getCalibratedDistance();
-
-  Serial.print("Distance: "); Serial.print(distance);
-  Serial.print("\tCalibrated Distance: "); Serial.println(calibratedDistance);
-
-  delay(1000 / LOOP_FREQUENCY);
-}
+class FlightController {
+    public:
+        void begin();
+        FlightInputs compute(
+            FlightInputs flightInputs,
+            StateEstimation state
+        );
+};
