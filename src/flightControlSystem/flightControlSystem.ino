@@ -32,17 +32,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Configuration.h"
 #include "Settings.h"
 #include "Types.h"
-#include "Drone.h"
 #include "UartCommunications.h"
-#include "Ultrasonic.h"
 #include <MPU9250.h>
-#include <SoftwareSerial.h>
+#include "Ultrasonic.h"
+#include "FlightController.h"
+#include "Drone.h"
 
 UartCommunications uartCommunications;
-Ultrasonic altimeter;
-Drone drone;
-FlightInputs flightInputs;
 MPU9250 mpu;
+Ultrasonic altimeter;
+FlightController flightController;
+Drone drone;
+
+FlightInputs userInputs;
 
 void setup() {
     Serial.begin(9600);
@@ -66,6 +68,8 @@ void setup() {
     );
     altimeter.calibrate();
 
+    flightController.begin();
+
     drone.setup(
         MOTOR_ONE_PIN,
         MOTOR_TWO_PIN,
@@ -76,12 +80,8 @@ void setup() {
 
 void loop() {
     if (uartCommunications.available()) {
-        flightInputs = uartCommunications.read();
+        userInputs = uartCommunications.read();
     }
-
-    drone.sendFlightInputs(
-        flightInputs
-    );
 
     StateEstimation state = getStateEstimation();
 
@@ -99,6 +99,16 @@ void loop() {
     Serial.print("\t");
     Serial.println(state.altitude);
 
+    FlightInputs flightInputs = flightController.compute(
+        userInputs,
+        state
+    );
+
+    drone.sendFlightInputs(
+        flightInputs
+    );
+
+    // TODO: Consider removing the delay.
     delay(1000 / COMMANDING_FREQUENCY_HZ);
 }
 
