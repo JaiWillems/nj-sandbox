@@ -42,6 +42,7 @@ UartCommunications<DroneState, FlightInputs> uartCommunications;
 MPU9250 mpu;
 Ultrasonic altimeter;
 FlightController flightController;
+Drone drone;
 
 FlightInputs userInputs;
 
@@ -79,7 +80,7 @@ void setup() {
 
 void loop() {
     if (uartCommunications.available()) {
-        flightInputs = uartCommunications.receive();
+        userInputs = uartCommunications.receive();
     }
 
     StateEstimation state = getStateEstimation();
