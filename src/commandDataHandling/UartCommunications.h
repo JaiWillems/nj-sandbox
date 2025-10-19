@@ -34,16 +34,20 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Types.h"
 #include "Configuration.h"
 
+template <typename TxType, typename RxType>
 class UartCommunications {
-    public:
-        void setup(
-            uint8_t rxPin,
-            uint8_t txPin,
-            unsigned long baudRate
-        );
-        void write(
-            FlightInputs flightInputs
-        );
-    private:
-        SoftwareSerial* _serial;
+	public:
+		void setup(
+			uint8_t rxPin,
+			uint8_t txPin,
+			unsigned long baudRate
+		);
+		void transmit(
+			TxType data
+		);
+		bool available();
+		RxType receive();
+	private:
+		SoftwareSerial* _serial;
+		RxType _rxDataBuffer;
 };

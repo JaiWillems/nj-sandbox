@@ -38,11 +38,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "FlightController.h"
 #include "Drone.h"
 
-UartCommunications uartCommunications;
+UartCommunications<DroneState, FlightInputs> uartCommunications;
 MPU9250 mpu;
 Ultrasonic altimeter;
 FlightController flightController;
-Drone drone;
 
 FlightInputs userInputs;
 
@@ -80,7 +79,7 @@ void setup() {
 
 void loop() {
     if (uartCommunications.available()) {
-        userInputs = uartCommunications.read();
+        flightInputs = uartCommunications.receive();
     }
 
     StateEstimation state = getStateEstimation();
