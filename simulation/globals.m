@@ -1,3 +1,25 @@
+% Ground Station
+
+MIN_INPUT = 0;
+MAX_INPUT = 1023;
+
+Z_DOT_AUTHORITY = 1; % [m / s].
+MIN_Z_DOT = -Z_DOT_AUTHORITY;
+MAX_Z_DOT = Z_DOT_AUTHORITY;
+
+ROLL_AUTHORITY = 0.52360; % [RAD], equivalent to 30 degrees.
+MIN_ROLL = -ROLL_AUTHORITY;
+MAX_ROLL = ROLL_AUTHORITY;
+
+PITCH_AUTHORITY = 0.52360; % [RAD], equivalent to 30 degrees.
+MIN_PITCH = -PITCH_AUTHORITY;
+MAX_PITCH = PITCH_AUTHORITY;
+
+YAW_RATE_AUTHORITY = 0.6; %1.25664; % [RAD / s], equivalent to 72 deg / s.
+MIN_YAW_RATE = -YAW_RATE_AUTHORITY;
+MAX_YAW_RATE = YAW_RATE_AUTHORITY;
+
+% Drone
 
 g = 9.81; % [m / s^2], gravitational acceleration.
 
@@ -31,5 +53,5 @@ pitch_Ki = roll_Ki;
 pitch_Kd = roll_Kd;
 
 yaw_Kp = 1;
-yaw_Ki = 0;
+yaw_Ki = 0.01;
 yaw_Kd = 0;
