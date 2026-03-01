@@ -7,11 +7,11 @@ Z_DOT_AUTHORITY = 1; % [m / s].
 MIN_Z_DOT = -Z_DOT_AUTHORITY;
 MAX_Z_DOT = Z_DOT_AUTHORITY;
 
-ROLL_AUTHORITY = 0.52360; % [RAD], equivalent to 30 degrees.
+ROLL_AUTHORITY = 0.17453; % [RAD], equivalent to 30 degrees.
 MIN_ROLL = -ROLL_AUTHORITY;
 MAX_ROLL = ROLL_AUTHORITY;
 
-PITCH_AUTHORITY = 0.52360; % [RAD], equivalent to 30 degrees.
+PITCH_AUTHORITY = 0.17453; % [RAD], equivalent to 30 degrees.
 MIN_PITCH = -PITCH_AUTHORITY;
 MAX_PITCH = PITCH_AUTHORITY;
 
