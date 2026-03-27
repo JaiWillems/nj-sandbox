@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef Types_h
 #define Types_h
 
-struct ControlInputs {
+struct ControlSignals {
     int16_t throttle;
     int16_t yaw;
     int16_t pitch;

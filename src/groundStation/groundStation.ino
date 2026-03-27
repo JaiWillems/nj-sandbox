@@ -36,12 +36,24 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Transmitter.h"
 
 Transmitter transmitter;
+ControlSignals averageSignals;
 
 void setup() {
     pinMode(THRUST_AXIS_PIN, INPUT);
     pinMode(YAW_AXIS_PIN, INPUT);
     pinMode(PITCH_AXIS_PIN, INPUT);
     pinMode(ROLL_AXIS_PIN, INPUT);
+
+    averageSignals = calculateAverageSignals();
+
+    Serial.begin(9600);
+    Serial.print(averageSignals.throttle);
+    Serial.print("\t");
+    Serial.print(averageSignals.yaw);
+    Serial.print("\t");
+    Serial.print(averageSignals.pitch);
+    Serial.print("\t");
+    Serial.println(averageSignals.roll);
 
     transmitter.setup(
         CE_PIN,
@@ -53,7 +65,10 @@ void setup() {
 
 void loop() {
     FlightInputs flightInputs = cubicMapInputs(
-        readControlInputs()
+        calibrateSignals(
+            readControlSignals(),
+            averageSignals
+        )
     );
 
     transmitter.write(
@@ -63,7 +78,7 @@ void loop() {
     delay(1000 / COMMANDING_FREQUENCY_HZ);
 }
 
-ControlInputs readControlInputs() {
+ControlSignals readControlSignals() {
     return {
         analogRead(THRUST_AXIS_PIN),
         analogRead(YAW_AXIS_PIN),
@@ -72,27 +87,58 @@ ControlInputs readControlInputs() {
     };
 }
 
+ControlSignals calculateAverageSignals() {
+    uint16_t throttle = 0;
+    uint16_t yaw = 0;
+    uint16_t pitch = 0;
+    uint16_t roll = 0;
+
+    for (int i = 0; i < CALIBRATION_ITERATIONS; i ++) {
+        ControlSignals signals = readControlSignals();
+
+        throttle += signals.throttle;
+        yaw += signals.yaw;
+        pitch += signals.pitch;
+        roll += signals.roll;
+    }
+    
+    return {
+        throttle / CALIBRATION_ITERATIONS,
+        yaw / CALIBRATION_ITERATIONS,
+        pitch / CALIBRATION_ITERATIONS,
+        roll / CALIBRATION_ITERATIONS
+    };
+}
+
+ControlSignals calibrateSignals(
+    ControlSignals rawSignals,
+    ControlSignals averageSignals
+) {
+    // TODO: Implement.
+    return rawSignals;
+}
+
 FlightInputs cubicMapInputs(
-    ControlInputs controlInputs
+    ControlSignals controlSignals
 ) {
     return {
         cubicMapInput(
-            controlInputs.throttle,
+            controlSignals.throttle,
             MAX_Z_DOT,
             MIN_Z_DOT
         ),
         cubicMapInput(
-            controlInputs.yaw,
+            controlSignals.yaw,
             MIN_YAW_RATE,
             MAX_YAW_RATE
         ),
         cubicMapInput(
-            controlInputs.pitch,
+            controlSignals.pitch,
             MIN_PITCH,
             MAX_PITCH
         ),
         cubicMapInput(
-            controlInputs.roll,
+            controlSignals.roll,
             MAX_ROLL,
             MIN_ROLL
         )

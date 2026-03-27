@@ -34,6 +34,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // *** GENERAL ***
 
+// Increasing calibration iterations above 110 may cause overflow.
+const uint8_t CALIBRATION_ITERATIONS = 100;
 const uint8_t COMMANDING_FREQUENCY_HZ = 40;
 
 // *** CONTROL MAPPING ***
