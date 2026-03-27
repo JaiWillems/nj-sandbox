@@ -1,7 +1,7 @@
 /*
 BSD 3-Clause License
 
-Copyright (c) 2025, Nishant Kumar, Jai Willems
+Copyright (c) 2026, Nishant Kumar, Jai Willems
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
@@ -34,13 +34,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 template <typename T>
 
-T mapInput(
+T cubicMapInput(
     uint16_t value,
     T range_min,
     T range_max
 ) {
-    float slope = (float) (range_max - range_min) / (MAX_CONTROL_INPUT - MIN_CONTROL_INPUT);
-    return slope * value + range_min;
+    float A = (float) 4 * (range_min - range_max) / pow(MIN_CONTROL_INPUT - MAX_CONTROL_INPUT, 3);
+    float B =  (float) (MIN_CONTROL_INPUT + MAX_CONTROL_INPUT) / 2;
+    float C = (float) (range_min + range_max) / 2;
+
+    return A * pow(value - B, 3) + C;
 }
 
 #endif

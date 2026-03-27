@@ -1,7 +1,7 @@
 /*
 BSD 3-Clause License
 
-Copyright (c) 2025, Nishant Kumar, Jai Willems
+Copyright (c) 2026, Nishant Kumar, Jai Willems
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
@@ -38,22 +38,21 @@ const uint8_t COMMANDING_FREQUENCY_HZ = 40;
 
 // *** CONTROL MAPPING ***
 
-const int16_t MIN_THROTTLE_AUTHORITY = 0;
-const int16_t MAX_THROTTLE_AUTHORITY = 1000;
+const float Z_DOT_AUTHORITY = 1; // [m / s].
+const float MIN_Z_DOT = -Z_DOT_AUTHORITY;
+const float MAX_Z_DOT = Z_DOT_AUTHORITY;
 
-// Max yaw authority of 127 for int8_t type.
-const int8_t YAW_AUTHORITY = 100;
-const int8_t MIN_YAW_AUTHORITY = -YAW_AUTHORITY;
-const int8_t MAX_YAW_AUTHORITY = YAW_AUTHORITY;
+const float ROLL_AUTHORITY = 0.17453; // [RAD], equivalent to 30 degrees.
+const float MIN_ROLL = -ROLL_AUTHORITY;
+const float MAX_ROLL = ROLL_AUTHORITY;
 
-// Max pitch authority of 127 for int8_t type.
-const int8_t PITCH_AUTHORITY = 100;
-const int8_t MIN_PITCH_AUTHORITY = PITCH_AUTHORITY;
-const int8_t MAX_PITCH_AUTHORITY = -PITCH_AUTHORITY;
+const float PITCH_AUTHORITY = 0.17453; // [RAD], equivalent to 30 degrees.
+const float MIN_PITCH = -PITCH_AUTHORITY;
+const float MAX_PITCH = PITCH_AUTHORITY;
 
-// Max roll authority of 127 for int8_t type.
-const int8_t ROLL_AUTHORITY = 100;
-const int8_t MIN_ROLL_AUTHORITY = -ROLL_AUTHORITY;
-const int8_t MAX_ROLL_AUTHORITY = ROLL_AUTHORITY;
+const float YAW_RATE_AUTHORITY = 0.6; // [RAD / s], equivalent to 72 deg / s.
+const float MIN_YAW_RATE = -YAW_RATE_AUTHORITY;
+const float MAX_YAW_RATE = YAW_RATE_AUTHORITY;
+
 
 #endif

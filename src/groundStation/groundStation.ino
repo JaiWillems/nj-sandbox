@@ -1,7 +1,7 @@
 /*
 BSD 3-Clause License
 
-Copyright (c) 2025, Nishant Kumar, Jai Willems
+Copyright (c) 2026, Nishant Kumar, Jai Willems
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
@@ -52,7 +52,7 @@ void setup() {
 }
 
 void loop() {
-    FlightInputs flightInputs = mapInputs(
+    FlightInputs flightInputs = cubicMapInputs(
         readControlInputs()
     );
 
@@ -72,29 +72,29 @@ ControlInputs readControlInputs() {
     };
 }
 
-FlightInputs mapInputs(
+FlightInputs cubicMapInputs(
     ControlInputs controlInputs
 ) {
     return {
-        mapInput(
+        cubicMapInput(
             controlInputs.throttle,
-            MIN_THROTTLE_AUTHORITY,
-            MAX_THROTTLE_AUTHORITY
+            MAX_Z_DOT,
+            MIN_Z_DOT
         ),
-        mapInput(
+        cubicMapInput(
             controlInputs.yaw,
-            MIN_YAW_AUTHORITY,
-            MAX_YAW_AUTHORITY
+            MIN_YAW_RATE,
+            MAX_YAW_RATE
         ),
-        mapInput(
+        cubicMapInput(
             controlInputs.pitch,
-            MIN_PITCH_AUTHORITY,
-            MAX_PITCH_AUTHORITY
+            MIN_PITCH,
+            MAX_PITCH
         ),
-        mapInput(
+        cubicMapInput(
             controlInputs.roll,
-            MIN_ROLL_AUTHORITY,
-            MAX_ROLL_AUTHORITY
+            MAX_ROLL,
+            MIN_ROLL
         )
     };
 }
