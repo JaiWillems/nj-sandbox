@@ -1,7 +1,7 @@
 /*
 BSD 3-Clause License
 
-Copyright (c) 2025, Nishant Kumar, Jai Willems
+Copyright (c) 2026, Nishant Kumar, Jai Willems
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
@@ -36,6 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 const int16_t MIN_CONTROL_INPUT = 0;
 const int16_t MAX_CONTROL_INPUT = 1023;
+const int16_t MID_CONTROL_INPUT = (MIN_CONTROL_INPUT + MAX_CONTROL_INPUT) / 2;
 
 const uint8_t THRUST_AXIS_PIN = A1;
 const uint8_t YAW_AXIS_PIN = A2;

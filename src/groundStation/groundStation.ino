@@ -46,15 +46,6 @@ void setup() {
 
     averageSignals = calculateAverageSignals();
 
-    Serial.begin(9600);
-    Serial.print(averageSignals.throttle);
-    Serial.print("\t");
-    Serial.print(averageSignals.yaw);
-    Serial.print("\t");
-    Serial.print(averageSignals.pitch);
-    Serial.print("\t");
-    Serial.println(averageSignals.roll);
-
     transmitter.setup(
         CE_PIN,
         CSN_PIN,
@@ -114,9 +105,60 @@ ControlSignals calibrateSignals(
     ControlSignals rawSignals,
     ControlSignals averageSignals
 ) {
-    // TODO: Implement.
-    return rawSignals;
+    return {
+        calibrateSignal(
+            rawSignals.throttle,
+            averageSignals.throttle
+        ),
+        calibrateSignal(
+            rawSignals.yaw,
+            averageSignals.yaw
+        ),
+        calibrateSignal(
+            rawSignals.pitch,
+            averageSignals.pitch
+        ),
+        calibrateSignal(
+            rawSignals.roll,
+            averageSignals.roll
+        )
+    };
 }
+
+int16_t calibrateSignal(
+    int16_t rawSignal,
+    int16_t averageSignal
+) {
+    if (rawSignal > averageSignal) {
+        return linearMap(
+            rawSignal,
+            averageSignal,
+            MAX_CONTROL_INPUT,
+            MID_CONTROL_INPUT,
+            MAX_CONTROL_INPUT
+        );
+    } else {
+        return linearMap(
+            rawSignal,
+            MIN_CONTROL_INPUT,
+            averageSignal,
+            MIN_CONTROL_INPUT,
+            MID_CONTROL_INPUT
+        );
+    }
+}
+
+int16_t linearMap(
+    int16_t value,
+    int16_t minInputValue,
+    int16_t maxInputValue,
+    int16_t minOutputValue,
+    int16_t maxOutputValue
+) {
+    float slope = (float) (minOutputValue - maxOutputValue) / (minInputValue - maxInputValue);
+    return slope * (value - minInputValue) + minOutputValue;
+}
+
 
 FlightInputs cubicMapInputs(
     ControlSignals controlSignals
