@@ -1,7 +1,7 @@
 /*
 BSD 3-Clause License
 
-Copyright (c) 2025, Nishant Kumar, Jai Willems
+Copyright (c) 2026, Nishant Kumar, Jai Willems
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
@@ -36,12 +36,22 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Transmitter.h"
 
 Transmitter transmitter;
+ControlSignals averageSignals;
+
+bool droneState = false; // On is True, off is False.
+uint8_t buttonHistory = 0b00000000;
+uint8_t stateSwitchMask = 0b01111111;
 
 void setup() {
     pinMode(THRUST_AXIS_PIN, INPUT);
     pinMode(YAW_AXIS_PIN, INPUT);
     pinMode(PITCH_AXIS_PIN, INPUT);
     pinMode(ROLL_AXIS_PIN, INPUT);
+
+    pinMode(SWITCH_LEFT_PIN, INPUT_PULLUP);
+    pinMode(SWITCH_RIGHT_PIN, INPUT_PULLUP);
+    
+    averageSignals = calculateAverageSignals();
 
     transmitter.setup(
         CE_PIN,
@@ -52,18 +62,37 @@ void setup() {
 }
 
 void loop() {
-    FlightInputs flightInputs = mapInputs(
-        readControlInputs()
+    if (simultaneousJoystickPress()) {
+        droneState = !droneState;
+    }
+
+    FlightInputs flightInputs = cubicMapInputs(
+        calibrateSignals(
+            readControlSignals(),
+            averageSignals
+        )
     );
 
     transmitter.write(
-        flightInputs
+        flightInputs,
+        droneState
     );
 
     delay(1000 / COMMANDING_FREQUENCY_HZ);
 }
 
-ControlInputs readControlInputs() {
+bool simultaneousJoystickPress() {
+    uint8_t leftSwitchState = digitalRead(SWITCH_LEFT_PIN);
+    uint8_t rightSwitchState = digitalRead(SWITCH_RIGHT_PIN);
+    uint8_t bothSwitchesPressed = !(leftSwitchState || rightSwitchState);
+    
+    buttonHistory = buttonHistory << 1;
+    buttonHistory = buttonHistory | bothSwitchesPressed;
+    
+    return !(buttonHistory ^ stateSwitchMask)
+}
+
+ControlSignals readControlSignals() {
     return {
         analogRead(THRUST_AXIS_PIN),
         analogRead(YAW_AXIS_PIN),
@@ -72,29 +101,111 @@ ControlInputs readControlInputs() {
     };
 }
 
-FlightInputs mapInputs(
-    ControlInputs controlInputs
+ControlSignals calculateAverageSignals() {
+    uint16_t throttle = 0;
+    uint16_t yaw = 0;
+    uint16_t pitch = 0;
+    uint16_t roll = 0;
+
+    for (int i = 0; i < CALIBRATION_ITERATIONS; i ++) {
+        ControlSignals signals = readControlSignals();
+
+        throttle += signals.throttle;
+        yaw += signals.yaw;
+        pitch += signals.pitch;
+        roll += signals.roll;
+    }
+    
+    return {
+        throttle / CALIBRATION_ITERATIONS,
+        yaw / CALIBRATION_ITERATIONS,
+        pitch / CALIBRATION_ITERATIONS,
+        roll / CALIBRATION_ITERATIONS
+    };
+}
+
+ControlSignals calibrateSignals(
+    ControlSignals rawSignals,
+    ControlSignals averageSignals
 ) {
     return {
-        mapInput(
-            controlInputs.throttle,
-            MIN_THROTTLE_AUTHORITY,
-            MAX_THROTTLE_AUTHORITY
+        calibrateSignal(
+            rawSignals.throttle,
+            averageSignals.throttle
         ),
-        mapInput(
-            controlInputs.yaw,
-            MIN_YAW_AUTHORITY,
-            MAX_YAW_AUTHORITY
+        calibrateSignal(
+            rawSignals.yaw,
+            averageSignals.yaw
         ),
-        mapInput(
-            controlInputs.pitch,
-            MIN_PITCH_AUTHORITY,
-            MAX_PITCH_AUTHORITY
+        calibrateSignal(
+            rawSignals.pitch,
+            averageSignals.pitch
         ),
-        mapInput(
-            controlInputs.roll,
-            MIN_ROLL_AUTHORITY,
-            MAX_ROLL_AUTHORITY
+        calibrateSignal(
+            rawSignals.roll,
+            averageSignals.roll
+        )
+    };
+}
+
+int16_t calibrateSignal(
+    int16_t rawSignal,
+    int16_t averageSignal
+) {
+    if (rawSignal > averageSignal) {
+        return linearMap(
+            rawSignal,
+            averageSignal,
+            MAX_CONTROL_INPUT,
+            MID_CONTROL_INPUT,
+            MAX_CONTROL_INPUT
+        );
+    } else {
+        return linearMap(
+            rawSignal,
+            MIN_CONTROL_INPUT,
+            averageSignal,
+            MIN_CONTROL_INPUT,
+            MID_CONTROL_INPUT
+        );
+    }
+}
+
+int16_t linearMap(
+    int16_t value,
+    int16_t minInputValue,
+    int16_t maxInputValue,
+    int16_t minOutputValue,
+    int16_t maxOutputValue
+) {
+    float slope = (float) (minOutputValue - maxOutputValue) / (minInputValue - maxInputValue);
+    return slope * (value - minInputValue) + minOutputValue;
+}
+
+
+FlightInputs cubicMapInputs(
+    ControlSignals controlSignals
+) {
+    return {
+        cubicMapInput(
+            controlSignals.throttle,
+            MAX_Z_DOT,
+            MIN_Z_DOT
+        ),
+        cubicMapInput(
+            controlSignals.yaw,
+            MIN_YAW_RATE,
+            MAX_YAW_RATE
+        ),
+        cubicMapInput(
+            controlSignals.pitch,
+            MIN_PITCH,
+            MAX_PITCH
+        ),
+        cubicMapInput(
+            controlSignals.roll,
+            MAX_ROLL,
+            MIN_ROLL
         )
     };
 }
