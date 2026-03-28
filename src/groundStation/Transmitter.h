@@ -44,7 +44,8 @@ class Transmitter {
             byte writeAddress[6]
         );
         void write(
-            FlightInputs FlightInputs
+            FlightInputs FlightInputs,
+            bool droneState
         );
     private:
         RF24* _transmitter;

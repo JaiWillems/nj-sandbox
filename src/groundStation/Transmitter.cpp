@@ -49,20 +49,23 @@ void Transmitter::setup(
 }
 
 void Transmitter::write(
-    FlightInputs flightInputs
+    FlightInputs flightInputs,
+    bool droneState
 ) {
     struct DataPackage {
         int8_t throttle;
         int8_t yaw;
         int8_t pitch;
         int8_t roll;
+        int8_t droneState;
     };
 
     DataPackage dataPackage = {
         100 * flightInputs.throttle,
         100 * flightInputs.yaw,
         100 * flightInputs.pitch,
-        100 * flightInputs.roll
+        100 * flightInputs.roll,
+        droneState
     };
 
     _transmitter->write(

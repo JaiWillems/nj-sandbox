@@ -38,12 +38,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 Transmitter transmitter;
 ControlSignals averageSignals;
 
+bool droneState = false; // On is True, off is False.
+uint8_t buttonHistory = 0b00000000;
+uint8_t stateSwitchMask = 0b01111111;
+
 void setup() {
     pinMode(THRUST_AXIS_PIN, INPUT);
     pinMode(YAW_AXIS_PIN, INPUT);
     pinMode(PITCH_AXIS_PIN, INPUT);
     pinMode(ROLL_AXIS_PIN, INPUT);
 
+    pinMode(SWITCH_LEFT_PIN, INPUT_PULLUP);
+    pinMode(SWITCH_RIGHT_PIN, INPUT_PULLUP);
+    
     averageSignals = calculateAverageSignals();
 
     transmitter.setup(
@@ -55,6 +62,10 @@ void setup() {
 }
 
 void loop() {
+    if (simultaneousJoystickPress()) {
+        droneState = !droneState;
+    }
+
     FlightInputs flightInputs = cubicMapInputs(
         calibrateSignals(
             readControlSignals(),
@@ -63,10 +74,22 @@ void loop() {
     );
 
     transmitter.write(
-        flightInputs
+        flightInputs,
+        droneState
     );
 
     delay(1000 / COMMANDING_FREQUENCY_HZ);
+}
+
+bool simultaneousJoystickPress() {
+    uint8_t leftSwitchState = digitalRead(SWITCH_LEFT_PIN);
+    uint8_t rightSwitchState = digitalRead(SWITCH_RIGHT_PIN);
+    uint8_t bothSwitchesPressed = !(leftSwitchState || rightSwitchState);
+    
+    buttonHistory = buttonHistory << 1;
+    buttonHistory = buttonHistory | bothSwitchesPressed;
+    
+    return !(buttonHistory ^ stateSwitchMask)
 }
 
 ControlSignals readControlSignals() {

@@ -40,8 +40,11 @@ const int16_t MID_CONTROL_INPUT = (MIN_CONTROL_INPUT + MAX_CONTROL_INPUT) / 2;
 
 const uint8_t THRUST_AXIS_PIN = A1;
 const uint8_t YAW_AXIS_PIN = A2;
-const uint8_t PITCH_AXIS_PIN = A4;
-const uint8_t ROLL_AXIS_PIN = A3;
+const uint8_t PITCH_AXIS_PIN = A5;
+const uint8_t ROLL_AXIS_PIN = A4;
+
+const uint8_t SWITCH_LEFT_PIN = 2;
+const uint8_t SWITCH_RIGHT_PIN = 3;
 
 // *** TRANSCEIVER ***
 
