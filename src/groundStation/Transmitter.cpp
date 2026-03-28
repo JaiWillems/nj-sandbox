@@ -51,8 +51,22 @@ void Transmitter::setup(
 void Transmitter::write(
     FlightInputs flightInputs
 ) {
+    struct DataPackage {
+        int8_t throttle;
+        int8_t yaw;
+        int8_t pitch;
+        int8_t roll;
+    };
+
+    DataPackage dataPackage = {
+        100 * flightInputs.throttle,
+        100 * flightInputs.yaw,
+        100 * flightInputs.pitch,
+        100 * flightInputs.roll
+    };
+
     _transmitter->write(
-        &flightInputs,
-        sizeof(flightInputs)
+        &dataPackage,
+        sizeof(dataPackage)
     );
 }
