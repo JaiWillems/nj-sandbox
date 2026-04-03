@@ -1,7 +1,7 @@
 /*
 BSD 3-Clause License
 
-Copyright (c) 2025, Nishant Kumar, Jai Willems
+Copyright (c) 2026, Nishant Kumar, Jai Willems
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
@@ -31,8 +31,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "UartCommunications.h"
 
-template <typename TxType, typename RxType>
-void UartCommunications<TxType, RxType>::setup(
+template <typename TxType>
+void UartCommunications<TxType>::setup(
 	uint8_t rxPin,
 	uint8_t txPin,
 	unsigned long baudRate
@@ -44,8 +44,8 @@ void UartCommunications<TxType, RxType>::setup(
 	_serial->begin(baudRate);
 }
 
-template <typename TxType, typename RxType>
-void UartCommunications<TxType, RxType>::transmit(
+template <typename TxType>
+void UartCommunications<TxType>::transmit(
 	TxType data
 ) {
 	_serial->write(START_MARKER);
@@ -55,27 +55,9 @@ void UartCommunications<TxType, RxType>::transmit(
 	);
 }
 
-template <typename TxType, typename RxType>
-bool UartCommunications<TxType, RxType>::available() {
+template <typename TxType>
+bool UartCommunications<TxType>::available() {
 	return _serial->available() > 0;
 }
 
-template <typename TxType, typename RxType>
-RxType UartCommunications<TxType, RxType>::receive() {
-	while (_serial->available()) {
-		byte data = _serial->read();
-
-		if (data == START_MARKER) {
-			byte* structStart = reinterpret_cast<byte*>(&_rxDataBuffer);
-
-			for (byte n = 0; n < sizeof(_rxDataBuffer); n++) {
-				while (!_serial->available()) {}
-				*(structStart + n) = _serial->read();
-			}
-			
-			return _rxDataBuffer;
-		}
-	}
-}
-
-template class UartCommunications<FlightInputs, DroneState>;
+template class UartCommunications<DataPacket>;
