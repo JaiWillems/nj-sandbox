@@ -62,12 +62,24 @@ void setup() {
 }
 
 void loop() {
-    lights.blinkingRefresh();
-
     if (receiver.available()) {
+        DataPacket data = receiver.read();
+        
         uartCommunications.transmit(
-            receiver.read()
+            data
         );
+
+        if (data.droneState) {
+            lights.blinkingRefresh(
+                NAV_LIGHTS_OFF_DURATION_MS,
+                NAV_LIGHTS_ON_DURATION_MS
+            );
+        } else {
+            lights.blinkingRefresh(
+                RAPID_NAV_LIGHTS_OFF_DURATION_MS,
+                RAPID_NAV_LIGHTS_ON_DURATION_MS
+            );
+        }
     }
 
     delay(1000 / COMMANDING_FREQUENCY_HZ);

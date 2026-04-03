@@ -1,7 +1,7 @@
 /*
 BSD 3-Clause License
 
-Copyright (c) 2025, Nishant Kumar, Jai Willems
+Copyright (c) 2026, Nishant Kumar, Jai Willems
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
@@ -40,7 +40,10 @@ class Lights {
             uint8_t lightThreePin,
             uint8_t lightFourPin
         );
-        void blinkingRefresh();
+        void blinkingRefresh(
+            uint16_t offDuration,
+            uint16_t onDuration
+        );
         void on();
         void off();
     private:
