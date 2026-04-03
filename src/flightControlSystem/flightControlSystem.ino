@@ -83,10 +83,10 @@ void loop() {
     if (uartCommunications.available()) {
         DataPacket data = uartCommunications.receive();
 
-        userInputs.throttle = data.throttle / 100;
-        userInputs.yaw = data.yaw / 100;
-        userInputs.pitch = data.pitch / 100;
-        userInputs.roll = data.roll / 100;
+        userInputs.throttle = data.throttle / 100.0f;
+        userInputs.yaw = data.yaw / 100.0f;
+        userInputs.pitch = data.pitch / 100.0f;
+        userInputs.roll = data.roll / 100.0f;
         
         droneState = data.droneState;
     }

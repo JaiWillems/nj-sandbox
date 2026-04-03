@@ -37,7 +37,7 @@ void UartCommunications<RxType>::setup(
 	uint8_t txPin,
 	unsigned long baudRate
 ) {
-	_serial = new SoftwareSerial(
+	_serial = new NeoSWSerial(
 		rxPin,
 		txPin
 	);
