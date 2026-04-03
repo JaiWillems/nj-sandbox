@@ -89,7 +89,7 @@ bool simultaneousJoystickPress() {
     buttonHistory = buttonHistory << 1;
     buttonHistory = buttonHistory | bothSwitchesPressed;
     
-    return !(buttonHistory ^ stateSwitchMask)
+    return !(buttonHistory ^ stateSwitchMask);
 }
 
 ControlSignals readControlSignals() {
