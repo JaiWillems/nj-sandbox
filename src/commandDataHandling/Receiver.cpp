@@ -1,7 +1,7 @@
 /*
 BSD 3-Clause License
 
-Copyright (c) 2025, Nishant Kumar, Jai Willems
+Copyright (c) 2026, Nishant Kumar, Jai Willems
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
@@ -52,10 +52,10 @@ bool Receiver::available() {
     return _receiver->available();
 }
 
-FlightInputs Receiver::read() {
+DataPacket Receiver::read() {
     _receiver->read(
-        &_flightInputs,
-        sizeof(_flightInputs)
+        &_dataPacket,
+        sizeof(_dataPacket)
     );
-    return _flightInputs;
+    return _dataPacket;
 }

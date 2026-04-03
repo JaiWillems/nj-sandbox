@@ -1,7 +1,7 @@
 /*
 BSD 3-Clause License
 
-Copyright (c) 2025, Nishant Kumar, Jai Willems
+Copyright (c) 2026, Nishant Kumar, Jai Willems
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
@@ -40,5 +40,8 @@ const uint8_t COMMANDING_FREQUENCY_HZ = 40;
 
 const uint16_t NAV_LIGHTS_ON_DURATION_MS = 1500;
 const uint16_t NAV_LIGHTS_OFF_DURATION_MS = 500;
+
+const uint16_t RAPID_NAV_LIGHTS_ON_DURATION_MS = 250;
+const uint16_t RAPID_NAV_LIGHTS_OFF_DURATION_MS = 250;
 
 #endif

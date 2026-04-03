@@ -1,7 +1,7 @@
 /*
 BSD 3-Clause License
 
-Copyright (c) 2025, Nishant Kumar, Jai Willems
+Copyright (c) 2026, Nishant Kumar, Jai Willems
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
@@ -63,11 +63,14 @@ void Lights::setup(
     _elapsedTime = millis();
 };
 
-void Lights::blinkingRefresh() {
+void Lights::blinkingRefresh(
+    uint16_t offDuration,
+    uint16_t onDuration
+) {
     unsigned long _stateDuration = millis() - _elapsedTime;
-    if (_state == LOW && _stateDuration > NAV_LIGHTS_OFF_DURATION_MS) {
+    if (_state == LOW && _stateDuration > offDuration) {
         on();
-    } else if (_state == HIGH && _stateDuration > NAV_LIGHTS_ON_DURATION_MS) {
+    } else if (_state == HIGH && _stateDuration > onDuration) {
         off();
     }
 }
