@@ -38,13 +38,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "FlightController.h"
 #include "Drone.h"
 
-UartCommunications<DroneState, FlightInputs> uartCommunications;
+UartCommunications<DataPacket> uartCommunications;
 MPU9250 mpu;
 Ultrasonic altimeter;
 FlightController flightController;
 Drone drone;
 
 FlightInputs userInputs;
+bool droneState = false;
 
 void setup() {
     Serial.begin(9600);
@@ -80,24 +81,39 @@ void setup() {
 
 void loop() {
     if (uartCommunications.available()) {
-        userInputs = uartCommunications.receive();
+        DataPacket data = uartCommunications.receive();
+
+        userInputs.throttle = data.throttle / 100;
+        userInputs.yaw = data.yaw / 100;
+        userInputs.pitch = data.pitch / 100;
+        userInputs.roll = data.roll / 100;
+        
+        droneState = data.droneState;
     }
 
     StateEstimation state = getStateEstimation();
 
-    Serial.print(state.yaw);
-    Serial.print("\t");
-    Serial.print(state.yawRate);
-    Serial.print("\t");
-    Serial.print(state.pitch);
-    Serial.print("\t");
-    Serial.print(state.pitchRate);
-    Serial.print("\t");
-    Serial.print(state.roll);
-    Serial.print("\t");
-    Serial.print(state.rollRate);
-    Serial.print("\t");
-    Serial.println(state.altitude);
+    // Serial.print(userInputs.throttle);
+    // Serial.print("\t");
+    // Serial.print(userInputs.yaw);
+    // Serial.print("\t");
+    // Serial.print(userInputs.pitch);
+    // Serial.print("\t");
+    // Serial.println(userInputs.roll);
+    
+    // Serial.print(state.yaw);
+    // Serial.print("\t");
+    // Serial.print(state.yawRate);
+    // Serial.print("\t");
+    // Serial.print(state.pitch);
+    // Serial.print("\t");
+    // Serial.print(state.pitchRate);
+    // Serial.print("\t");
+    // Serial.print(state.roll);
+    // Serial.print("\t");
+    // Serial.print(state.rollRate);
+    // Serial.print("\t");
+    // Serial.println(state.altitude);
 
     FlightInputs flightInputs = flightController.compute(
         userInputs,

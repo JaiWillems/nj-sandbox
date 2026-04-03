@@ -32,18 +32,20 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef Types_h
 #define Types_h
 
-enum DroneState {
-   OFF = 0,
-   SETUP = 1,
-   READY = 2
+// Keep memory small to reduce communication latencies.
+struct DataPacket {
+   int8_t throttle;
+   int8_t yaw;
+   int8_t pitch;
+   int8_t roll;
+   int8_t droneState;
 };
 
-// Keep memory small to reduce communication latencies.
 struct FlightInputs {
-	int16_t throttle;
-	int8_t yaw;
-	int8_t pitch;
-	int8_t roll;
+	float throttle;
+	float yaw;
+	float pitch;
+	float roll;
 };
 
 struct StateEstimation {
