@@ -33,6 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 const uint16_t MIN_SERVO_INPUT = 1000;
 const uint16_t MAX_SERVO_INPUT = 2000;
+const uint8_t SCALING_FACTOR = 10;
 const uint16_t OFFSET = 1000;
 
 void Motor::attach(
@@ -56,7 +57,7 @@ void Motor::setSpeed(
 ) {
 	_motor.write(
 		constrain(
-			input + OFFSET,
+			SCALING_FACTOR * input + OFFSET,
 			MIN_SERVO_INPUT,
 			MAX_SERVO_INPUT
 		)
