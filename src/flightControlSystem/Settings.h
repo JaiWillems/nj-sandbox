@@ -36,13 +36,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // *** MAGNETOMETER OFFSETS ***
 
-Vector3D HARD_IRON_OFFSET = {
+static Vector3D HARD_IRON_OFFSET = {
     .x = 26.01,
     .y = 13.85,
     .z = 10.03
 };
 
-Matrix3x3 SOFT_IRON_OFFSET = {
+static Matrix3x3 SOFT_IRON_OFFSET = {
     .m11 = 1.004,
     .m12 = 0.010,
     .m13 = -0.002,
@@ -54,7 +54,28 @@ Matrix3x3 SOFT_IRON_OFFSET = {
     .m33 = 0.984
 };
 
+// *** FLIGHT CONTROLLER PID GAINS ***
+
+const float ALTITUDE_RATE_KP = 25;
+const float ALTITUDE_RATE_KI = 50;
+const float ALTITUDE_RATE_KD = 0;
+
+const float YAW_RATE_KP = 1;
+const float YAW_RATE_KI = 0.01;
+const float YAW_RATE_KD = 0;
+
+const float PITCH_KP = 6;
+const float PITCH_KI = 0.01;
+const float PITCH_KD = 0.25;
+
+const float ROLL_KP = 6;
+const float ROLL_KI = 0.01;
+const float ROLL_KD = 0;
+
 // *** GENERAL ***
+
+const float MIN_MOTOR_INPUTS = 0;
+const float MAX_MOTOR_INPUTS = 100;
 
 const uint8_t COMMANDING_FREQUENCY_HZ = 100;
 

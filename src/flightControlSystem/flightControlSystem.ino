@@ -69,14 +69,14 @@ void setup() {
     );
     altimeter.calibrate();
 
-    flightController.begin();
-
     drone.setup(
         MOTOR_ONE_PIN,
         MOTOR_TWO_PIN,
         MOTOR_THREE_PIN,
         MOTOR_FOUR_PIN
     );
+
+    flightController.begin();
 }
 
 void loop() {

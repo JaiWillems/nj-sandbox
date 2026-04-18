@@ -1,7 +1,7 @@
 /*
 BSD 3-Clause License
 
-Copyright (c) 2025, Nishant Kumar, Jai Willems
+Copyright (c) 2026, Nishant Kumar, Jai Willems
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
@@ -31,6 +31,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <Arduino.h>
 #include "Types.h"
+#include "PidController.h"
+#include "Settings.h"
 
 class FlightController {
     public:
@@ -39,4 +41,9 @@ class FlightController {
             FlightInputs flightInputs,
             StateEstimation state
         );
+    private:
+        PidController _altitudeRateController;
+        PidController _yawRateController;
+        PidController _pitchController;
+        PidController _rollController;
 };

@@ -1,7 +1,7 @@
 /*
 BSD 3-Clause License
 
-Copyright (c) 2025, Nishant Kumar, Jai Willems
+Copyright (c) 2026, Nishant Kumar, Jai Willems
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
@@ -32,13 +32,64 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "FlightController.h"
 
 void FlightController::begin(){
-    // TODO: Implement the flight controller PID function
+    _altitudeRateController.initialize(
+        ALTITUDE_RATE_KP,
+        ALTITUDE_RATE_KI,
+        ALTITUDE_RATE_KD,
+        MIN_MOTOR_INPUTS,
+        MAX_MOTOR_INPUTS
+    );
+    _yawRateController.initialize(
+        YAW_RATE_KP,
+        YAW_RATE_KI,
+        YAW_RATE_KD,
+        MIN_MOTOR_INPUTS,
+        MAX_MOTOR_INPUTS
+    );
+    _pitchController.initialize(
+        PITCH_KP,
+        PITCH_KI,
+        PITCH_KD,
+        MIN_MOTOR_INPUTS,
+        MAX_MOTOR_INPUTS
+    );
+    _rollController.initialize(
+        ROLL_KP,
+        ROLL_KI,
+        ROLL_KD,
+        MIN_MOTOR_INPUTS,
+        MAX_MOTOR_INPUTS
+    );
+
+    _altitudeRateController.begin();
+    _yawRateController.begin();
+    _pitchController.begin();
+    _rollController.begin();
 }
 
 FlightInputs FlightController::compute(
     FlightInputs flightInputs,
     StateEstimation state
 ){
-    // TODO: Implement with controller instead
-    return flightInputs;
+    FlightInputs output;
+    output.throttle = _altitudeRateController.compute(
+        flightInputs.throttle,
+        state.altitudeRate
+    );    
+    output.yaw = _yawRateController.compute(
+        flightInputs.yaw,
+        state.yawRate
+    );
+    output.pitch = _pitchController.compute(
+        flightInputs.pitch,
+        state.pitch,
+        state.pitchRate
+    );
+    output.roll = _rollController.compute(
+        flightInputs.roll,
+        state.roll,
+        state.rollRate
+    );
+
+    return output;
 }
