@@ -113,7 +113,7 @@ void loop() {
 StateEstimation getStateEstimation() {
     Attitude attitude = mpu.getYawPitchRoll();
     Vector3D gyroscope = mpu.readGyroscope();
-    float altitude = altimeter.getCalibratedDistance();
+    Vector2D altitude = altimeter.getDistanceVelocity();
 
     StateEstimation state;
     state.yaw = attitude.yaw;
@@ -122,7 +122,8 @@ StateEstimation getStateEstimation() {
     state.pitchRate = gyroscope.y;
     state.roll = attitude.roll;
     state.rollRate = gyroscope.x;
-    state.altitude = altitude;
+    state.altitude = altitude.x;
+    state.altitudeRate = altitude.y;
 
     return state;
 };

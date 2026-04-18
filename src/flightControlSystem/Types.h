@@ -48,6 +48,11 @@ struct FlightInputs {
 	float roll;
 };
 
+struct Vector2D {
+   float x;
+   float y;
+};
+
 struct StateEstimation {
    float yaw;
    float yawRate;
@@ -56,6 +61,7 @@ struct StateEstimation {
    float roll;
    float rollRate;
    float altitude;
+   float altitudeRate;
 };
 
 #endif

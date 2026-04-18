@@ -35,42 +35,68 @@ const int PULSE_DURATION_MICROS = 300000;
 const float SPEED_OF_SOUND_M_PER_MICROS = 0.000343;
 
 void Ultrasonic::setup(
-  int trigPin,
-  int echoPin
+	int trigPin,
+	int echoPin
 ) {
-  _trigPin = trigPin;
-  _echoPin = echoPin;
+  	_trigPin = trigPin;
+  	_echoPin = echoPin;
 
-  pinMode(_trigPin, OUTPUT);
-  pinMode(_echoPin, INPUT);
+  	pinMode(_trigPin, OUTPUT);
+  	pinMode(_echoPin, INPUT);
 }
 
 void Ultrasonic::calibrate() {
-  _referenceDistance = getDistance();
+  	_referenceDistance = getDistance();
 
-  // Delay required for sensor stabilization.
-  delay(10);
+  	// Delay required for sensor stabilization.
+  	delay(10);
 }
 
 // A delay is requried between successive function calls to allow sensor
 // stabilization. If a delay is not used, the pulseIn function will hang.
 // A delay was not incorporated since sufficient delay should exist in
 // the main loop.
-float Ultrasonic::getDistance() {
-  digitalWrite(_trigPin, LOW);
-  delayMicroseconds(2);
-  digitalWrite(_trigPin, HIGH);
-  delayMicroseconds(10);
-  digitalWrite(_trigPin, LOW);
+float Ultrasonic::getRawDistance() {
+	digitalWrite(_trigPin, LOW);
+	delayMicroseconds(2);
+	digitalWrite(_trigPin, HIGH);
+	delayMicroseconds(10);
+	digitalWrite(_trigPin, LOW);
 
-  long duration = pulseIn(
-    _echoPin,
-    HIGH,
-    PULSE_DURATION_MICROS
-  );
-  return duration * SPEED_OF_SOUND_M_PER_MICROS / 2;
+  	long duration = pulseIn(
+    	_echoPin,
+    	HIGH,
+    	PULSE_DURATION_MICROS
+  	);
+
+	return duration * SPEED_OF_SOUND_M_PER_MICROS / 2;
 }
 
-float Ultrasonic::getCalibratedDistance() {
-  return getDistance() - _referenceDistance;
+float Ultrasonic::getDistance() {
+	return getRawDistance() - _referenceDistance;
+}
+
+float Ultrasonic::getVelocity(
+	float currentDistance,
+	long currentTime
+) {
+
+  	if (currentTime - _previousTime > 0){
+   		float altitudeRate = 1000 * (currentDistance - _previousDistance)
+    		/ (currentTime - _previousTime);
+    	_previousDistance = currentDistance;
+    	_previousTime = currentTime;
+
+    	return altitudeRate;
+  	}
+}
+
+Vector2D Ultrasonic::getDistanceVelocity() {
+	float distance = getDistance();
+  	float velocity = getVelocity(
+		distance,
+		millis()
+	);
+  
+  return {distance, velocity};
 }

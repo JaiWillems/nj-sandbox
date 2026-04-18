@@ -30,18 +30,26 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include <Arduino.h>
+#include "Types.h"
 
 class Ultrasonic {
-  public:
-    void setup(
-      int trigPin,
-      int echoPin
-    );
-    void calibrate();
-    float getDistance();
-    float getCalibratedDistance();
-  private:
-    int _trigPin;
-    int _echoPin;
-    float _referenceDistance;
+    public:
+      	void setup(
+			int trigPin,
+        	int echoPin
+      	);
+      	void calibrate();
+      	float getRawDistance();
+      	float getDistance();
+      	Vector2D getDistanceVelocity();
+    private:
+    	int _trigPin;
+    	int _echoPin;
+    	float _referenceDistance;
+    	float _previousDistance;
+    	long _previousTime;
+    	float getVelocity(
+    		float currentDistance,
+    		long currentTime
+    	);
 };
