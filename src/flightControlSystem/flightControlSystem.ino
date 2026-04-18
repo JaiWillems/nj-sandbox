@@ -1,7 +1,7 @@
 /*
 BSD 3-Clause License
 
-Copyright (c) 2025, Nishant Kumar, Jai Willems
+Copyright (c) 2026, Nishant Kumar, Jai Willems
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
@@ -91,38 +91,20 @@ void loop() {
         droneState = data.droneState;
     }
 
-    StateEstimation state = getStateEstimation();
+    if (droneState) {
+        StateEstimation state = getStateEstimation();
 
-    // Serial.print(userInputs.throttle);
-    // Serial.print("\t");
-    // Serial.print(userInputs.yaw);
-    // Serial.print("\t");
-    // Serial.print(userInputs.pitch);
-    // Serial.print("\t");
-    // Serial.println(userInputs.roll);
-    
-    // Serial.print(state.yaw);
-    // Serial.print("\t");
-    // Serial.print(state.yawRate);
-    // Serial.print("\t");
-    // Serial.print(state.pitch);
-    // Serial.print("\t");
-    // Serial.print(state.pitchRate);
-    // Serial.print("\t");
-    // Serial.print(state.roll);
-    // Serial.print("\t");
-    // Serial.print(state.rollRate);
-    // Serial.print("\t");
-    // Serial.println(state.altitude);
+        FlightInputs flightInputs = flightController.compute(
+            userInputs,
+            state
+        );
 
-    FlightInputs flightInputs = flightController.compute(
-        userInputs,
-        state
-    );
-
-    drone.sendFlightInputs(
-        flightInputs
-    );
+        drone.sendFlightInputs(
+            flightInputs
+        );
+    } else {
+        drone.sendFlightInputs({});
+    }
 
     // TODO: Consider removing the delay.
     delay(1000 / COMMANDING_FREQUENCY_HZ);
