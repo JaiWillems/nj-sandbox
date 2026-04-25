@@ -65,7 +65,4 @@ class PidController {
             float integralError,
             float derivativeError
         );
-        float saturate(
-            float input
-        );
 };

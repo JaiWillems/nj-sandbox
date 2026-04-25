@@ -44,7 +44,7 @@ Ultrasonic altimeter;
 FlightController flightController;
 Drone drone;
 
-FlightInputs userInputs;
+UserInputs userInputs;
 bool droneState = false;
 
 void setup() {
@@ -83,10 +83,10 @@ void loop() {
     if (uartCommunications.available()) {
         DataPacket data = uartCommunications.receive();
 
-        userInputs.throttle = data.throttle / 100.0f;
-        userInputs.yaw = data.yaw / 100.0f;
-        userInputs.pitch = data.pitch / 100.0f;
+        userInputs.altitudeRate = data.altitudeRate / 100.0f;
         userInputs.roll = data.roll / 100.0f;
+        userInputs.pitch = data.pitch / 100.0f;
+        userInputs.yawRate = data.yawRate / 100.0f;
         
         droneState = data.droneState;
     }
@@ -98,6 +98,12 @@ void loop() {
             userInputs,
             state
         );
+        
+        Serial.print(userInputs.altitudeRate);
+        Serial.print("\t");
+        Serial.print(state.altitudeRate);
+        Serial.print("\t");
+        Serial.println(flightInputs.U1);
 
         drone.sendFlightInputs(
             flightInputs
@@ -111,19 +117,19 @@ void loop() {
 }
 
 StateEstimation getStateEstimation() {
+    Vector2D altitude = altimeter.getDistanceVelocity();
     Attitude attitude = mpu.getYawPitchRoll();
     Vector3D gyroscope = mpu.readGyroscope();
-    Vector2D altitude = altimeter.getDistanceVelocity();
 
     StateEstimation state;
-    state.yaw = attitude.yaw;
-    state.yawRate = gyroscope.z;
-    state.pitch = attitude.pitch;
-    state.pitchRate = gyroscope.y;
-    state.roll = attitude.roll;
-    state.rollRate = gyroscope.x;
     state.altitude = altitude.x;
     state.altitudeRate = altitude.y;
+    state.roll = attitude.roll;
+    state.rollRate = gyroscope.x;
+    state.pitch = attitude.pitch;
+    state.pitchRate = gyroscope.y;
+    state.yaw = attitude.yaw;
+    state.yawRate = gyroscope.z;
 
     return state;
 };

@@ -98,10 +98,10 @@ int16_t Drone::mixFlightInputs(
     bool port,
     FlightInputs flightInputs
 ) {
-    int16_t throttleInput = flightInputs.throttle;
-    int8_t yawInput = flightInputs.yaw;
-    int8_t pitchInput = flightInputs.pitch;
-    int8_t rollInput = flightInputs.roll;
+    int16_t throttleInput = flightInputs.U1;
+    int8_t rollInput = flightInputs.U2;
+    int8_t pitchInput = flightInputs.U3;
+    int8_t yawInput = flightInputs.U4;
 
     bool motorCcw = isMotorCcw(bow, port);
 

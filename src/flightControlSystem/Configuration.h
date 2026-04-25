@@ -1,7 +1,7 @@
 /*
 BSD 3-Clause License
 
-Copyright (c) 2025, Nishant Kumar, Jai Willems
+Copyright (c) 2026, Nishant Kumar, Jai Willems
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
@@ -63,5 +63,9 @@ const uint8_t START_MARKER = 255;
 
 const uint8_t ULTRASONIC_TRIG_PIN = 12;
 const uint8_t ULTRASONIC_ECHO_PIN = 13;
+
+// *** DRONE PROPERTIES ***
+
+const float DRONE_MASS = 1.00;
 
 #endif

@@ -68,28 +68,28 @@ void FlightController::begin(){
 }
 
 FlightInputs FlightController::compute(
-    FlightInputs flightInputs,
+    UserInputs userInputs,
     StateEstimation state
 ){
-    FlightInputs output;
-    output.throttle = _altitudeRateController.compute(
-        flightInputs.throttle,
+    FlightInputs flightInputs;
+    flightInputs.U1 = _altitudeRateController.compute(
+        userInputs.altitudeRate,
         state.altitudeRate
-    );    
-    output.yaw = _yawRateController.compute(
-        flightInputs.yaw,
-        state.yawRate
-    );
-    output.pitch = _pitchController.compute(
-        flightInputs.pitch,
-        state.pitch,
-        state.pitchRate
-    );
-    output.roll = _rollController.compute(
-        flightInputs.roll,
+    ) + GRAVITATIONAL_ACCELERATION * DRONE_MASS;
+    flightInputs.U2 = _rollController.compute(
+        userInputs.roll,
         state.roll,
         state.rollRate
     );
+    flightInputs.U3 = _pitchController.compute(
+        userInputs.pitch,
+        state.pitch,
+        state.pitchRate
+    );
+    flightInputs.U4 = _yawRateController.compute(
+        userInputs.yawRate,
+        state.yawRate
+    );
 
-    return output;
+    return flightInputs;
 }

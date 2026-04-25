@@ -33,12 +33,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Types.h"
 #include "PidController.h"
 #include "Settings.h"
+#include "Configuration.h"
 
 class FlightController {
     public:
         void begin();
         FlightInputs compute(
-            FlightInputs flightInputs,
+            UserInputs userInputs,
             StateEstimation state
         );
     private:

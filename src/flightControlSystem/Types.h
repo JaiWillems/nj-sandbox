@@ -1,7 +1,7 @@
 /*
 BSD 3-Clause License
 
-Copyright (c) 2025, Nishant Kumar, Jai Willems
+Copyright (c) 2026, Nishant Kumar, Jai Willems
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
@@ -34,18 +34,25 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // Keep memory small to reduce communication latencies.
 struct DataPacket {
-   int8_t throttle;
-   int8_t yaw;
+   int8_t altitudeRate;
+   int8_t yawRate;
    int8_t pitch;
    int8_t roll;
    int8_t droneState;
 };
 
+struct UserInputs {
+   float altitudeRate;
+   float roll;
+   float pitch;
+   float yawRate;
+};
+
 struct FlightInputs {
-	float throttle;
-	float yaw;
-	float pitch;
-	float roll;
+	float U1;
+	float U2;
+	float U3;
+	float U4;
 };
 
 struct Vector2D {
@@ -54,14 +61,14 @@ struct Vector2D {
 };
 
 struct StateEstimation {
-   float yaw;
-   float yawRate;
-   float pitch;
-   float pitchRate;
-   float roll;
-   float rollRate;
    float altitude;
    float altitudeRate;
+   float roll;
+   float rollRate;
+   float pitch;
+   float pitchRate;
+   float yaw;
+   float yawRate;
 };
 
 #endif

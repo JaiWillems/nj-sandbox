@@ -75,21 +75,7 @@ float PidController::getInput(
 	float integralError,
 	float derivativeError
 ) {
-	return saturate(
-		_kp * error +
-		_ki * integralError +
-		_kd * derivativeError
-	);
-}
-
-float PidController::saturate(
-	float input
-) {
-	return constrain(
-		input,
-		_minLimit,
-		_maxLimit
-  	);
+	return _kp * error + _ki * integralError + _kd * derivativeError;
 }
 
 float PidController::compute(
