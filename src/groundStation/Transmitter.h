@@ -44,7 +44,7 @@ class Transmitter {
             byte writeAddress[6]
         );
         void write(
-            FlightInputs FlightInputs,
+            UserInputs userInputs,
             bool droneState
         );
     private:
