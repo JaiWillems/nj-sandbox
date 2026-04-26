@@ -67,5 +67,6 @@ const uint8_t ULTRASONIC_ECHO_PIN = 13;
 // *** DRONE PROPERTIES ***
 
 const float DRONE_MASS = 1.00;
+const float ARM_LENGTH = 0.27305; // [m].
 
 #endif

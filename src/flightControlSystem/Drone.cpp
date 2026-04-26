@@ -1,7 +1,7 @@
 /*
 BSD 3-Clause License
 
-Copyright (c) 2025, Nishant Kumar, Jai Willems
+Copyright (c) 2026, Nishant Kumar, Jai Willems
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
@@ -63,63 +63,21 @@ void Drone::arm() {
 void Drone::sendFlightInputs(
     FlightInputs flightInputs
 ) {
+    const float a1 = flightInputs.U1 / (4 * KF);
+    const float a2 = flightInputs.U2 / (2 * sqrt(2) * ARM_LENGTH * KF);
+    const float a3 = flightInputs.U3 / (2 * sqrt(2) * ARM_LENGTH * KF);
+    const float a4 = flightInputs.U4 / (4 * KM);
+    
     _motorOne.setSpeed(
-        mixFlightInputs(
-            MOTOR_ONE_BOW,
-            MOTOR_ONE_PORT,
-            flightInputs
-        )
+        a1 - a2 - a4 - a4
     );
     _motorTwo.setSpeed(
-        mixFlightInputs(
-            MOTOR_TWO_BOW,
-            MOTOR_TWO_PORT,
-            flightInputs
-        )
+        a1 - a2 + a3 + a4
     );
     _motorThree.setSpeed(
-        mixFlightInputs(
-            MOTOR_THREE_BOW,
-            MOTOR_THREE_PORT,
-            flightInputs
-        )
+        a1 + a2 + a3 - a4
     );
     _motorFour.setSpeed(
-        mixFlightInputs(
-            MOTOR_FOUR_BOW,
-            MOTOR_FOUR_PORT,
-            flightInputs
-        )
+        a1 + a2 - a3 + a4
     );
-}
-
-int16_t Drone::mixFlightInputs(
-    bool bow,
-    bool port,
-    FlightInputs flightInputs
-) {
-    int16_t throttleInput = flightInputs.U1;
-    int8_t rollInput = flightInputs.U2;
-    int8_t pitchInput = flightInputs.U3;
-    int8_t yawInput = flightInputs.U4;
-
-    bool motorCcw = isMotorCcw(bow, port);
-
-    int8_t signedYawInput = motorCcw ? yawInput : -yawInput;
-    int8_t signedPitchInput = bow ? pitchInput : -pitchInput;
-    int8_t signedRollInput = port ? rollInput : -rollInput;
-
-    int16_t motorInput = throttleInput;
-    motorInput = motorInput + signedYawInput;
-    motorInput = motorInput + signedPitchInput;
-    motorInput = motorInput + signedRollInput;
-
-    return motorInput;
-}
-
-bool Drone::isMotorCcw(
-    bool bow,
-    bool port
-) {
-    return (bow && !port) || (!bow && port);
 }

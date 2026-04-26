@@ -33,6 +33,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define Settings_h
 
 #include <MPU9250.h>
+#include "Configuration.h"
+
+// *** ENVIRONMENTAL ***
+
+const float GRAVITATIONAL_ACCELERATION = 9.81; // [m / s^2].
 
 // *** MAGNETOMETER OFFSETS ***
 
@@ -72,16 +77,21 @@ const float ROLL_KP = 6;
 const float ROLL_KI = 0.01;
 const float ROLL_KD = 0;
 
-// *** GENERAL ***
+// *** MOTOR PERFORMANCE ***
+
+const float THRUST_TO_WEIGHT_RATIO = 2;
+const float KF = THRUST_TO_WEIGHT_RATIO * DRONE_MASS * GRAVITATIONAL_ACCELERATION / (4 * 100); // [N / PWM], motor force coefficient.
+
+const float ESC_CURRENT = 30; // [A].
+const float MOTOR_KV_RATING = 1000; // Motor kv rating.
+const float KM = ESC_CURRENT / MOTOR_KV_RATING; // [Nm / PWM], motor torque coefficient.
 
 // Motor inputs influence the scaling factor in Motor.cpp.
 const float MIN_MOTOR_INPUTS = 0;
 const float MAX_MOTOR_INPUTS = 100;
 
+// *** GENERAL ***
+
 const uint8_t COMMANDING_FREQUENCY_HZ = 100;
-
-// *** ENVIRONMENTAL ***
-
-const float GRAVITATIONAL_ACCELERATION = 9.81; // [m / s^2].
 
 #endif
