@@ -86,10 +86,6 @@ const float ESC_CURRENT = 30; // [A].
 const float MOTOR_KV_RATING = 1000; // Motor kv rating.
 const float KM = ESC_CURRENT / MOTOR_KV_RATING; // [Nm / PWM], motor torque coefficient.
 
-// Motor inputs influence the scaling factor in Motor.cpp.
-const float MIN_MOTOR_INPUTS = 0;
-const float MAX_MOTOR_INPUTS = 100;
-
 // *** GENERAL ***
 
 const uint8_t COMMANDING_FREQUENCY_HZ = 100;

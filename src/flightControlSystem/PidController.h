@@ -1,7 +1,7 @@
 /*
 BSD 3-Clause License
 
-Copyright (c) 2024, Nishant Kumar, Jai Willems
+Copyright (c) 2026, Nishant Kumar, Jai Willems
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
@@ -36,9 +36,7 @@ class PidController {
         void initialize(
             float kp,
             float ki,
-            float kd,
-            float minLimit,
-            float maxLimit
+            float kd
         );
         void begin();
         float compute(
@@ -54,8 +52,6 @@ class PidController {
         float _kp;
         float _ki;
         float _kd;
-        float _minLimit;
-        float _maxLimit;
         float _previousTime;
         float _previousError;
         float _integralError;

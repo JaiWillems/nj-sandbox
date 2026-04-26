@@ -1,7 +1,7 @@
 /*
 BSD 3-Clause License
 
-Copyright (c) 2024, Nishant Kumar, Jai Willems
+Copyright (c) 2026, Nishant Kumar, Jai Willems
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
@@ -34,15 +34,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 void PidController::initialize(
 	float kp,
 	float ki,
-	float kd,
-	float minLimit,
-	float maxLimit
+	float kd
 ) {
 	_kp = kp;
 	_ki = ki;
 	_kd = kd;
-	_minLimit = minLimit;
-	_maxLimit = maxLimit;
 }
 
 void PidController::begin() {

@@ -1,7 +1,7 @@
 /*
 BSD 3-Clause License
 
-Copyright (c) 2025, Nishant Kumar, Jai Willems
+Copyright (c) 2026, Nishant Kumar, Jai Willems
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
@@ -39,8 +39,14 @@ class Motor {
 		);
 		void arm();
 		void setSpeed(
-			uint16_t input
+			uint16_t pwmDutyCycle
 		);
 	private:
 		Servo _motor;
+		uint16_t validatePwmDutyCycle(
+			uint16_t pwmDutyCycle
+		);
+		uint16_t convertPwmToServoInputs(
+			uint16_t pwmDutyCycle
+		);
 };

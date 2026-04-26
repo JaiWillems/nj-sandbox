@@ -35,30 +35,22 @@ void FlightController::begin(){
     _altitudeRateController.initialize(
         ALTITUDE_RATE_KP,
         ALTITUDE_RATE_KI,
-        ALTITUDE_RATE_KD,
-        MIN_MOTOR_INPUTS,
-        MAX_MOTOR_INPUTS
+        ALTITUDE_RATE_KD
     );
     _yawRateController.initialize(
         YAW_RATE_KP,
         YAW_RATE_KI,
-        YAW_RATE_KD,
-        MIN_MOTOR_INPUTS,
-        MAX_MOTOR_INPUTS
+        YAW_RATE_KD
     );
     _pitchController.initialize(
         PITCH_KP,
         PITCH_KI,
-        PITCH_KD,
-        MIN_MOTOR_INPUTS,
-        MAX_MOTOR_INPUTS
+        PITCH_KD
     );
     _rollController.initialize(
         ROLL_KP,
         ROLL_KI,
-        ROLL_KD,
-        MIN_MOTOR_INPUTS,
-        MAX_MOTOR_INPUTS
+        ROLL_KD
     );
 
     _altitudeRateController.begin();
