@@ -31,8 +31,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "Motor.h"
 
-const uint16_t MIN_PWM_DUTY_CYCLE = 0;
-const uint16_t MAX_PWM_DUTY_CYCLE = 100;
+const uint8_t MIN_PWM_DUTY_CYCLE = 0;
+const uint8_t MAX_PWM_DUTY_CYCLE = 100;
 const uint16_t MIN_SERVO_INPUT = 1000;
 const uint16_t MAX_SERVO_INPUT = 2000;
 const uint8_t SCALING_FACTOR = 10;
@@ -55,7 +55,7 @@ void Motor::arm() {
 }
 
 void Motor::setSpeed(
-	uint16_t pwmDutyCycle
+	int16_t pwmDutyCycle
 ) {
 	_motor.write(
 		convertPwmToServoInputs(
@@ -66,8 +66,8 @@ void Motor::setSpeed(
 	);
 }
 
-uint16_t Motor::validatePwmDutyCycle(
-	uint16_t pwmDutyCycle
+uint8_t Motor::validatePwmDutyCycle(
+	int16_t pwmDutyCycle
 ) {
 	return constrain(
 		pwmDutyCycle,
@@ -77,7 +77,7 @@ uint16_t Motor::validatePwmDutyCycle(
 }
 
 uint16_t Motor::convertPwmToServoInputs(
-	uint16_t pwmDutyCycle
+	uint8_t pwmDutyCycle
 ) {
 	return SCALING_FACTOR * pwmDutyCycle + OFFSET;
 }

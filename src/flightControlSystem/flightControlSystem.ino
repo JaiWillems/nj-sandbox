@@ -48,7 +48,13 @@ UserInputs userInputs;
 bool droneState = false;
 
 void setup() {
-    Serial.begin(9600);
+    drone.setup(
+        MOTOR_ONE_PIN,
+        MOTOR_TWO_PIN,
+        MOTOR_THREE_PIN,
+        MOTOR_FOUR_PIN
+    );
+    drone.arm();
     
     uartCommunications.setup(
         UART_RX_PIN,
@@ -69,17 +75,10 @@ void setup() {
     );
     altimeter.calibrate();
 
-    drone.setup(
-        MOTOR_ONE_PIN,
-        MOTOR_TWO_PIN,
-        MOTOR_THREE_PIN,
-        MOTOR_FOUR_PIN
-    );
-
     flightController.begin();
 }
 
-void loop() {
+    void loop() {
     if (uartCommunications.available()) {
         DataPacket data = uartCommunications.receive();
 
@@ -98,12 +97,6 @@ void loop() {
             userInputs,
             state
         );
-        
-        Serial.print(userInputs.altitudeRate);
-        Serial.print("\t");
-        Serial.print(state.altitudeRate);
-        Serial.print("\t");
-        Serial.println(flightInputs.U1);
 
         drone.sendFlightInputs(
             flightInputs
@@ -124,12 +117,12 @@ StateEstimation getStateEstimation() {
     StateEstimation state;
     state.altitude = altitude.x;
     state.altitudeRate = altitude.y;
-    state.roll = attitude.roll;
-    state.rollRate = gyroscope.x;
-    state.pitch = attitude.pitch;
-    state.pitchRate = gyroscope.y;
-    state.yaw = attitude.yaw;
-    state.yawRate = gyroscope.z;
+    state.roll = DEG_TO_RAD * attitude.roll;
+    state.rollRate = DEG_TO_RAD * gyroscope.x;
+    state.pitch = DEG_TO_RAD * attitude.pitch;
+    state.pitchRate = DEG_TO_RAD * gyroscope.y;
+    state.yaw = DEG_TO_RAD * attitude.yaw;
+    state.yawRate = DEG_TO_RAD * gyroscope.z;
 
     return state;
 };

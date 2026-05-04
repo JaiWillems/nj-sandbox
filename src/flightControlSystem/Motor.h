@@ -39,14 +39,14 @@ class Motor {
 		);
 		void arm();
 		void setSpeed(
-			uint16_t pwmDutyCycle
+			int16_t pwmDutyCycle
 		);
 	private:
 		Servo _motor;
-		uint16_t validatePwmDutyCycle(
-			uint16_t pwmDutyCycle
+		uint8_t validatePwmDutyCycle(
+			int16_t pwmDutyCycle
 		);
 		uint16_t convertPwmToServoInputs(
-			uint16_t pwmDutyCycle
+			uint8_t pwmDutyCycle
 		);
 };
