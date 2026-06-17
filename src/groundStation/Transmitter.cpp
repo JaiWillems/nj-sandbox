@@ -1,7 +1,7 @@
 /*
 BSD 3-Clause License
 
-Copyright (c) 2025, Nishant Kumar, Jai Willems
+Copyright (c) 2026, Nishant Kumar, Jai Willems
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
@@ -49,10 +49,27 @@ void Transmitter::setup(
 }
 
 void Transmitter::write(
-    FlightInputs flightInputs
+    FlightInputs flightInputs,
+    bool droneState
 ) {
+    struct DataPackage {
+        int8_t throttle;
+        int8_t yaw;
+        int8_t pitch;
+        int8_t roll;
+        int8_t droneState;
+    };
+
+    DataPackage dataPackage = {
+        100 * flightInputs.throttle,
+        100 * flightInputs.yaw,
+        100 * flightInputs.pitch,
+        100 * flightInputs.roll,
+        droneState
+    };
+
     _transmitter->write(
-        &flightInputs,
-        sizeof(flightInputs)
+        &dataPackage,
+        sizeof(dataPackage)
     );
 }

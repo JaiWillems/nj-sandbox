@@ -1,7 +1,7 @@
 /*
 BSD 3-Clause License
 
-Copyright (c) 2025, Nishant Kumar, Jai Willems
+Copyright (c) 2026, Nishant Kumar, Jai Willems
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
@@ -44,7 +44,8 @@ class Transmitter {
             byte writeAddress[6]
         );
         void write(
-            FlightInputs FlightInputs
+            FlightInputs FlightInputs,
+            bool droneState
         );
     private:
         RF24* _transmitter;

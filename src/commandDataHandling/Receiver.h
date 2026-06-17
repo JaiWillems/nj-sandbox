@@ -1,7 +1,7 @@
 /*
 BSD 3-Clause License
 
-Copyright (c) 2025, Nishant Kumar, Jai Willems
+Copyright (c) 2026, Nishant Kumar, Jai Willems
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
@@ -44,8 +44,8 @@ class Receiver {
             byte readAddress[6]
         );
         bool available();
-        FlightInputs read();
+        DataPacket read();
     private:
         RF24* _receiver;
-        FlightInputs _flightInputs;
+        DataPacket _dataPacket;
 };
