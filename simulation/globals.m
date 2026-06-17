@@ -4,19 +4,19 @@ MIN_INPUT = 0;
 MAX_INPUT = 1023;
 MID_INPUT = 0.5 * (MIN_INPUT + MAX_INPUT);
 
-Z_DOT_AUTHORITY = 1; % [m / s].
+Z_DOT_AUTHORITY = 0.5; % [m / s].
 MIN_Z_DOT = -Z_DOT_AUTHORITY;
 MAX_Z_DOT = Z_DOT_AUTHORITY;
 
-ROLL_AUTHORITY = 0.17453; % [RAD], equivalent to 30 degrees.
+ROLL_AUTHORITY = 0.26180; % [RAD], equivalent to 15 degrees.
 MIN_ROLL = -ROLL_AUTHORITY;
 MAX_ROLL = ROLL_AUTHORITY;
 
-PITCH_AUTHORITY = 0.17453; % [RAD], equivalent  to 30 degrees.
+PITCH_AUTHORITY = 0.26180; % [RAD], equivalent  to 15 degrees.
 MIN_PITCH = -PITCH_AUTHORITY;
 MAX_PITCH = PITCH_AUTHORITY;
 
-YAW_RATE_AUTHORITY = 0.6; %1.25664; % [RAD / s], equivalent to 72 deg / s.
+YAW_RATE_AUTHORITY = 0.52360; % [RAD / s], equivalent to 30 deg / s.
 MIN_YAW_RATE = -YAW_RATE_AUTHORITY;
 MAX_YAW_RATE = YAW_RATE_AUTHORITY;
 
