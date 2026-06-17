@@ -24,19 +24,15 @@ MAX_YAW_RATE = YAW_RATE_AUTHORITY;
 
 g = 9.81; % [m / s^2], gravitational acceleration.
 
-m = 1; % [kg], drone mass.
-L = 0.27305; % [m], arm length.
+m = 1.04100; % [kg], drone mass.
+L = 0.27250; % [m], arm length.
 
-Ixb = 0.0033; % [kg m^2], body x moment of inertia.
-Iyb = 0.0033; % [kg m^2], body y moment of inertia.
-Izb = 0.0058; % [kg m^2], body z moment of inertia. 
+Ixb = 0.01468; % [kg m^2], body x moment of inertia.
+Iyb = 0.01492; % [kg m^2], body y moment of inertia.
+Izb = 0.02800; % [kg m^2], body z moment of inertia. 
 
-r = 2; % Thrust to weight ratio.
-kF = r * m * g / (4 * 100); % [N / PWM], motor force coefficient.
-
-I = 30; % [A], ESC current.
-kV = 1000; % Motor kv rating.
-kM = I / kV; % [Nm / PWM], motor torque coefficient.
+kF = 0.12139; % [N / PWM], motor force coefficient.
+kM = 0.00208; % [Nm / PWM], motor torque coefficient.
 
 max_voltage = 4; % [V], maximum motor voltage.
 rpm_per_voltage = 1000; % [RPM / V], motor KV rating.
