@@ -61,30 +61,26 @@ static Matrix3x3 SOFT_IRON_OFFSET = {
 
 // *** FLIGHT CONTROLLER PID GAINS ***
 
-const float ALTITUDE_RATE_KP = 25;
+const float ALTITUDE_RATE_KP = 50;
 const float ALTITUDE_RATE_KI = 50;
 const float ALTITUDE_RATE_KD = 0;
 
-const float YAW_RATE_KP = 1;
+const float YAW_RATE_KP = 0.3;
 const float YAW_RATE_KI = 0.01;
 const float YAW_RATE_KD = 0;
 
-const float PITCH_KP = 6;
+const float PITCH_KP = 10;
 const float PITCH_KI = 0.01;
-const float PITCH_KD = 0.25;
+const float PITCH_KD = 0.6;
 
-const float ROLL_KP = 6;
+const float ROLL_KP = 10;
 const float ROLL_KI = 0.01;
-const float ROLL_KD = 0;
+const float ROLL_KD = 0.6;
 
 // *** MOTOR PERFORMANCE ***
 
-const float THRUST_TO_WEIGHT_RATIO = 2;
-const float KF = THRUST_TO_WEIGHT_RATIO * DRONE_MASS * GRAVITATIONAL_ACCELERATION / (4 * 100); // [N / PWM], motor force coefficient.
-
-const float ESC_CURRENT = 30; // [A].
-const float MOTOR_KV_RATING = 1000; // Motor kv rating.
-const float KM = ESC_CURRENT / MOTOR_KV_RATING; // [Nm / PWM], motor torque coefficient.
+const float KF = 0.12139; // [N / PWM], motor force coefficient.
+const float KM = 0.00208; // [Nm / PWM], motor torque coefficient.
 
 // *** GENERAL ***
 

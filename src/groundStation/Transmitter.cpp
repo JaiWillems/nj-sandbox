@@ -44,7 +44,9 @@ void Transmitter::setup(
     );
     _transmitter->begin();
     _transmitter->openWritingPipe(writeAddress);
-    _transmitter->setPALevel(RF24_PA_MIN);
+    _transmitter->setDataRate(RF24_2MBPS);
+    _transmitter->setChannel(124);
+    _transmitter->setPALevel(RF24_PA_MAX);
     _transmitter->stopListening();
 }
 
