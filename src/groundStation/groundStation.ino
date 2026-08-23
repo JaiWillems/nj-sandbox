@@ -43,6 +43,8 @@ uint8_t buttonHistory = 0b00000000;
 uint8_t stateSwitchMask = 0b01111111;
 
 void setup() {
+    Serial.begin(9600);
+
     pinMode(THRUST_AXIS_PIN, INPUT);
     pinMode(YAW_AXIS_PIN, INPUT);
     pinMode(PITCH_AXIS_PIN, INPUT);

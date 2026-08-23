@@ -40,19 +40,19 @@ const uint8_t COMMANDING_FREQUENCY_HZ = 40;
 
 // *** CONTROL MAPPING ***
 
-const float Z_DOT_AUTHORITY = 0.5; // [m / s].
+const float Z_DOT_AUTHORITY = 0.33; // [m / s].
 const float MIN_Z_DOT = -Z_DOT_AUTHORITY;
 const float MAX_Z_DOT = Z_DOT_AUTHORITY;
 
-const float ROLL_AUTHORITY = 0.26180; // [RAD], equivalent to 15 degrees.
+const float ROLL_AUTHORITY = 0.17453; // [RAD], equivalent to 15 degrees.
 const float MIN_ROLL = -ROLL_AUTHORITY;
 const float MAX_ROLL = ROLL_AUTHORITY;
 
-const float PITCH_AUTHORITY = 0.26180; // [RAD], equivalent to 15 degrees.
+const float PITCH_AUTHORITY = 0.17453; // [RAD], equivalent to 15 degrees.
 const float MIN_PITCH = -PITCH_AUTHORITY;
 const float MAX_PITCH = PITCH_AUTHORITY;
 
-const float YAW_RATE_AUTHORITY = 0.52360; // [RAD / s], equivalent to 30 deg / s.
+const float YAW_RATE_AUTHORITY = 0.34907; // [RAD / s], equivalent to 30 deg / s.
 const float MIN_YAW_RATE = -YAW_RATE_AUTHORITY;
 const float MAX_YAW_RATE = YAW_RATE_AUTHORITY;
 
