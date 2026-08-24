@@ -1,7 +1,7 @@
 /*
 BSD 3-Clause License
 
-Copyright (c) 2025, Nishant Kumar, Jai Willems
+Copyright (c) 2026, Nishant Kumar, Jai Willems
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
@@ -33,6 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Configuration.h"
 #include "Types.h"
 #include "Motor.h"
+#include "Settings.h"
 
 class Drone {
     public:
@@ -51,13 +52,4 @@ class Drone {
         Motor _motorTwo;
         Motor _motorThree;
         Motor _motorFour;
-        int mixFlightInputs(
-            bool bow,
-            bool port,
-            FlightInputs flightInputs
-        );
-        bool isMotorCcw(
-            bool bow,
-            bool port
-        );
 };

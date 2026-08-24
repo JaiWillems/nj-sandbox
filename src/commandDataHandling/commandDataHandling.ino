@@ -62,7 +62,7 @@ void setup() {
 }
 
 void loop() {
-    if (receiver.available()) {
+    while (receiver.available()) {
         DataPacket data = receiver.read();
         
         uartCommunications.transmit(
@@ -80,7 +80,7 @@ void loop() {
                 RAPID_NAV_LIGHTS_ON_DURATION_MS
             );
         }
-    }
 
-    delay(1000 / COMMANDING_FREQUENCY_HZ);
+        delay(1000 / COMMANDING_FREQUENCY_HZ);
+    }
 }

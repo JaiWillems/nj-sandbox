@@ -33,16 +33,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define Types_h
 
 struct ControlSignals {
-    int16_t throttle;
-    int16_t yaw;
-    int16_t pitch;
-    int16_t roll;
+    int16_t LX; // Altitude rate.
+    int16_t LY; // Yaw rate.
+    int16_t RX; // Pitch.
+    int16_t RY; // Roll.
 };
 
-// Keep memory small to reduce communication latencies.
-struct FlightInputs {
-    float throttle;
-    float yaw;
+struct UserInputs {
+    float altitudeRate;
+    float yawRate;
     float pitch;
     float roll;
 };

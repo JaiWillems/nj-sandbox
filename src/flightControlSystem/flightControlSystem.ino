@@ -1,7 +1,7 @@
 /*
 BSD 3-Clause License
 
-Copyright (c) 2025, Nishant Kumar, Jai Willems
+Copyright (c) 2026, Nishant Kumar, Jai Willems
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
@@ -38,16 +38,23 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "FlightController.h"
 #include "Drone.h"
 
-UartCommunications<DroneState, FlightInputs> uartCommunications;
+UartCommunications<DataPacket> uartCommunications;
 MPU9250 mpu;
 Ultrasonic altimeter;
 FlightController flightController;
 Drone drone;
 
-FlightInputs userInputs;
+UserInputs userInputs;
+bool droneState = false;
 
 void setup() {
-    Serial.begin(9600);
+    drone.setup(
+        MOTOR_ONE_PIN,
+        MOTOR_TWO_PIN,
+        MOTOR_THREE_PIN,
+        MOTOR_FOUR_PIN
+    );
+    drone.arm();
     
     uartCommunications.setup(
         UART_RX_PIN,
@@ -69,62 +76,53 @@ void setup() {
     altimeter.calibrate();
 
     flightController.begin();
-
-    drone.setup(
-        MOTOR_ONE_PIN,
-        MOTOR_TWO_PIN,
-        MOTOR_THREE_PIN,
-        MOTOR_FOUR_PIN
-    );
 }
 
-void loop() {
+    void loop() {
     if (uartCommunications.available()) {
-        userInputs = uartCommunications.receive();
+        DataPacket data = uartCommunications.receive();
+
+        userInputs.altitudeRate = data.altitudeRate / 100.0f;
+        userInputs.roll = data.roll / 100.0f;
+        userInputs.pitch = data.pitch / 100.0f;
+        userInputs.yawRate = data.yawRate / 100.0f;
+        
+        droneState = data.droneState;
     }
 
-    StateEstimation state = getStateEstimation();
+    if (droneState) {
+        StateEstimation state = getStateEstimation();
 
-    Serial.print(state.yaw);
-    Serial.print("\t");
-    Serial.print(state.yawRate);
-    Serial.print("\t");
-    Serial.print(state.pitch);
-    Serial.print("\t");
-    Serial.print(state.pitchRate);
-    Serial.print("\t");
-    Serial.print(state.roll);
-    Serial.print("\t");
-    Serial.print(state.rollRate);
-    Serial.print("\t");
-    Serial.println(state.altitude);
+        FlightInputs flightInputs = flightController.compute(
+            userInputs,
+            state
+        );
 
-    FlightInputs flightInputs = flightController.compute(
-        userInputs,
-        state
-    );
-
-    drone.sendFlightInputs(
-        flightInputs
-    );
+        drone.sendFlightInputs(
+            flightInputs
+        );
+    } else {
+        drone.sendFlightInputs({});
+    }
 
     // TODO: Consider removing the delay.
     delay(1000 / COMMANDING_FREQUENCY_HZ);
 }
 
 StateEstimation getStateEstimation() {
+    Vector2D altitude = altimeter.getDistanceVelocity();
     Attitude attitude = mpu.getYawPitchRoll();
     Vector3D gyroscope = mpu.readGyroscope();
-    float altitude = altimeter.getCalibratedDistance();
 
     StateEstimation state;
-    state.yaw = attitude.yaw;
-    state.yawRate = gyroscope.z;
-    state.pitch = attitude.pitch;
-    state.pitchRate = gyroscope.y;
-    state.roll = attitude.roll;
-    state.rollRate = gyroscope.x;
-    state.altitude = altitude;
+    state.altitude = altitude.x;
+    state.altitudeRate = altitude.y;
+    state.roll = DEG_TO_RAD * attitude.roll;
+    state.rollRate = DEG_TO_RAD * gyroscope.x;
+    state.pitch = DEG_TO_RAD * attitude.pitch;
+    state.pitchRate = DEG_TO_RAD * gyroscope.y;
+    state.yaw = DEG_TO_RAD * attitude.yaw;
+    state.yawRate = DEG_TO_RAD * gyroscope.z;
 
     return state;
 };

@@ -29,61 +29,74 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef Settings_h
-#define Settings_h
+#include "PidController.h"
 
-#include <MPU9250.h>
-#include "Configuration.h"
+void PidController::initialize(
+	float kp,
+	float ki,
+	float kd
+) {
+	_kp = kp;
+	_ki = ki;
+	_kd = kd;
+}
 
-// *** ENVIRONMENTAL ***
+void PidController::begin() {
+	_previousTime = millis();
+}
 
-const float GRAVITATIONAL_ACCELERATION = 9.81; // [m / s^2].
+float PidController::compute(
+	float reference,
+	float measured
+) {
+	float deltaTime = getDeltaTime();
 
-// *** MAGNETOMETER OFFSETS ***
+	float currentError = reference - measured;
+	_integralError = _integralError +
+		currentError * deltaTime;
+	float derivativeError = (currentError -
+		_previousError) / deltaTime;
 
-static Vector3D HARD_IRON_OFFSET = {
-    .x = 26.01,
-    .y = 13.85,
-    .z = 10.03
-};
+	_previousError = currentError;
 
-static Matrix3x3 SOFT_IRON_OFFSET = {
-    .m11 = 1.004,
-    .m12 = 0.010,
-    .m13 = -0.002,
-    .m21 = 0.010,
-    .m22 = 1.011,
-    .m23 = -0.001,
-    .m31 = -0.002,
-    .m32 = -0.001,
-    .m33 = 0.984
-};
+	return getInput(
+    	currentError,
+    	_integralError,
+    	derivativeError
+  	);
+}
 
-// *** FLIGHT CONTROLLER PID GAINS ***
+float PidController::getInput(
+	float error,
+	float integralError,
+	float derivativeError
+) {
+	return _kp * error + _ki * integralError + _kd * derivativeError;
+}
 
-const float ALTITUDE_RATE_KP = 50;
-const float ALTITUDE_RATE_KI = 50;
-const float ALTITUDE_RATE_KD = 0;
+float PidController::compute(
+	float reference,
+	float measured,
+	float measuredDerivative
+) {
+	float deltaTime = getDeltaTime();
 
-const float YAW_RATE_KP = 0.3;
-const float YAW_RATE_KI = 0.01;
-const float YAW_RATE_KD = 0;
+	float currentError = reference - measured;
+	_integralError = _integralError +
+		currentError * deltaTime;
 
-const float PITCH_KP = 10;
-const float PITCH_KI = 0.01;
-const float PITCH_KD = 0.6;
+	_previousError = currentError;
 
-const float ROLL_KP = 10;
-const float ROLL_KI = 0.01;
-const float ROLL_KD = 0.6;
+	return getInput(
+		currentError,
+    	_integralError,
+    	measuredDerivative
+  	);
+}
 
-// *** MOTOR PERFORMANCE ***
-
-const float KF = 0.12139; // [N / PWM], motor force coefficient.
-const float KM = 0.00208; // [Nm / PWM], motor torque coefficient.
-
-// *** GENERAL ***
-
-const uint8_t COMMANDING_FREQUENCY_HZ = 100;
-
-#endif
+float PidController::getDeltaTime() {
+  	float currentTime = millis();
+  	float deltaTime = (currentTime - _previousTime) / 1000;
+  	_previousTime = currentTime;
+  	return deltaTime;
+}

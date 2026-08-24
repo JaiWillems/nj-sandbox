@@ -1,7 +1,7 @@
 /*
 BSD 3-Clause License
 
-Copyright (c) 2025, Nishant Kumar, Jai Willems
+Copyright (c) 2026, Nishant Kumar, Jai Willems
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
@@ -31,8 +31,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "Motor.h"
 
+const uint8_t MIN_PWM_DUTY_CYCLE = 0;
+const uint8_t MAX_PWM_DUTY_CYCLE = 100;
 const uint16_t MIN_SERVO_INPUT = 1000;
 const uint16_t MAX_SERVO_INPUT = 2000;
+const uint8_t SCALING_FACTOR = 10;
 const uint16_t OFFSET = 1000;
 
 void Motor::attach(
@@ -52,13 +55,29 @@ void Motor::arm() {
 }
 
 void Motor::setSpeed(
-	uint16_t input
+	int16_t pwmDutyCycle
 ) {
 	_motor.write(
-		constrain(
-			input + OFFSET,
-			MIN_SERVO_INPUT,
-			MAX_SERVO_INPUT
+		convertPwmToServoInputs(
+			validatePwmDutyCycle(
+				pwmDutyCycle
+			)
 		)
 	);
+}
+
+uint8_t Motor::validatePwmDutyCycle(
+	int16_t pwmDutyCycle
+) {
+	return constrain(
+		pwmDutyCycle,
+		MIN_PWM_DUTY_CYCLE,
+		MAX_PWM_DUTY_CYCLE
+	);
+}
+
+uint16_t Motor::convertPwmToServoInputs(
+	uint8_t pwmDutyCycle
+) {
+	return SCALING_FACTOR * pwmDutyCycle + OFFSET;
 }

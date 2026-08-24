@@ -30,7 +30,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include <Arduino.h>
-#include <SoftwareSerial.h>
+#include <NeoSWSerial.h>
 #include "Types.h"
 #include "Configuration.h"
 
@@ -47,5 +47,5 @@ class UartCommunications {
 		);
 		bool available();
 	private:
-		SoftwareSerial* _serial;
+		NeoSWSerial* _serial;
 };

@@ -29,61 +29,36 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef Settings_h
-#define Settings_h
+#include <Arduino.h>
 
-#include <MPU9250.h>
-#include "Configuration.h"
-
-// *** ENVIRONMENTAL ***
-
-const float GRAVITATIONAL_ACCELERATION = 9.81; // [m / s^2].
-
-// *** MAGNETOMETER OFFSETS ***
-
-static Vector3D HARD_IRON_OFFSET = {
-    .x = 26.01,
-    .y = 13.85,
-    .z = 10.03
+class PidController {
+    public:
+        void initialize(
+            float kp,
+            float ki,
+            float kd
+        );
+        void begin();
+        float compute(
+            float reference,
+            float measured
+        );
+        float compute(
+            float reference,
+            float measured,
+            float measuredDerivative
+        );
+    private:
+        float _kp;
+        float _ki;
+        float _kd;
+        float _previousTime;
+        float _previousError;
+        float _integralError;
+        float getDeltaTime();
+        float getInput(
+            float error,
+            float integralError,
+            float derivativeError
+        );
 };
-
-static Matrix3x3 SOFT_IRON_OFFSET = {
-    .m11 = 1.004,
-    .m12 = 0.010,
-    .m13 = -0.002,
-    .m21 = 0.010,
-    .m22 = 1.011,
-    .m23 = -0.001,
-    .m31 = -0.002,
-    .m32 = -0.001,
-    .m33 = 0.984
-};
-
-// *** FLIGHT CONTROLLER PID GAINS ***
-
-const float ALTITUDE_RATE_KP = 50;
-const float ALTITUDE_RATE_KI = 50;
-const float ALTITUDE_RATE_KD = 0;
-
-const float YAW_RATE_KP = 0.3;
-const float YAW_RATE_KI = 0.01;
-const float YAW_RATE_KD = 0;
-
-const float PITCH_KP = 10;
-const float PITCH_KI = 0.01;
-const float PITCH_KD = 0.6;
-
-const float ROLL_KP = 10;
-const float ROLL_KI = 0.01;
-const float ROLL_KD = 0.6;
-
-// *** MOTOR PERFORMANCE ***
-
-const float KF = 0.12139; // [N / PWM], motor force coefficient.
-const float KM = 0.00208; // [Nm / PWM], motor torque coefficient.
-
-// *** GENERAL ***
-
-const uint8_t COMMANDING_FREQUENCY_HZ = 100;
-
-#endif

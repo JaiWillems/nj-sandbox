@@ -66,7 +66,7 @@ void loop() {
         droneState = !droneState;
     }
 
-    FlightInputs flightInputs = cubicMapInputs(
+    UserInputs userInputs = cubicMapInputs(
         calibrateSignals(
             readControlSignals(),
             averageSignals
@@ -74,7 +74,7 @@ void loop() {
     );
 
     transmitter.write(
-        flightInputs,
+        userInputs,
         droneState
     );
 
@@ -102,25 +102,25 @@ ControlSignals readControlSignals() {
 }
 
 ControlSignals calculateAverageSignals() {
-    uint16_t throttle = 0;
-    uint16_t yaw = 0;
-    uint16_t pitch = 0;
-    uint16_t roll = 0;
+    uint16_t lx = 0;
+    uint16_t ly = 0;
+    uint16_t rx = 0;
+    uint16_t ry = 0;
 
     for (int i = 0; i < CALIBRATION_ITERATIONS; i ++) {
         ControlSignals signals = readControlSignals();
 
-        throttle += signals.throttle;
-        yaw += signals.yaw;
-        pitch += signals.pitch;
-        roll += signals.roll;
+        lx += signals.LX;
+        ly += signals.LY;
+        rx += signals.RX;
+        ry += signals.RY;
     }
     
     return {
-        throttle / CALIBRATION_ITERATIONS,
-        yaw / CALIBRATION_ITERATIONS,
-        pitch / CALIBRATION_ITERATIONS,
-        roll / CALIBRATION_ITERATIONS
+        lx / CALIBRATION_ITERATIONS,
+        ly / CALIBRATION_ITERATIONS,
+        rx / CALIBRATION_ITERATIONS,
+        ry / CALIBRATION_ITERATIONS
     };
 }
 
@@ -130,20 +130,20 @@ ControlSignals calibrateSignals(
 ) {
     return {
         calibrateSignal(
-            rawSignals.throttle,
-            averageSignals.throttle
+            rawSignals.LX,
+            averageSignals.LX
         ),
         calibrateSignal(
-            rawSignals.yaw,
-            averageSignals.yaw
+            rawSignals.LY,
+            averageSignals.LY
         ),
         calibrateSignal(
-            rawSignals.pitch,
-            averageSignals.pitch
+            rawSignals.RX,
+            averageSignals.RX
         ),
         calibrateSignal(
-            rawSignals.roll,
-            averageSignals.roll
+            rawSignals.RY,
+            averageSignals.RY
         )
     };
 }
@@ -183,27 +183,27 @@ int16_t linearMap(
 }
 
 
-FlightInputs cubicMapInputs(
+UserInputs cubicMapInputs(
     ControlSignals controlSignals
 ) {
     return {
         cubicMapInput(
-            controlSignals.throttle,
+            controlSignals.LX,
             MAX_Z_DOT,
             MIN_Z_DOT
         ),
         cubicMapInput(
-            controlSignals.yaw,
+            controlSignals.LY,
             MIN_YAW_RATE,
             MAX_YAW_RATE
         ),
         cubicMapInput(
-            controlSignals.pitch,
-            MIN_PITCH,
-            MAX_PITCH
+            controlSignals.RX,
+            MAX_PITCH,
+            MIN_PITCH
         ),
         cubicMapInput(
-            controlSignals.roll,
+            controlSignals.RY,
             MAX_ROLL,
             MIN_ROLL
         )

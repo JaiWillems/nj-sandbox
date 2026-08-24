@@ -44,7 +44,9 @@ void Receiver::setup(
     );
     _receiver->begin();
     _receiver->openReadingPipe(0, readAddress);
-    _receiver->setPALevel(RF24_PA_MIN);
+    _receiver->setDataRate(RF24_2MBPS);
+    _receiver->setChannel(124);
+    _receiver->setPALevel(RF24_PA_MAX);
     _receiver->startListening();
 }
 

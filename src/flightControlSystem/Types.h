@@ -1,7 +1,7 @@
 /*
 BSD 3-Clause License
 
-Copyright (c) 2025, Nishant Kumar, Jai Willems
+Copyright (c) 2026, Nishant Kumar, Jai Willems
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
@@ -32,28 +32,43 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef Types_h
 #define Types_h
 
-enum DroneState {
-   OFF = 0,
-   SETUP = 1,
-   READY = 2
+// Keep memory small to reduce communication latencies.
+struct DataPacket {
+   int8_t altitudeRate;
+   int8_t yawRate;
+   int8_t pitch;
+   int8_t roll;
+   int8_t droneState;
 };
 
-// Keep memory small to reduce communication latencies.
+struct UserInputs {
+   float altitudeRate;
+   float roll;
+   float pitch;
+   float yawRate;
+};
+
 struct FlightInputs {
-	int16_t throttle;
-	int8_t yaw;
-	int8_t pitch;
-	int8_t roll;
+	float U1;
+	float U2;
+	float U3;
+	float U4;
+};
+
+struct Vector2D {
+   float x;
+   float y;
 };
 
 struct StateEstimation {
-   float yaw;
-   float yawRate;
-   float pitch;
-   float pitchRate;
+   float altitude;
+   float altitudeRate;
    float roll;
    float rollRate;
-   float altitude;
+   float pitch;
+   float pitchRate;
+   float yaw;
+   float yawRate;
 };
 
 #endif

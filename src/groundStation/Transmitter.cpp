@@ -44,27 +44,29 @@ void Transmitter::setup(
     );
     _transmitter->begin();
     _transmitter->openWritingPipe(writeAddress);
-    _transmitter->setPALevel(RF24_PA_MIN);
+    _transmitter->setDataRate(RF24_2MBPS);
+    _transmitter->setChannel(124);
+    _transmitter->setPALevel(RF24_PA_MAX);
     _transmitter->stopListening();
 }
 
 void Transmitter::write(
-    FlightInputs flightInputs,
+    UserInputs userInputs,
     bool droneState
 ) {
     struct DataPackage {
-        int8_t throttle;
-        int8_t yaw;
+        int8_t altitudeRate;
+        int8_t yawRate;
         int8_t pitch;
         int8_t roll;
         int8_t droneState;
     };
 
     DataPackage dataPackage = {
-        100 * flightInputs.throttle,
-        100 * flightInputs.yaw,
-        100 * flightInputs.pitch,
-        100 * flightInputs.roll,
+        100 * userInputs.altitudeRate,
+        100 * userInputs.yawRate,
+        100 * userInputs.pitch,
+        100 * userInputs.roll,
         droneState
     };
 
