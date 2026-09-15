@@ -37,6 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Ultrasonic.h"
 #include "FlightController.h"
 #include "Drone.h"
+#include "MovingAverage.h"
 
 UartCommunications<DataPacket> uartCommunications;
 MPU9250 mpu;
@@ -46,6 +47,15 @@ Drone drone;
 
 UserInputs userInputs;
 bool droneState = false;
+
+MovingAverage altitudeAverage;
+MovingAverage altitudeRateAverage;
+MovingAverage rollAverage;
+MovingAverage rollRateAverage;
+MovingAverage pitchAverage;
+MovingAverage pitchRateAverage;
+MovingAverage yawAverage;
+MovingAverage yawRateAverage;
 
 void setup() {
     drone.setup(
@@ -114,15 +124,24 @@ StateEstimation getStateEstimation() {
     Attitude attitude = mpu.getYawPitchRoll();
     Vector3D gyroscope = mpu.readGyroscope();
 
+    altitudeAverage.newValue(altitude.x);
+    altitudeRateAverage.newValue(altitude.y);
+    rollAverage.newValue(DEG_TO_RAD * attitude.roll);
+    rollRateAverage.newValue(DEG_TO_RAD * gyroscope.x);
+    pitchAverage.newValue(DEG_TO_RAD * attitude.pitch);
+    pitchRateAverage.newValue(DEG_TO_RAD * gyroscope.y);
+    yawAverage.newValue(DEG_TO_RAD * attitude.yaw);
+    yawRateAverage.newValue(DEG_TO_RAD * gyroscope.z);
+
     StateEstimation state;
-    state.altitude = altitude.x;
-    state.altitudeRate = altitude.y;
-    state.roll = DEG_TO_RAD * attitude.roll;
-    state.rollRate = DEG_TO_RAD * gyroscope.x;
-    state.pitch = DEG_TO_RAD * attitude.pitch;
-    state.pitchRate = DEG_TO_RAD * gyroscope.y;
-    state.yaw = DEG_TO_RAD * attitude.yaw;
-    state.yawRate = DEG_TO_RAD * gyroscope.z;
+    state.altitude = altitudeAverage.getAverage();
+    state.altitudeRate = altitudeRateAverage.getAverage();
+    state.roll = rollAverage.getAverage();
+    state.rollRate = rollRateAverage.getAverage();
+    state.pitch = pitchAverage.getAverage();
+    state.pitchRate = pitchRateAverage.getAverage();
+    state.yaw = yawAverage.getAverage();
+    state.yawRate = yawRateAverage.getAverage();
 
     return state;
 };
