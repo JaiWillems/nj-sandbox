@@ -20,7 +20,7 @@ TODO: Photos of the finished build, a hover video, CAD render.
 
 # Overview
 
-TODO: What we set out to build and the constraints we chose (fully custom aircframe, no off-the-shelf flight controller, arduino class hardware, all control code written from scratch.
+The Spyder drone is an interest project to explore mechatronic concepts applied to aerial systems. The goal was to develop a quadrotor capapable of controlled flight with extensibility for capable payloads including autonomous operations. To align with this learning objective, the platform was developed from the ground up with a fully custom airframe, bespoke controller design and implementation, and arduino class hardware. The result is a crude implementation with personality, quirks, and bruises.
 
 # System Architecture
 
