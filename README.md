@@ -1,4 +1,4 @@
-# <a href="https://github.com/JaiWillems/nj-sandbox"><img alt="Spyder" src="/branding/logoV2/fulllogo_transparent_nobuffer.png" height="150"></a>
+# <a href="https://github.com/JaiWillems/nj-sandbox"><img alt="Spyder" src="/branding/logoV2/fulllogo_nobuffer.png" height="150"></a>
 
 The Spyder drone, developed by [Nishant Kumar](https://github.com/nishantkumar201) and [Jai Willems](https://github.com/JaiWillems), is an x-configuration quad-rotor developed from the ground up, using arduino class sensors and compute.
 
