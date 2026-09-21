@@ -1540,9 +1540,9 @@
 		)
 		(uuid "8904c305-169a-42b5-adca-1d5693425be7")
 	)
-	(text "June 24, 2025\n"
+	(text "September 20, 2026\n"
 		(exclude_from_sim no)
-		(at 214.63 193.04 0)
+		(at 216.408 193.294 0)
 		(effects
 			(font
 				(size 1.27 1.27)
