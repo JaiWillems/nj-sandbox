@@ -1,4 +1,6 @@
-# <a href="https://github.com/JaiWillems/nj-sandbox"><img alt="Spyder" src="/branding/logoV2/fulllogo_nobuffer.png" height="150"></a>
+<div align="center">
+  <img src="/branding/logoV2/fulllogo_nobuffer.png" alt="Spyder Logo">
+</div>
 
 The Spyder drone, developed by [Nishant Kumar](https://github.com/nishantkumar201) and [Jai Willems](https://github.com/JaiWillems), is an x-configuration quad-rotor developed from the ground up, using arduino class sensors and compute.
 
@@ -24,7 +26,23 @@ The Spyder drone is an interest project to explore mechatronic concepts applied 
 
 # System Architecture
 
-TODO: System diagrams including FFBD, SBD, etc.
+A System Block Diagram (SBD) is illustrated in [Figure 1](#fig-sbd) for the Spyder system defining segment and sub-system interactions and interfacing with external systems. The system decomposition is further explored in the System Hierarchy Diagram (SHD) illustrated in [Figure 2](#fig-shd).
+
+<a id="fig-sbd"></a>
+<div align="center">
+  <img src="/design/Systems/System Block Diagram.svg" alt="System Block Diagram">
+  <br>
+  <em>Figure 1: System Block Diagram</em>
+</div>
+
+<br>
+
+<a id="fig-shd"></a>
+<div align="center">
+  <img src="/design/Systems/System Hierarchy Diagram.svg" alt="System Hierarchy Diagram">
+  <br>
+  <em>Figure 2: System Hierarchy Diagram</em>
+</div>
 
 # Hardware
 
@@ -42,7 +60,7 @@ TODO: Electrical schematics.
 
 # Modelling and Control Design
 
-TODO: The quadcopter dynamics, coordinate axes, propellor spin directions, motor naming, control architecture, Simulink modeling. Plant model, limitations (no air resistance), minimal hardware limitations). Show model performance. Perhaps discuss the motor saturation problem.
+TODO: The quadcopter dynamics, coordinate axes, propellor spin directions, motor naming, control architecture, Simulink modeling. Plant model, limitations (no air resistance), minimal hardware limitations. Show model performance. Perhaps discuss the motor saturation problem.
 
 # Motor and Propellor Characterization
 
