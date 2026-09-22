@@ -58,19 +58,22 @@ TODO: The seven parts, design rationale, the artifacts and where to find them (m
 
 The electrical schematics for the Air and Ground Segments are provided in [Figure 3](#fig-as-schematic) and [Figure 4](#fig-gs-schematic), respectively.
 
-<a id="fig-as-schematic"></a>
-<div align="center">
-  <img src="/design/Wiring Diagram/Drone/Spyder Wiring Diagram.svg" alt="Air Segment Electrical Schematic">
-  <br>
-  <em>Figure 3: Air Segment Electrical Schematic</em>
-</div>
-
-<a id="fig-gs-schematic"></a>
-<div align="center">
-  <img src="/design/Wiring Diagram/Ground Station/Ground Station Wiring Diagram.svg" alt="Ground Segment Electrical Schematic">
-  <br>
-  <em>Figure 4: Ground Segment Electrical Schematic</em>
-</div>
+<table border="0">
+  <tr>
+    <a id="fig-as-schematic"></a>
+    <td align="center">
+      <img src="/design/Wiring Diagram/Drone/Spyder Wiring Diagram.svg" alt="Air Segment Electrical Schematic">
+      <br>
+      <em>Figure 3: Air Segment Electrical Schematic</em>
+    </td>
+    <a id="fig-gs-schematic"></a>
+    <td align="center">
+      <img src="/design/Wiring Diagram/Ground Station/Ground Station Wiring Diagram.svg" alt="Ground Segment Electrical Schematic">
+      <br>
+      <em>Figure 4: Ground Segment Electrical Schematic</em>
+    </td>
+</tr>
+</table>
 
 # Modelling and Control Design
 
