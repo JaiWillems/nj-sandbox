@@ -143,7 +143,18 @@ As seen in [Figure 7](#fig-control-architecture), the controller design uses fou
 
 ## Simulink Implementation and Results
 
-TODO: Show the simulink implementation including the hardware constraints implemented (potentially the equations used). Show model performance. Discuss the motor saturation problem.
+A MATLAB Simulink model was implemented to assist in tuning PID gains and assessing the performance of the control architecture. The high-level control loop is shown in [Figure 8](#fig-simulink-control-loop). The Ground Station block receives digital signals from ground station hardware to support hardware-in-the-loop simulation, and performs signal calibration and mapping, as discussed in [Ground Station Calibration and Signal Mapping](#ground-station-calibration-and-signal-mapping). The Controller block implements the PID controllers as demonstrated in [Controller Architecture](#controller-architecture). Lastly, the Drone Model block implements the physics, detailed in [Quadrotor Dynamics (Plant)](#quadrotor-dynamics-plant), in addition to enforcing smiple hardware limitations. A complete export of the Simulink model is provided in pdf form [here](/design/Photos/Simulink/Complete%20Simulink%20Model.pdf).
+
+<a id="fig-simulink-control-loop"></a>
+<div align="center">
+  <img src="/design/Photos/Simulink/Control Loop.png" alt="Simulink Control Loop">
+  <br>
+  <em>Figure 8: Simulink Control Loop</em>
+</div>
+
+TODO: Discuss simulation results, show tuned performance, and the saturation problem.
+
+The quality of simulation results are impacted by two core sources of error: (1) the quadrotor dynamics model is simplistic and does not account for affects such as air resistence and propellor drag, and (2) hardware constraints, including motor ramp-up time, are not adressed.
 
 # Motor and Propellor Characterization
 
@@ -153,9 +164,9 @@ TODO: Motor thrust test stand, measurement process, analysis calculations to arr
 
 TODO: IMU library, gryo and accel calibration, magnetometer calibration, tilt compensation.
 
-# Ground Station: Calibration and Signal Mapping
+# Ground Station Calibration and Signal Mapping
 
-TODO: Startup center finding (calibration) (documented overflow ceiling), piecewise linear calibration mapping each half, cubic mapping, control authority limits, arm-disarm, packet encoding (why it is kept minimal).
+TODO: Startup center finding (calibration) (documented overflow ceiling), piecewise linear calibration mapping each half, cubic mapping, control authority limits, arm-disarm, packet encoding (why it is kept minimal). Maybe show results for both linear and cubic responses.
 
 # Build and Flash Instructions
 
@@ -163,7 +174,7 @@ TODO: Target boards, required libraries, how to compile each of the three sketch
 
 # Future Work
 
-TODO: New control architecture.
+TODO: New control architecture. Need global reference for robustness against wind. More complete dynamics model. Better represent hardware constraints. Prioritized contoller allocation.
 
 # License, Authors, and Acknowlegements
 
