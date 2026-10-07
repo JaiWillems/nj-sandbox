@@ -132,15 +132,22 @@ The Spyder quadrotor has the parameter values as given in the following table.
 
 ## Controller Architecture
 
-TODO: Control architecture.
+As seen in [Figure 7](#fig-control-architecture), the controller design uses four PID loops to track altitude rate, roll angle, pitch angle, and yaw rate. The PID loops consume error signals computed from reference and state data, and return the control signals ($U_i$ for $i=1,2,3,4$). Preliminary tuning of controller gains were performed using MATLAB's Simulink environment, discussed more in [Simulink Implementation and Results](#simulink-implementation-and-results).
 
-## Simulation Results
+<a id="fig-control-architecture"></a>
+<div align="center">
+  <img src="/design/Photos/Control Architecture.svg" alt="Control Architecture">
+  <br>
+  <em>Figure 7: Control Architecture</em>
+</div>
 
-TODO: Simulink modeling. Show model performance. Discuss the motor saturation problem. Minimal hardware limitations.
+## Simulink Implementation and Results
+
+TODO: Show the simulink implementation including the hardware constraints implemented (potentially the equations used). Show model performance. Discuss the motor saturation problem.
 
 # Motor and Propellor Characterization
 
-TODO: Motor thrust test stand, measurement process, analysis calculations to arrive at final results. Add raw data and show plots with best fit lines and regression models.
+TODO: Motor thrust test stand, measurement process, analysis calculations to arrive at final results. Add raw data and show (MATLAB) plots with best fit lines and regression models.
 
 # State Estimation
 
@@ -153,6 +160,10 @@ TODO: Startup center finding (calibration) (documented overflow ceiling), piecew
 # Build and Flash Instructions
 
 TODO: Target boards, required libraries, how to compile each of the three sketches.
+
+# Future Work
+
+TODO: New control architecture.
 
 # License, Authors, and Acknowlegements
 
