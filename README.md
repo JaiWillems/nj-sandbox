@@ -172,13 +172,13 @@ TODO
 
 ## Pose Estimation
 
-The pose of the quadrotor is characterized by the three quantities of roll ($\phi$), pitch ($\theta$), and yaw ($\psi$), as defined in [Figure 6](#fig-definition), and are calculated by relating quantities between the body and Earth reference frame. Roll and pitch can be calculated from accelerometer data alone. However, deriving a yaw formula resistent to tilt errors requires both accelerometer and magnetometer readings.
+The pose of the quadrotor is characterized by the three quantities of roll ($\phi$), pitch ($\theta$), and yaw ($\psi$), as defined in [Figure 6](#fig-definition), and are calculated by relating quantities between the body and Earth reference frames. Roll and pitch can be calculated from accelerometer data alone. However, deriving a yaw formula resistent to tilt errors requires both accelerometer and magnetometer readings.
 
 The following sections give an overview of the methodology; however, a detailed explanation is given in [Circuit Cellar Issue 265](https://www.nxp.com/docs/en/supporting-information/ARTICLE_REPRINT.pdf).
 
 ### Calculating Roll and Pitch
 
-In the absence of linear accelerations, the MPU9250's accelerometer measures 1g acceleration due to gravity after the rotation in $\psi$, then $\theta$, and lastly $\phi$. When in level flight, the accelerometer measures 1g in the negative Z direction. Relating the gravity vector in both the body frame ($\mathbf{G}$) and Earth frame yield the following relation where $\mathbf{R}_x$, $\mathbf{R}_y$, and $\mathbf{R}_z$ are principle axis rotations.
+In the absence of linear accelerations, the MPU9250's accelerometer measures 1g acceleration due to gravity after the rotation in $\psi$, then $\theta$, and lastly $\phi$. However, when in level flight, the accelerometer measures 1g in the negative Z direction. Relating the gravity vector in both the body frame ($\mathbf{G}$) and Earth frame yield the following relation where $\mathbf{R}_x$, $\mathbf{R}_y$, and $\mathbf{R}_z$ are principle axis rotations.
 
 $$
 \mathbf{G}=\begin{pmatrix}
@@ -226,11 +226,11 @@ $$
 
 ## Angular Velocity
 
-Angular velocities are measured directly from the MPU9250's 3-axis gyroscope. Since the MPU9250 axes align with the quadrotor's body frame, no additional processing is required.
+The angular velocities of roll rate ($\dot\phi$), pitch rate ($\dot\theta$), and yaw rate ($\dot\psi$) are measured directly from the MPU9250's 3-axis gyroscope. No additional processing is required since the MPU9250 axes align with the quadrotor's body frame.
 
 ## Altitude
 
-The HC-SR04 ultrasonic sensor sends an acoustic pulse and measures the duration ($t$) from the time the pulse is emitted and the time it received. The distance ($d$) can then be calculated using the one-way travel time ($t/2$) and the speed of sound ($c$) by the following relation.
+The HC-SR04 ultrasonic sensor sends an acoustic pulse and measures the duration ($t$) from the time the pulse is emitted to the time it received. The distance ($d$) can then be calculated using the one-way travel time ($t/2$) and the speed of sound ($c$) by the following relation.
 
 $$
 d=\frac{ct}{2}
