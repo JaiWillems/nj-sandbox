@@ -162,7 +162,81 @@ TODO: Motor thrust test stand, measurement process, analysis calculations to arr
 
 # State Estimation
 
-TODO: IMU library, gryo and accel calibration, magnetometer calibration, tilt compensation.
+The quadrotor leverages a 9-axis MPU9250 Inertial Measurement Unit (IMU), located at the center of rotation with axes aligned to the quadrotor's body frame; by combining a 3-axis accelerometer, 3-axis gyroscope, and the AK8963 3-axis magnetometer, the sensor is capable of defining pose (roll, pitch, yaw) and angular velocity (roll rate, pitch rate, and yaw rate). To measure altitude, the quadrotor exploits a down-facing HC-SR04 low-cost ultrasonic sensor, which uses acoustic returns and the speed of sound for ranging.
+
+The following sections detail the theory for sensor calibration and state estimation using raw sensor readings from the MP9250 and HC-SR04. Note that the MPU9250 state estimation calculations do not exist in the Spyder source code and are modularized in the home-cooked MPU9250 Arduino library found [here](https://github.com/JaiWillems/MPU9250).
+
+## Calibration
+
+TODO
+
+## Pose Estimation
+
+The pose of the quadrotor is characterized by the three quantities of roll ($\phi$), pitch ($\theta$), and yaw ($\psi$), as defined in [Figure 6](#fig-definition), and are calculated by relating quantities between the body and Earth reference frame. Roll and pitch can be calculated from accelerometer data alone. However, deriving a yaw formula resistent to tilt errors requires both accelerometer and magnetometer readings.
+
+The following sections give an overview of the methodology; however, a detailed explanation is given in [Circuit Cellar Issue 265](https://www.nxp.com/docs/en/supporting-information/ARTICLE_REPRINT.pdf).
+
+### Calculating Roll and Pitch
+
+In the absence of linear accelerations, the MPU9250's accelerometer measures 1g acceleration due to gravity after the rotation in $\psi$, then $\theta$, and lastly $\phi$. When in level flight, the accelerometer measures 1g in the negative Z direction. Relating the gravity vector in both the body frame ($\mathbf{G}$) and Earth frame yield the following relation where $\mathbf{R}_x$, $\mathbf{R}_y$, and $\mathbf{R}_z$ are principle axis rotations.
+
+$$
+\mathbf{G}=\begin{pmatrix}
+G_x\\
+G_y\\
+G_z\\
+\end{pmatrix}=\mathbf{R}_x(\phi)\mathbf{R}_y(\theta)\mathbf{R}_z(\psi)\begin{pmatrix}
+0\\
+0\\
+1\\
+\end{pmatrix}
+$$
+
+The above system of equations can then be expanded and solved to gain relations for $\phi$ and $\theta$ in terms of $\mathbf{G}$.
+
+$$
+\phi=\tan^{-1}\left(\frac{G_y}{G_z}\right)
+$$
+
+$$
+\theta=\tan^{-1}\left(\frac{-G_x}{\sqrt{G_y^2+G_z^2}}\right)
+$$
+
+### Calculating Tilt-Compensated Yaw
+
+In the absence of local magnetic disturbances, the MPU9250's AK8963 magnetormeter measures the Earth's magnetic field after rotaion in $\psi$, then $\theta$, and lastly $\phi$. Relating the magnetic field vector in both the body frame ($\mathbf{B}$) and Earth frame yield the following relation.
+
+$$
+\mathbf{B}=\begin{pmatrix}
+B_x\\
+B_y\\
+B_z\\
+\end{pmatrix}=\mathbf{R}_x(\phi)\mathbf{R}_y(\theta)\mathbf{R}_z(\psi)B_0\begin{pmatrix}
+\cos\delta\\
+0\\
+\sin\delta\\
+\end{pmatrix}
+$$
+
+The above system of equations can then be expanded and solved to gain the relation for $\psi$ in terms of other known quantities.
+
+$$
+\psi=\tan^{-1}\left(\frac{-B_y\cos\phi+B_z\sin\phi}{B_x\cos\theta+B_y\sin\theta\sin\phi+B_z\sin\theta\cos\phi}\right)
+$$
+
+## Angular Velocity
+
+Angular velocities are measured directly from the MPU9250's 3-axis gyroscope. Since the MPU9250 axes align with the quadrotor's body frame, no additional processing is required.
+
+## Altitude
+
+The HC-SR04 ultrasonic sensor sends an acoustic pulse and measures the duration ($t$) from the time the pulse is emitted and the time it received. The distance ($d$) can then be calculated using the one-way travel time ($t/2$) and the speed of sound ($c$) by the following relation.
+
+$$
+d=\frac{ct}{2}
+$$
+
+Due to the down-facing fix of the sensor, the calculated distance is the quadrotor's altitude. It should be noted that rolling or pitching of the quadrotor will cause a reading in surplus of the actual altitude.
 
 # Ground Station Calibration and Signal Mapping
 
